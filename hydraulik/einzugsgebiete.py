@@ -7,7 +7,7 @@ class einzugsgebiete:
     gebietskennung: Optional[str] = None
     gebietsname: Optional[str] = None
     kommentar: Optional[str] = None
-    einwohnerwere: Optional[float] = None
+    einwohner: Optional[float] = None
     einwohnerdichte: Optional[float] = None # E/hages
     trockenwetterkennung: Optional[str] = None
 
