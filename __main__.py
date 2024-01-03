@@ -1,5 +1,6 @@
 from xml_parser import *
 from massen import *
+from hydraulik.forge_inp import create_inp, SimulationMetadata
 import xml.dom.minidom
 import sys
 import codecs
@@ -11,7 +12,7 @@ import codecs
 
 
 def main():
-    file_path = 'input/Stammdaten_ISY.xml'
+    file_path = r"input/Stammdaten_ISY.xml"
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -33,6 +34,9 @@ def main():
         massen_leitung = sum_lengths(leitung_list)
         massen_leitung
         export_leitung(massen_leitung, massen_index_leitung)
+        metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Quagliarliello")
+
+        create_inp(metadata)
         
         sys.exit()
 
