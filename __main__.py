@@ -34,7 +34,7 @@ def main():
         massen_leitung = sum_lengths(leitung_list)
         massen_leitung
         export_leitung(massen_leitung, massen_index_leitung)
-        metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Quagliarliello")
+        metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
 
         create_inp(metadata)
         
