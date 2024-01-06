@@ -32,7 +32,7 @@ class Polygon:
     kante: Kante
 
 @dataclass
-class flaeche:
+class Flaeche:
     flaechennummer: Optional[int] = None
     flaechenbezeichnung: Optional[str] = None
     flaechenart: Optional[int] = None # 1= befestigt ; 2= teilbefestigt ; 3= unbefestigt ; 4= natürlich ; 5= keine Infos
@@ -51,3 +51,17 @@ class flaeche:
     schwerpunktlaufzeit: Optional[float] = None
     kb_wert: Optional[float] = None
     kst_wert: Optional[float] = None
+
+def parse_flaeche(root):
+    # Extract the data into custom classes
+    for flaeche_objekt in root.getElementsByTagName('Flaechen'):
+        flaeche = Flaeche()
+        flaechennummer_element = flaeche_objekt.getElementsByTagName('Flaechennummer')
+        if flaechennummer_element:
+            flaeche.flaechennummer = int(flaechennummer_element[0].firstChild.nodeValue)
+        flaechenbezeichnung_element = flaeche_objekt.getElementsByTagName('Flaechenbezeichnung')
+        if flaechenbezeichnung_element:
+            flaeche.flaechenbezeichnung = str(flaechenbezeichnung_element[0].firstChild.nodeValue)
+        flaechenart_element = flaeche_objekt.getElementsByTagName('Flaechenart')
+        if flaechenart_element: 
+            flaeche.flaechenart = int(flaeche_objekt[0].firstChild.nodeValue)
