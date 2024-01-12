@@ -3,11 +3,12 @@ from typing import Optional
 
 einzugsgebiete_list = []
 @dataclass
-class inzugsgebiete:
+class einzugsgebiete:
     gebietskennung: Optional[str] = None
     gebietsname: Optional[str] = None
     kommentar: Optional[str] = None
     einwohner: Optional[float] = None
+    einwohnerwerte: Optional[str] = None
     einwohnerdichte: Optional[float] = None # E/hages
     trockenwetterkennung: Optional[str] = None
 
@@ -26,7 +27,7 @@ def parse_einzugsgebiete(root):
             einzugsgebiet.kommentar = str(einzugsgebiet_objekt[0].firstChild.nodeValue)
         einwohnerwerte_element = einzugsgebiet_objekt.getElementsByTagName('Einwohnerwerte')
         if einwohnerwerte_element:
-            einzugsgebiet.Einwohnerwerte = float(einzugsgebiet_objekt[0].firstChild.nodeValue)
+            einzugsgebiet.einwohnerwerte = float(einzugsgebiet_objekt[0].firstChild.nodeValue)
         einwohnerdichte_element = einzugsgebiet_objekt.getElementsByTagName('Einwohnerdichte')
         if einwohnerdichte_element:
             einzugsgebiet.einwohnerdichte = float(einzugsgebiet_objekt[0].firstChild.nodeValue)

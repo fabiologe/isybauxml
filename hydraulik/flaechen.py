@@ -53,6 +53,8 @@ class Flaeche:
     schwerpunktlaufzeit: Optional[float] = None
     kb_wert: Optional[float] = None
     kst_wert: Optional[float] = None
+    #custome made attributes:
+    
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
     def add_kante(self, kante: Kante):
@@ -144,7 +146,4 @@ class hoehenlinien:
     polygon: Optional[List[Polygon]] = None
 
     def create_conturs(flaechen_list, netz_punkt):
-         
-         
-
-
+         pass
