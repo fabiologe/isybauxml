@@ -1,0 +1,43 @@
+[TITLE]
+Kohn's Wasserwirtschaft
+Fabio Q.
+2024-01-12
+
+[OPTIONS]
+flow_units           CMS
+infiltration         HORTON
+flow_routing         KINWAVE
+start_date           01/01/2007
+start_time           00:00:00
+report_start_date    01/01/2007
+report_start_time    00:00:00
+end_date             01/01/2007
+end_time             12:00:00
+sweep_start          01/01
+sweep_end            12/31
+dry_days             0
+report_step          00:01:00
+wet_step             00:01:00
+dry_step             01:00:00
+routing_step         0:01:00
+allow_ponding        NO
+inertial_damping     PARTIAL
+variable_step        0.75
+lengthening_step     0
+min_surfarea         0
+normal_flow_limited  SLOPE
+skip_steady_state    NO
+force_main_equation  H-W
+link_offsets         DEPTH
+min_slope            0
+
+[EVAPORATION]
+;;Type       Parameters
+;;---------- ----------
+CONSTANT   0.0
+
+[RAINGAGES]
+;;               Rain      Time   Snow   Data
+;;Name           Type      Intrvl Catch  Source
+;;-------------- --------- ------ ------ ----------
+RainGage        INTENSITY 0:05   1.0    TIMESERIES 2 - y r
