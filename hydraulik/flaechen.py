@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List
-
 flaechen_list = []
+
 flaechen_punkt = []
 @dataclass
 class Punkt:
@@ -54,7 +54,8 @@ class Flaeche:
     kb_wert: Optional[float] = None
     kst_wert: Optional[float] = None
     #custome made attributes:
-    
+    vertices: Optional[List] = None
+    nodes: Optional[List] = None
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
     def add_kante(self, kante: Kante):
