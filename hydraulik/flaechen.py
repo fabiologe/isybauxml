@@ -31,6 +31,7 @@ class Kante:
 @dataclass
 class Polygon:
     kante: Kante
+    points: Optional[List] = None
 
 @dataclass
 class Flaeche:
@@ -47,8 +48,8 @@ class Flaeche:
     abflussbeiwert: Optional[float] = None
     kommentar: Optional[str] = None
     gebietskennung: Optional[str] = None
-    polygon: Optional[List] = None
-    kante: Optional[List] = None    
+    polygon: Optional[Polygon] = None
+    kanten: Optional[List] = None    
     schwerpunkt: Optional[Punkt] = None
     schwerpunktlaufzeit: Optional[float] = None
     kb_wert: Optional[float] = None
@@ -59,7 +60,7 @@ class Flaeche:
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
     def add_kante(self, kante: Kante):
-        self.kante.append(kante)
+        self.kanten.append(kante)
 
 def parse_flaeche(root):
     # Extract the data into custom classes
@@ -106,29 +107,29 @@ def parse_flaeche(root):
             flaeche.gebietskennung = str(flaeche_objekt[0].firstChild.nodeValue)       
         for polygon_element in flaeche_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
+
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                     if kanten_element:
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
                                         x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt = Punkt(x=x, y=y, z=z)
-                                        flaechen_punkt.append(punkt)
+                                        punkt_s= Punkt(x=x, y=y, z=z)
                                         tag = start_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        start = Start(punkt=punkt, tag=tag)
+                                        start = Start(punkt=punkt_s, tag=tag)
 
                                         ende_element = kanten_element.getElementsByTagName('Ende')[0]
                                         x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt = Punkt(x=x, y=y, z=z)
-                                        flaechen_punkt.append(punkt)
+                                        punkt_e = Punkt(x=x, y=y, z=z)
                                         tag = ende_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        ende = Ende(punkt=punkt, tag=tag)
+                                        ende = Ende(punkt=punkt_e, tag=tag)
 
                                         kante = Kante(start=start, ende=ende)
                                         flaeche.add_kante(kante)
                                 polygon = Polygon(kante=kante)
+                                polygon.points.append(punkt_s,punkt_e)
                                 flaeche.add_polygon(polygon)
         schwerpunktlaufzeit_element = flaeche_objekt.getElementsByTagName('Schwerpunktlaufzeit')
         if schwerpunktlaufzeit_element:

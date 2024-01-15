@@ -1,51 +1,110 @@
-from shapely.geometry import Polygon as ShapelyPolygon, LineString
 from hydraulik.flaechen import flaechen_list
 from xml_parser import *
 
-def convert_to_shapely(polygons):
-    # Initialize empty list
-    coordinates = []
+class hydr_point: 
+    def __init__(self,x, y, objekt):
+        self.x = x
+        self.y = y
+        self.objekt = objekt
+def point_in_polygon(point_2D, polygon_2D):
+    num_vertices = len(polygon_2D)
+    x, y = point_2D.x, point_2D.y
+    inside = False
+ 
+    # Store the first point in the polygon and initialize the second point
+    p1 = polygon_2D[0]
+ 
+    # Loop through each edge in the polygon
+    for i in range(1, num_vertices + 1):
+        # Get the next point in the polygon
+        p2 = polygon_2D[i % num_vertices]
+ 
+        # Check if the point is above the minimum y coordinate of the edge
+        if y > min(p1.y, p2.y):
+            # Check if the point is below the maximum y coordinate of the edge
+            if y <= max(p1.y, p2.y):
+                # Check if the point is to the left of the maximum x coordinate of the edge
+                if x <= max(p1.x, p2.x):
+                    # Calculate the x-intersection of the line connecting the point to the edge
+                    x_intersection = (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x
+ 
+                    # Check if the point is on the same line as the edge or to the left of the x-intersection
+                    if p1.x == p2.x or x <= x_intersection:
+                        # Flip the inside flag
+                        inside = not inside
+ 
+        # Store the current point as the first point for the next iteration
+        p1 = p2
+ 
+    # Return the value of the inside flag
+    return inside
+'''
+def get_polygon2D(flaechen_list):
+    for polygon in flaechen_list:
+        num_vertices = len(polygon.points)
+    return num_vertices
 
-    # Loop through each Kante
-    for kante in polygons:  
-        x_start = kante.start.punkt.x
-        y_start = kante.start.punkt.y
-        z_start = kante.start.punkt.z  # not needed for 2D geometry ops, but added for completeness
-        # Add the start coordinates to our list
-        coordinates.append((x_start, y_start, z_start))
+for flaeche in flaechen_list:
+    point = point_2D(fefefefefef)
+    point_in_polygon(point, polygon)'''
+hydr_point_list= []
 
-    # Add the last point (the end of the last Kante) manually
-    x_end = polygons[-1].kante.ende.punkt.x
-    y_end = polygons[-1].kante.ende.punkt.y
-    z_end = polygons[-1].kante.ende.punkt.z
+def zulauf_to_2d(haltung_list):
+    for haltung in haltung_list:
+        print(f"Haltung:{haltung.objektbezeichnung}")
+        num_kanten = len(haltung.kanten)
+        print(f"Anzahl Kanten{num_kanten}")
+        for i in range (0,num_kanten):
+            x= float(haltung.kante[i].punkte[0].x)
+            y= float(haltung.kante[i].punkte[0].y)
+            objekt = haltung.objektbezeichnung
+            
+            point = hydr_point(x,y, objekt)
+            hydr_point_list.append(point)
 
-    # Add the end coordinates to list
-    coordinates.append((x_end, y_end, z_end))
+    return hydro_poly_list
 
-    # Create a LineString
-    shapely_line = LineString(coordinates)
+def ablauf_to_2d(haltung_list):
+    for haltung in haltung_list:
+        print(f"Haltung:{haltung.objektbezeichnung}")
+        num_kanten = len(haltung.kanten)
+        print(f"Anzahl Kanten{num_kanten}")
+        for i in range (0,num_kanten):
+            x= float(haltung.kante[i].punkte[1].x)
+            y= float(haltung.kante[i].punkte[1].y)
+            objekt = haltung.objektbezeichnung
 
-    return shapely_line
+            point = hydr_point(x,y, objekt)
+            hydr_point_list.append(point)
+    return hydro_poly_list
 
+hydro_poly_list =[]
 
+def flaeche_2D(flaechen_list):
+    for flaeche in flaechen_list:
+        print(f"Flaeche:{flaeche.flaechenbezeichnung}")
+        num_kanten = len(flaeche.kanten)
+        print(f"Anzahl Kanten{num_kanten}")
+        for i in range (0,num_kanten):
+            x= float(flaeche.kante[i].punkte[0].x)
+            y= float(flaeche.kante[i].punkte[0].y)
+            objekt = flaeche.flaechenbezeichnung
+            point = hydr_point(x,y, objekt)
+            hydro_poly_list.append(point)
+            x= float(flaeche.kante[i].punkte[1].x)
+            y= float(flaeche.kante[i].punkte[1].y)
+            objekt = flaeche.flaechenbezeichnung
 
-def get_vertices(flaeche_list, haltung_list, leitung_list,convert_to_shapely):
-    for flaeche in flaeche_list:
-        vertices_inside = []
-        
-        ''' Trans. from class object to tuple to work with the shapely lib 
-        neeeds to be done '''
-        # convert the Flache polygon to a Shapely polygon
-        flaeche_polygon = convert_to_shapely(flaeche.polygon)
+            point = hydr_point(x,y, objekt)
+            hydro_poly_list.append(point)
+        return hydro_poly_list
+    
+def check_point_poly():
+    for flaeche in flaechen_list:
+        polygon_2D = flaeche_2D(flaechen_list)
+        hydr_point_list = zulauf_to_2d(haltung_list)
+        hydr_point_list= ablauf_to_2d(haltung_list)
+        for point in hydr_point_list:
+            point_in_polygon(point, polygon_2D)
 
-        for haltung in haltung_list:
-            haltung_polygon = convert_to_shapely(haltung.polygon)
-            if flaeche_polygon.contains(haltung_polygon):
-                vertices_inside.append(haltung)
-
-        for leitung in leitung_list:
-            leitung_polygon = convert_to_shapely(leitung.polygon)
-            if flaeche_polygon.contains(leitung_polygon):
-                vertices_inside.append(leitung)
-
-        flaeche.vertices = vertices_inside
+    
