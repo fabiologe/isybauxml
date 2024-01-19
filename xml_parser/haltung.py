@@ -198,3 +198,6 @@ def parse_haltung(root):
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
     return haltung_list
+
+
+

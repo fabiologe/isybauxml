@@ -122,6 +122,42 @@ class raingage:
         return "\n".join(header + [values])
     
 raingage_data = raingage(name="RainGage", type="INTENSITY", interval="0:05", catch=1.0, source_type="TIMESERIES", source_info="2-yr")
+
+
+@dataclass
+class subcatchments:
+    name: str
+    raingage: str 
+    outletID: str  # name of node or subcatchment that receives runoff from subcatchment. 
+    area: float  # naked area 
+    imperv : float #percent imperviousness of subcatchment /& Befestigungsgrad
+    width: float # charact. width of subcatachment
+    slope: float # gefaelle (DE)
+    clength : Optional[float] = 0 # Bordsteinlaenge ??
+    spack: Optional[str] = None # Name of the Snowpack if needed 
+
+    def get_flaeche(flaechen_list):
+        for flaeche in flaechen_list:
+            subcatchments_sgl = subcatchments(
+                    name = flaeche.objektbezeichnung,
+                    raingage = "RainGage",
+                    outletID= str(flaeche.hydro_vertices[0]),
+                    imperv = float(flaeche.abflussbeiwert),
+                    width= 100, # NOT READY
+                    slope = float(flaeche.neigungsklasse),
+                    clength= 0,
+                    spack= None
+            )
+    
+    def to_subcatchment_string(self):
+        header = [
+            "[SUBCATCHMENTS]",
+            ";;                                                 Total    Pcnt.             Pcnt.    Curb     Snow "  , 
+            ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack " ,
+            ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------"
+        ]
+            
+
 def create_inp(metadata):
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")

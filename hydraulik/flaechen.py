@@ -44,12 +44,12 @@ class Flaeche:
     materialzusatz: Optional[int] = None
     verschmutzungsklasse: Optional[int] = None
     flaechengroesse: Optional[float] = None
-    neigungsklasse: Optional[int] = None
-    abflussbeiwert: Optional[float] = None
+    neigungsklasse: Optional[int] = None    # Need to translate to floats 
+    abflussbeiwert: Optional[float] = 0
     kommentar: Optional[str] = None
     gebietskennung: Optional[str] = None
     polygon: Optional[Polygon] = None
-    kanten: Optional[List] = None    
+    kanten: Optional[List] = None   
     schwerpunkt: Optional[Punkt] = None
     schwerpunktlaufzeit: Optional[float] = None
     kb_wert: Optional[float] = None
@@ -57,10 +57,16 @@ class Flaeche:
     #custome made attributes:
     vertices: Optional[List] = None
     nodes: Optional[List] = None
+    hydro_vertices: Optional[List] = None
+    width: Optional[float] = None
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
+    def calc_width(self, polygon):
+        pass 
+    '''For creating INP needs to calculate the width of the polygon'''
+
 
 def parse_flaeche(root):
     # Extract the data into custom classes
@@ -131,6 +137,11 @@ def parse_flaeche(root):
                                 polygon = Polygon(kante=kante)
                                 polygon.points.append(punkt_s,punkt_e)
                                 flaeche.add_polygon(polygon)
+        for hydro_objekt in flaeche_objekt.getElementsByTagName('HydraulikObjekt'):
+            hydro_vertices = hydro_objekt.getElementsByTagName('Objektbezeichnung')
+            if hydro_vertices:
+                haltung_bez = str(hydro_objekt[0].firstChild.nodeValue)
+                flaeche.hydro_vertices.append(haltung_bez) 
         schwerpunktlaufzeit_element = flaeche_objekt.getElementsByTagName('Schwerpunktlaufzeit')
         if schwerpunktlaufzeit_element:
              flaeche.schwerpunktlaufzeit = float(flaeche_objekt[0].firstChild.nodeValue)

@@ -80,8 +80,7 @@ def ablauf_to_2d(haltung_list):
 
 hydro_poly_list =[]
 
-def flaeche_2D(flaechen_list):
-    for flaeche in flaechen_list:
+def flaeche_2D(flaeche):
         print(f"Flaeche:{flaeche.flaechenbezeichnung}")
         num_kanten = len(flaeche.kanten)
         print(f"Anzahl Kanten{num_kanten}")
@@ -101,7 +100,7 @@ def flaeche_2D(flaechen_list):
     
 def check_point_poly():
     for flaeche in flaechen_list:
-        polygon_2D = flaeche_2D(flaechen_list)
+        polygon_2D = flaeche_2D(flaeche)
         hydr_point_list = zulauf_to_2d(haltung_list)
         hydr_point_list= ablauf_to_2d(haltung_list)
         for point in hydr_point_list:
