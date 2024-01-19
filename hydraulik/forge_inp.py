@@ -1,7 +1,7 @@
 from xml_parser.parse_all import all_lists
 from datetime import datetime
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 class SimulationMetadata:
@@ -156,7 +156,112 @@ class subcatchments:
             ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack " ,
             ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------"
         ]
-            
+
+@dataclass
+class subareas:
+    subcat: str
+    nimp: Optional[float] = 0.5  # Manning impervious sub-area
+    nperv: Optional[float] = 0.5 # Manning pervious sub-area 
+    simp: Optional[float] = 0 # depression storage fo impervious sub-area(mm)
+    sperv: Optional[float] = 0 # depression storage for pervious sub-area (mm)
+    zero: Optional[float] = 0 # % of impervious area with no depression storage 
+    route_to: Union[str("IMPERVIOUS"),str("PERVIOUS", str("OUTLETE"))] = str("OUTLET") 
+    routed: Optional[float] = 100 # % of runoff routed from one type of area to another
+
+@dataclass
+class infiltration_H: #For Horton/ Modified Horton
+    maxrate: Optional[float] = 0 # maximum infiltration rate on Horton curve (in/hr or mm/hr)
+    minrate: Optional[float] = 0 # minimum infiltration rate on Horton curve (in/hr or mm/hr)
+    decay: Optional[float] = 0 # decay rate constant of Horton curve (1/hr).
+    drytime: Optional[float] = 0 # time it takes for fully saturated soil to dry  (days).
+    maxinf: Optional[float] = 0 #maximum infiltration volume possible  (mm)
+
+@dataclass
+class infiltration_G: # Green- Ampt Infiltration
+    psi: Optional[float] = 0 #soil capillary suction (mm)
+    ksat: Optional[float] = None 
+    imd: Optional[float] = None
+
+@dataclass
+class infiltration_C: # Curve-Number Infiltration
+    curveno: Optional[float]
+    ksat: Optional[float]
+    drytime: Optional[float]
+
+@dataclass
+class lid_controls:
+    name: str 
+    type: Optional[str] # Surface , Soil, Pavement, Storage, Drain, Drainment
+
+
+@dataclass
+class lid_usage:
+    subcat: str 
+    lid: str
+    number: int
+    area: Optional[float]
+    width: Optional[float]
+    initsat: Optional[float]
+    fromimp: Optional[float] = 0
+    toperv: Optional[float] = 0
+    drainTo: Optional[str] = None
+
+@dataclass
+class junctions:
+    pass
+
+@dataclass
+class outfalls:
+    pass
+
+@dataclass
+class conduits:
+    pass
+
+@dataclass
+class xsection:
+    pass
+
+@dataclass
+class losses:
+    pass
+
+@dataclass
+class timeseries:
+    pass
+
+@dataclass
+class report:
+    pass
+
+@dataclass
+class tags:
+    pass
+
+@dataclass
+class cooordinates:
+    pass
+
+@dataclass 
+class vertices:
+    pass
+
+@dataclass
+class polygons:
+    pass
+
+@dataclass
+class symbols: 
+    pass 
+
+@dataclass
+class labels:
+    pass 
+
+@dataclass
+class backdrop:
+    pass 
+
 
 def create_inp(metadata):
     with open("model.inp", "w") as f:
