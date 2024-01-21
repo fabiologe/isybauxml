@@ -206,26 +206,239 @@ class lid_usage:
     toperv: Optional[float] = 0
     drainTo: Optional[str] = None
 
+'''MISSING CLASSES: AQUIFIER , GROUNDWATER , GWF , SNOWPACK ---> maybe when there is an project I gonna add them '''
+
 @dataclass
 class junctions:
-    pass
+    name: str
+    elev: float
+    ymax : Optional[float] = 0
+    y0: Optional[float]  = 0
+    ysur: Optional[float]  = 0
+    apond: Optional[float]  = 0 
 
 @dataclass
-class outfalls:
-    pass
+class divider:
+    name: str
+    elev: Optional[float] 
+    divlink: Optional[str] 
+    Qmin: Optional[float] 
+    Dcurve: Optional[str]
+    ht: Optional[float] 
+    cd: Optional[float] 
+    ymax: Optional[float]  = 0
+    y0: Optional[float] = 0
+    ysur: Optional[float] = 0
+    apond: Optional[float] = 0
+
 
 @dataclass
-class conduits:
-    pass
+class outfalls:  #AUSLASS 
+    name: str
+    elev: Optional[float] 
+    stage: Optional[float]
+    tcurve: Optional[str]
+    tseries: Optional[str]
+    gated: Optional[bool] = False
+    routeto: Optional[str]
+
+
+@dataclass
+class storage:
+    name: str
+    elev: Optional[float]
+    ymax: Optional[float]
+    y0: Optional[float]
+    acurve: Optional[str] = 'TABULAR'
+    apond: Optional[float] = 0
+    fevap: Optional[float] = 0
+    psi : Optional[float]
+    ksat: Optional[float]
+    imd : Optional[float]
+    
+@dataclass
+class conduits: #abflusswirksame Verbindungen
+    name: str
+    node1: str
+    node2: str
+    length: float
+    n: Optional[float] #roughness paramater
+    z1: float
+    z2: float
+    Q0: Optional[float] = 0
+    Qmax: float
+@dataclass
+class pumps:
+    name: str
+    node1: str
+    node2: str
+    pcurve: str
+    status: bool = True
+    startup: Optional[float] = 0
+    shutoff: Optional[float] = 0
+@dataclass
+class orifices: #SCHIEBER
+    name: str
+    node1: str
+    node2: str
+    type : str='SIDE'  # can also be BOTTOM
+    offset: Optional[float]
+    cd: Optional[float] 
+    flap:  str='NO'
+    orate: Optional[float] = 0
+@dataclass
+class weirs:   # WEHR
+    name: str
+    node1: str
+    node2: str
+    type: str #TRANSVERSE, SIDEFLOW, V-NOTCH, TRAPEZOIDAL or ROADWAY
+    crestht: Optional[float]
+    cd: float = 3322
+    gated: str = 'NO' #YES if flap gate present to prevent reverse flow, NO if not (default is NO)
+    ec: float= 0
+    cd2: float = 3322
+    sur: str = 'YES' 
+    width: float
+    surface: Optional[str]
+@dataclass
+class outlets: #DROSSEL
+    name: str
+    node1: str
+    node2: str
+    offset: Optional[float]
+    Qcurve: str
+    c1: Optional[float]
+    c2: Optional[float]
+    gated: str= 'NO'
+
 
 @dataclass
 class xsection:
-    pass
+    link: str
+    shape: str
+    geom1: float
+    geom2: Optional[float]
+    geom3: Optional[float]
+    geom4: Optional[float]
+    barrels: int = 1 
+    culvert: Optional[int] = None
+    curve: Optional[str]
+    tsec: Optional[str]
+    
 
 @dataclass
 class losses:
-    pass
+    conduit: str
+    kentry: Optional[float]
+    kexit: Optional[float]
+    kavg: Optional[float]
+    flap: str = 'YES'
+    seepage: float= 0
+@dataclass
+class transects:
+    nleft: float = 0
+    nright: float = 0
+    nchanl: float = 0
+    name: str 
+    nsta: Optional[float]
+    xleft: Optional[float]
+    xright: Optional[float]
+    lfactor: float = 0
+    wfactor: float = 0
+    Eoffset: float = 0
+    elev: Optional[float]
+    station: Optional[float]
+'''NO SUPPORT FOR CONTROLS'''
+@dataclass
+class pollutants:
+    name: str
+    units: str = 'MG/L'
+    crain: Optional[float]
+    cgw: Optional[float]
+    cii: Optional[float]
+    kdecay: Optional[float]
+    sflag: str = 'NO'
 
+@dataclass
+class landuses:
+    name: str
+    sweepintervall: Optional[int]
+    availability: Optional[float]
+    lastsweep: Optional[int]
+
+@dataclass
+class coverages:
+    subcat: str
+    landuse: str
+    percent: float
+
+@dataclass
+class loadings:
+    subcat: str
+    pollut: str
+    initbuildup: float #kg/hectare
+
+@dataclass
+class buildup:
+    landuse: str
+    pollutant: str
+    functype: str
+    c1: str
+    c2: str
+    c3: str
+    perunit: str= 'AREA'
+
+@dataclass
+class washoff:
+    landuse: str
+    pollutant: str
+    functype: str
+    c1: str
+    c2: str
+    sweeprmvl: float
+    bmprmvl: float
+
+@dataclass
+class treatment: 
+    node: str
+    pollut: str
+    result: str= 'R'
+    func: str = 'FLOW'
+
+@dataclass
+class inflow:
+    node: str
+    pollut: str
+    tseries: str
+    type: str = 'CONCEN'
+    mfactor: float = 1.0
+    sfactor: float = 1.0
+    base: float = 0.0
+    pat: Optional[str]
+
+@dataclass
+class dwf: # Trockenwetterabfluss
+    node: str
+    type: str = 'FLOW'
+    base: float 
+
+@dataclass
+class hydrographs:
+    name: str
+    raingage: str
+    month: str = 'ALL'
+    term: str= 'MEDIUM'  #SHORT ; MEDIUM ; LONG
+    R: float
+    T: float
+    K: float = 2.0
+
+@dataclass
+class curves:
+    name: str
+    type: str
+    x_values: List[float]
+    y_values: List[float]
+    
 @dataclass
 class timeseries:
     pass
