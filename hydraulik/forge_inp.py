@@ -136,37 +136,75 @@ class subcatchments:
     clength : Optional[float] = 0 # Bordsteinlaenge ??
     spack: Optional[str] = None # Name of the Snowpack if needed 
 
-    def get_flaeche(flaechen_list):
+    def from_flache(flaechen_list: List) -> List['subcatchments']:
+        subcatchment_list = []
         for flaeche in flaechen_list:
-            subcatchments_sgl = subcatchments(
-                    name = flaeche.objektbezeichnung,
-                    raingage = "RainGage",
-                    outletID= str(flaeche.hydro_vertices[0]),
-                    imperv = float(flaeche.abflussbeiwert),
-                    width= 100, # NOT READY
-                    slope = float(flaeche.neigungsklasse),
-                    clength= 0,
-                    spack= None
-            )
-    
-    def to_subcatchment_string(self):
+            subcatchment_sgl = subcatchments(
+            name = flaeche.flaechenbezeichnung,
+            raingage = "RainGage",
+            outletID = str(flaeche.hydro_vertices[0]) if flaeche.hydro_vertices else "NO_HYDRO",
+            imperv = flaeche.abflussbeiwert,
+            area = flaeche.flaechengroesse,
+            width = flaeche.width or 100, 
+            slope = flaeche.neigungsklasse,
+            clength= 0,
+            spack= None ) 
+            subcatchment_list.append(subcatchment_sgl)
+        return subcatchment_list
+            
+    def to_subcatchment_string(flaechen_list: List, subcatchment_list: List['subcatchments']) -> str:
+        subcatchments.from_flache(flaechen_list)
         header = [
             "[SUBCATCHMENTS]",
-            ";;                                                 Total    Pcnt.             Pcnt.    Curb     Snow "  , 
-            ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack " ,
+            ";;                                                 Total    Pcnt.             Pcnt.    Curb     Snow ",
+            ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack ",
             ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------"
         ]
+        subcatchment_strings = []
+        for subcatchment in subcatchment_list:
+            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8.2f} {subcatchment.imperv:<8.2f} {subcatchment.width:<8.2f} {subcatchment.slope:<8.2f} {subcatchment.clength:<8.2f} {subcatchment.spack or '<none>':<8}"
+            subcatchment_strings.append(data)
+
+        return '\n'.join(header + subcatchment_strings)
 
 @dataclass
 class subareas:
     subcat: str
-    nimp: Optional[float] = 0.5  # Manning impervious sub-area
-    nperv: Optional[float] = 0.5 # Manning pervious sub-area 
-    simp: Optional[float] = 0 # depression storage fo impervious sub-area(mm)
-    sperv: Optional[float] = 0 # depression storage for pervious sub-area (mm)
-    zero: Optional[float] = 0 # % of impervious area with no depression storage 
-    route_to: Union[str("IMPERVIOUS"),str("PERVIOUS", str("OUTLETE"))] = str("OUTLET") 
+    nimp: Optional[float] = 0.015  # Manning impervious sub-area
+    nperv: Optional[float] = 0.24 # Manning pervious sub-area 
+    simp: Optional[float] = 0.06 # depression storage fo impervious sub-area(mm)
+    sperv: Optional[float] = 0.03 # depression storage for pervious sub-area (mm)
+    zero: Optional[float] = 25 # % of impervious area with no depression storage 
+    route_to: str = "OUTLET" 
     routed: Optional[float] = 100 # % of runoff routed from one type of area to another
+
+    def from_subcatchment(flaechen_list: List, subcatchment_list: List) -> List['subareas']:
+        subarea_list = []
+        for subcatchment in subcatchment_list:
+            subarea_sgl = subareas(
+            subcat = subcatchment.name ,
+            nimp = 0.015,
+            nperv = 0.24,
+            simp = 0.06,
+            sperv = 0.03,
+            zero = 25,
+            route_to = "OUTLET",
+            routed = 100) 
+            subarea_list.append(subarea_sgl)
+        return subarea_list
+    
+    def to_subarea_string(subarea_list: List, subcatchment_list : List) -> str:
+        subareas.from_subcatchment(subcatchment_list)
+        header = [
+            "[SUBAREAS]",
+            ";;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted ",
+            ";;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------", 
+        ]
+        subarea_strings = []
+        for subarea in subarea_list:
+            data = f"{subarea.subcat:<16} {subarea.nimp:<16} {subarea.nperv:<16} {subarea.simp:<8.2f} {subarea.sperv:<8.2f} {subarea.zero:<8.2f} {subarea.route_to:<8.2f} {subarea.routed:<8.2f}"
+            subarea_strings.append(data)
+        return '\n'.join(header + subarea_strings)
 
 @dataclass
 class infiltration_H: #For Horton/ Modified Horton
@@ -441,7 +479,11 @@ class curves:
     
 @dataclass
 class timeseries:
-    pass
+    name: str
+    date: str
+    hour: str
+    time: float
+    value: str
 
 @dataclass
 class report:
@@ -476,7 +518,12 @@ class backdrop:
     pass 
 
 
-def create_inp(metadata):
+
+def create_inp(metadata, flaechen_list):
+
+    subcatchment_list = subcatchments.from_flache(flaechen_list)
+    subarea_list = subareas.from_subcatchment(subcatchment_list)
+
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
         f.write(metadata.to_title_string())
@@ -489,3 +536,12 @@ def create_inp(metadata):
         f.write("\n")
         f.write("\n")
         f.write(raingage.to_raingage_string(raingage_data))
+        f.write("\n")
+        f.write("\n")
+        f.write(subcatchments.to_subcatchment_string(subcatchment_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(subareas.to_subarea_string(subarea_list))
+        f.write("\n")
+        f.write("\n")
+        
