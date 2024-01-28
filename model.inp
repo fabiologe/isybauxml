@@ -1,7 +1,7 @@
 [TITLE]
 Kohn's Wasserwirtschaft
 Fabio Q.
-2024-01-12
+2024-01-28
 
 [OPTIONS]
 flow_units           CMS
@@ -41,3 +41,17 @@ CONSTANT   0.0
 ;;Name           Type      Intrvl Catch  Source
 ;;-------------- --------- ------ ------ ----------
 RainGage        INTENSITY 0:05   1.0    TIMESERIES 2 - y r
+
+[SUBCATCHMENTS]
+;;                                                 Total    Pcnt.             Pcnt.    Curb     Snow 
+;;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack 
+;;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------
+pNI6iC4          RainGage         119001           0        0.0      100      1        0       
+119001           RainGage         119001           1.32     0.0      100      1.0      0       
+
+[SUBAREAS]
+;;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted 
+;;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
+pNI6iC4          0.015            0.24             0.06     0.03     25       OUTLET   100     
+119001           0.015            0.24             0.06     0.03     25       OUTLET   100     
+

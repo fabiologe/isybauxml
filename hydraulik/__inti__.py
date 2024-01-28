@@ -1,5 +1,5 @@
 from hydraulik.einzugsgebiete import einzugsgebiete_list
-from hydraulik.flaechen import flaechen_list
+from hydraulik.flaechen import flaechen_list ,parse_flaeche
 from hydraulik.forge_inp import create_inp
 from hydraulik.forge_inp import SimulationMetadata
 
@@ -8,4 +8,5 @@ __all__ = [
     'flaechen_list',
     'create_inp',
     'SimulationMetadata'
+    'parse_flaeche'
 ]

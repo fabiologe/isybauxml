@@ -1,8 +1,15 @@
 from xml_parser.parse_all import all_lists
+from hydraulik.flaechen import flaechen_list
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
+import random
+import string
 
+def generate_unique_id(length=7):
+    characters = string.ascii_letters + string.digits
+    unique_id = ''.join(random.choices(characters, k=length))
+    return unique_id
 
 class SimulationMetadata:
     def __init__(self, title, name):
@@ -134,21 +141,22 @@ class subcatchments:
     width: float # charact. width of subcatachment
     slope: float # gefaelle (DE)
     clength : Optional[float] = 0 # Bordsteinlaenge ??
-    spack: Optional[str] = None # Name of the Snowpack if needed 
+    #spack: Optional[str] = '' # Name of the Snowpack if needed 
 
     def from_flache(flaechen_list: List) -> List['subcatchments']:
         subcatchment_list = []
         for flaeche in flaechen_list:
             subcatchment_sgl = subcatchments(
-            name = flaeche.flaechenbezeichnung,
-            raingage = "RainGage",
-            outletID = str(flaeche.hydro_vertices[0]) if flaeche.hydro_vertices else "NO_HYDRO",
-            imperv = flaeche.abflussbeiwert,
-            area = flaeche.flaechengroesse,
-            width = flaeche.width or 100, 
-            slope = flaeche.neigungsklasse,
-            clength= 0,
-            spack= None ) 
+                name=flaeche.flaechenbezeichnung or str(generate_unique_id()),
+                raingage="RainGage",
+                outletID=str(flaeche.hydro_vertices[0]) or "NO_HYDRO",
+                imperv=float(flaeche.abflussbeiwert) if flaeche.abflussbeiwert is not None else 1,
+                area=float(flaeche.flaechengroesse) if flaeche.flaechengroesse is not None else 0,
+                width=float(flaeche.width) if flaeche.width is not None else 100,
+                slope=float(flaeche.neigungsklasse) if flaeche.neigungsklasse is not None else 1,
+                clength=0,
+                
+        )
             subcatchment_list.append(subcatchment_sgl)
         return subcatchment_list
             
@@ -162,11 +170,11 @@ class subcatchments:
         ]
         subcatchment_strings = []
         for subcatchment in subcatchment_list:
-            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8.2f} {subcatchment.imperv:<8.2f} {subcatchment.width:<8.2f} {subcatchment.slope:<8.2f} {subcatchment.clength:<8.2f} {subcatchment.spack or '<none>':<8}"
+            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8} {subcatchment.imperv:<8} {subcatchment.width:<8} {subcatchment.slope:<8} {subcatchment.clength:<8}"#{subcatchment.spack:<8.2f}
             subcatchment_strings.append(data)
-
         return '\n'.join(header + subcatchment_strings)
-
+        
+        
 @dataclass
 class subareas:
     subcat: str
@@ -178,11 +186,11 @@ class subareas:
     route_to: str = "OUTLET" 
     routed: Optional[float] = 100 # % of runoff routed from one type of area to another
 
-    def from_subcatchment(flaechen_list: List, subcatchment_list: List) -> List['subareas']:
+    def from_subcatchment(subcatchment_list: List) -> List['subareas']:
         subarea_list = []
         for subcatchment in subcatchment_list:
             subarea_sgl = subareas(
-            subcat = subcatchment.name ,
+            subcat = subcatchment.name or str(generate_unique_id()) ,
             nimp = 0.015,
             nperv = 0.24,
             simp = 0.06,
@@ -202,7 +210,7 @@ class subareas:
         ]
         subarea_strings = []
         for subarea in subarea_list:
-            data = f"{subarea.subcat:<16} {subarea.nimp:<16} {subarea.nperv:<16} {subarea.simp:<8.2f} {subarea.sperv:<8.2f} {subarea.zero:<8.2f} {subarea.route_to:<8.2f} {subarea.routed:<8.2f}"
+            data = f"{subarea.subcat:<16} {subarea.nimp:<16} {subarea.nperv:<16} {subarea.simp:<8} {subarea.sperv:<8} {subarea.zero:<8} {subarea.route_to:<8} {subarea.routed:<8}"
             subarea_strings.append(data)
         return '\n'.join(header + subarea_strings)
 
@@ -222,14 +230,14 @@ class infiltration_G: # Green- Ampt Infiltration
 
 @dataclass
 class infiltration_C: # Curve-Number Infiltration
-    curveno: Optional[float]
-    ksat: Optional[float]
-    drytime: Optional[float]
+    curveno: Optional[float] = 0
+    ksat: Optional[float] = 0
+    drytime: Optional[float] = 0
 
 @dataclass
 class lid_controls:
     name: str 
-    type: Optional[str] # Surface , Soil, Pavement, Storage, Drain, Drainment
+    type: Optional[str] = None # Surface , Soil, Pavement, Storage, Drain, Drainment
 
 
 @dataclass
@@ -237,9 +245,9 @@ class lid_usage:
     subcat: str 
     lid: str
     number: int
-    area: Optional[float]
-    width: Optional[float]
-    initsat: Optional[float]
+    area: Optional[float] = 0
+    width: Optional[float] = 0
+    initsat: Optional[float] = 0
     fromimp: Optional[float] = 0
     toperv: Optional[float] = 0
     drainTo: Optional[str] = None
@@ -251,20 +259,20 @@ class junctions:
     name: str
     elev: float
     ymax : Optional[float] = 0
-    y0: Optional[float]  = 0
-    ysur: Optional[float]  = 0
-    apond: Optional[float]  = 0 
+    y0: Optional[float] = 0  
+    ysur: Optional[float] = 0 
+    apond: Optional[float] = 0
 
 @dataclass
 class divider:
     name: str
-    elev: Optional[float] 
-    divlink: Optional[str] 
-    Qmin: Optional[float] 
-    Dcurve: Optional[str]
-    ht: Optional[float] 
-    cd: Optional[float] 
-    ymax: Optional[float]  = 0
+    elev: Optional[float] = 0
+    divlink: Optional[str] = None 
+    Qmin: Optional[float] = 0
+    Dcurve: Optional[str] = None
+    ht: Optional[float] = 0
+    cd: Optional[float] = 0
+    ymax: Optional[float] = 0
     y0: Optional[float] = 0
     ysur: Optional[float] = 0
     apond: Optional[float] = 0
@@ -273,26 +281,26 @@ class divider:
 @dataclass
 class outfalls:  #AUSLASS 
     name: str
-    elev: Optional[float] 
-    stage: Optional[float]
-    tcurve: Optional[str]
-    tseries: Optional[str]
+    elev: Optional[float] = 0
+    stage: Optional[float] = None
+    tcurve: Optional[str] = None
+    tseries: Optional[str] = None
     gated: Optional[bool] = False
-    routeto: Optional[str]
+    routeto: Optional[str] = None
 
 
 @dataclass
 class storage:
     name: str
-    elev: Optional[float]
-    ymax: Optional[float]
-    y0: Optional[float]
+    elev: Optional[float] = 0
+    ymax: Optional[float] = 0
+    y0: Optional[float] = 0
     acurve: Optional[str] = 'TABULAR'
     apond: Optional[float] = 0
     fevap: Optional[float] = 0
-    psi : Optional[float]
-    ksat: Optional[float]
-    imd : Optional[float]
+    psi : Optional[float] = 0
+    ksat: Optional[float] = 0
+    imd : Optional[float] = 0
     
 @dataclass
 class conduits: #abflusswirksame Verbindungen
@@ -300,11 +308,12 @@ class conduits: #abflusswirksame Verbindungen
     node1: str
     node2: str
     length: float
-    n: Optional[float] #roughness paramater
-    z1: float
-    z2: float
+    n: Optional[float] = 0#roughness paramater
+    z1: Optional[float] = 0
+    z2: Optional[float] = 0
     Q0: Optional[float] = 0
-    Qmax: float
+    Qmax: Optional[float] = 0 
+
 @dataclass
 class pumps:
     name: str
@@ -314,14 +323,15 @@ class pumps:
     status: bool = True
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
+
 @dataclass
 class orifices: #SCHIEBER
     name: str
     node1: str
     node2: str
     type : str='SIDE'  # can also be BOTTOM
-    offset: Optional[float]
-    cd: Optional[float] 
+    offset: Optional[float] = 0
+    cd: Optional[float] = 0
     flap:  str='NO'
     orate: Optional[float] = 0
 @dataclass
@@ -330,23 +340,23 @@ class weirs:   # WEHR
     node1: str
     node2: str
     type: str #TRANSVERSE, SIDEFLOW, V-NOTCH, TRAPEZOIDAL or ROADWAY
-    crestht: Optional[float]
+    crestht: Optional[float] = 0
     cd: float = 3322
     gated: str = 'NO' #YES if flap gate present to prevent reverse flow, NO if not (default is NO)
     ec: float= 0
     cd2: float = 3322
     sur: str = 'YES' 
-    width: float
-    surface: Optional[str]
+    width: Optional[float] = 0
+    surface: Optional[str] = None
 @dataclass
 class outlets: #DROSSEL
     name: str
     node1: str
     node2: str
-    offset: Optional[float]
-    Qcurve: str
-    c1: Optional[float]
-    c2: Optional[float]
+    offset: Optional[float] = None
+    Qcurve: Optional[str] = None
+    c1: Optional[float] = 0
+    c2: Optional[float] = 0
     gated: str= 'NO'
 
 
@@ -355,13 +365,13 @@ class xsection:
     link: str
     shape: str
     geom1: float
-    geom2: Optional[float]
-    geom3: Optional[float]
-    geom4: Optional[float]
+    geom2: Optional[float] = 0
+    geom3: Optional[float] = 0
+    geom4: Optional[float] = 0
     barrels: int = 1 
     culvert: Optional[int] = None
-    curve: Optional[str]
-    tsec: Optional[str]
+    curve: Optional[str] = None
+    tsec: Optional[str] = None
     
 
 @dataclass
@@ -374,35 +384,35 @@ class losses:
     seepage: float= 0
 @dataclass
 class transects:
+    name: str 
     nleft: float = 0
     nright: float = 0
     nchanl: float = 0
-    name: str 
-    nsta: Optional[float]
-    xleft: Optional[float]
-    xright: Optional[float]
+    nsta: Optional[float] = 0
+    xleft: Optional[float] = 0
+    xright: Optional[float] = 0
     lfactor: float = 0
     wfactor: float = 0
     Eoffset: float = 0
-    elev: Optional[float]
-    station: Optional[float]
+    elev: Optional[float] = 0
+    station: Optional[float] = 0
 '''NO SUPPORT FOR CONTROLS'''
 @dataclass
 class pollutants:
     name: str
     units: str = 'MG/L'
-    crain: Optional[float]
-    cgw: Optional[float]
-    cii: Optional[float]
-    kdecay: Optional[float]
+    crain: Optional[float] = 0
+    cgw: Optional[float] = 0
+    cii: Optional[float] = 0
+    kdecay: Optional[float] = 0
     sflag: str = 'NO'
 
 @dataclass
 class landuses:
     name: str
-    sweepintervall: Optional[int]
-    availability: Optional[float]
-    lastsweep: Optional[int]
+    sweepintervall: Optional[int] = 0
+    availability: Optional[float] = 0
+    lastsweep: Optional[int]= 0
 
 @dataclass
 class coverages:
@@ -451,14 +461,14 @@ class inflow:
     type: str = 'CONCEN'
     mfactor: float = 1.0
     sfactor: float = 1.0
-    base: float = 0.0
-    pat: Optional[str]
+    base: Optional[float] = 0
+    pat: Optional[str] = None
 
 @dataclass
 class dwf: # Trockenwetterabfluss
     node: str
     type: str = 'FLOW'
-    base: float 
+    base: Optional[float] = 0
 
 @dataclass
 class hydrographs:
@@ -466,8 +476,8 @@ class hydrographs:
     raingage: str
     month: str = 'ALL'
     term: str= 'MEDIUM'  #SHORT ; MEDIUM ; LONG
-    R: float
-    T: float
+    R: Optional[float] = 0
+    T: Optional[float] = 0
     K: float = 2.0
 
 @dataclass
@@ -518,10 +528,10 @@ class backdrop:
     pass 
 
 
-
 def create_inp(metadata, flaechen_list):
 
     subcatchment_list = subcatchments.from_flache(flaechen_list)
+    print(subcatchment_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
 
     with open("model.inp", "w") as f:
@@ -538,10 +548,9 @@ def create_inp(metadata, flaechen_list):
         f.write(raingage.to_raingage_string(raingage_data))
         f.write("\n")
         f.write("\n")
-        f.write(subcatchments.to_subcatchment_string(subcatchment_list))
+        f.write(subcatchments.to_subcatchment_string(flaechen_list, subcatchment_list))
         f.write("\n")
         f.write("\n")
-        f.write(subareas.to_subarea_string(subarea_list))
+        f.write(subareas.to_subarea_string(subarea_list, subcatchment_list))
         f.write("\n")
         f.write("\n")
-        

@@ -13,13 +13,13 @@ class Punkt:
 @dataclass
 class Start:
     punkt: Punkt
-    tag: str
+    tag: Optional[str] = 'EZG'
 
 
 @dataclass
 class Ende:
     punkt: Punkt
-    tag: str
+    tag: Optional[str] = 'EZG'
 
 
 @dataclass
@@ -31,7 +31,7 @@ class Kante:
 @dataclass
 class Polygon:
     kante: Kante
-    points: Optional[List] = None
+    points= []
 
 @dataclass
 class Flaeche:
@@ -48,16 +48,16 @@ class Flaeche:
     abflussbeiwert: Optional[float] = 0
     kommentar: Optional[str] = None
     gebietskennung: Optional[str] = None
-    polygon: Optional[Polygon] = None
-    kanten: Optional[List] = None   
+    polygon = []
+    kanten = [] 
     schwerpunkt: Optional[Punkt] = None
     schwerpunktlaufzeit: Optional[float] = None
     kb_wert: Optional[float] = None
     kst_wert: Optional[float] = None
     #custome made attributes:
-    vertices: Optional[List] = None
-    nodes: Optional[List] = None
-    hydro_vertices: Optional[List] = None
+    vertices= []
+    nodes= []
+    hydro_vertices= []
     width: Optional[float] = None
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
@@ -80,40 +80,39 @@ def parse_flaeche(root):
             flaeche.flaechenbezeichnung = str(flaechenbezeichnung_element[0].firstChild.nodeValue)
         flaechenart_element = flaeche_objekt.getElementsByTagName('Flaechenart')
         if flaechenart_element: 
-            flaeche.flaechenart = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.flaechenart = int(flaechenart_element[0].firstChild.nodeValue)
         flaecheneigenschaften_element = flaeche_objekt.getElementsByTagName('Flaecheneigenschaft')
         if flaecheneigenschaften_element:
-            flaeche.flaecheneigenschaften = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.flaecheneigenschaften = int(flaecheneigenschaften_element[0].firstChild.nodeValue)
         flaechenfunktion_element = flaeche_objekt.getElementsByTagName('Flaechenfunktion')
         if flaechenfunktion_element:
-            flaeche.flaechenfunktion = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.flaechenfunktion = int(flaechenfunktion_element[0].firstChild.nodeValue)
         flaechennutzung_element = flaeche_objekt.getElementsByTagName('Flaechennutzung')
         if flaechennutzung_element:
-            flaeche.flaechennutzung = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.flaechennutzung = int(flaechennutzung_element[0].firstChild.nodeValue)
         materialzusatz_element = flaeche_objekt.getElementsByTagName('Materialzusatz')
         if materialzusatz_element:
-            flaeche.materialzusatz = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.materialzusatz = int(materialzusatz_element[0].firstChild.nodeValue)
         verschmutzungsklasse_element = flaeche_objekt.getElementsByTagName('Verschmutzungsklasse')
         if verschmutzungsklasse_element:
-            flaeche.verschmutzungsklasse = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.verschmutzungsklasse = int(verschmutzungsklasse_element[0].firstChild.nodeValue)
         flaechengroesse_element = flaeche_objekt.getElementsByTagName('Flaechengroesse')
         if flaechengroesse_element:
-            flaeche.flaechengroesse = float(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.flaechengroesse = float(flaechengroesse_element[0].firstChild.nodeValue)
         neigungsklasse_element = flaeche_objekt.getElementsByTagName('Neigungsklasse')
         if neigungsklasse_element:
-            flaeche.neigungsklasse = int(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.neigungsklasse = int(neigungsklasse_element[0].firstChild.nodeValue)
         abflussbeiwert_element = flaeche_objekt.getElementsByTagName('Abflussbeiwert')
         if abflussbeiwert_element:
-            flaeche.abflussbeiwert = float(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.abflussbeiwert = float(abflussbeiwert_element[0].firstChild.nodeValue)
         kommentart_element = flaeche_objekt.getElementsByTagName('Kommentar')
         if kommentart_element:
-            flaeche.kommentar = str(flaeche_objekt[0].firstChild.nodeValue)
+            flaeche.kommentar = str(kommentart_element[0].firstChild.nodeValue)
         gebietskennung_element = flaeche_objekt.getElementsByTagName('Gebietskennung')
         if gebietskennung_element:
-            flaeche.gebietskennung = str(flaeche_objekt[0].firstChild.nodeValue)       
+            flaeche.gebietskennung = str(gebietskennung_element[0].firstChild.nodeValue)       
         for polygon_element in flaeche_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
-
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                     if kanten_element:
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -121,27 +120,29 @@ def parse_flaeche(root):
                                         y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
                                         punkt_s= Punkt(x=x, y=y, z=z)
-                                        tag = start_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        start = Start(punkt=punkt_s, tag=tag)
+                                        
+                                        start = Start(punkt=punkt_s)
 
                                         ende_element = kanten_element.getElementsByTagName('Ende')[0]
                                         x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
                                         punkt_e = Punkt(x=x, y=y, z=z)
-                                        tag = ende_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        ende = Ende(punkt=punkt_e, tag=tag)
+                                       
+                                        ende = Ende(punkt=punkt_e)
 
                                         kante = Kante(start=start, ende=ende)
                                         flaeche.add_kante(kante)
-                                polygon = Polygon(kante=kante)
-                                polygon.points.append(punkt_s,punkt_e)
+                                        polygon= Polygon(kante=kante)
+                                        point_tuple = (punkt_s,punkt_e)
+                                polygon.points.append(point_tuple)
                                 flaeche.add_polygon(polygon)
         for hydro_objekt in flaeche_objekt.getElementsByTagName('HydraulikObjekt'):
-            hydro_vertices = hydro_objekt.getElementsByTagName('Objektbezeichnung')
-            if hydro_vertices:
-                haltung_bez = str(hydro_objekt[0].firstChild.nodeValue)
-                flaeche.hydro_vertices.append(haltung_bez) 
+            if hydro_objekt:
+                hydro_vertices = hydro_objekt.getElementsByTagName('Objektbezeichnung')
+                if hydro_vertices:
+                    haltung_bez = str(hydro_vertices[0].firstChild.nodeValue)
+                    flaeche.hydro_vertices.append(haltung_bez) 
         schwerpunktlaufzeit_element = flaeche_objekt.getElementsByTagName('Schwerpunktlaufzeit')
         if schwerpunktlaufzeit_element:
              flaeche.schwerpunktlaufzeit = float(flaeche_objekt[0].firstChild.nodeValue)
