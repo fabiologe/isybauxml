@@ -1,10 +1,11 @@
 from xml_parser.parse_all import all_lists
-from hydraulik.flaechen import flaechen_list
+from xml_parser.flaechen import flaechen_list
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
 import random
 import string
+
 
 def generate_unique_id(length=7):
     characters = string.ascii_letters + string.digits
@@ -147,7 +148,7 @@ class subcatchments:
         subcatchment_list = []
         for flaeche in flaechen_list:
             subcatchment_sgl = subcatchments(
-                name=flaeche.flaechenbezeichnung or str(generate_unique_id()),
+                name= str(flaeche.objektbezeichnung) if flaeche.objektbezeichnung is not None else str(generate_unique_id()),
                 raingage="RainGage",
                 outletID=str(flaeche.hydro_vertices[0]) or "NO_HYDRO",
                 imperv=float(flaeche.abflussbeiwert) if flaeche.abflussbeiwert is not None else 1,
@@ -190,7 +191,7 @@ class subareas:
         subarea_list = []
         for subcatchment in subcatchment_list:
             subarea_sgl = subareas(
-            subcat = subcatchment.name or str(generate_unique_id()) ,
+            subcat = subcatchment.name ,
             nimp = 0.015,
             nperv = 0.24,
             simp = 0.06,
@@ -206,7 +207,7 @@ class subareas:
         header = [
             "[SUBAREAS]",
             ";;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted ",
-            ";;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------", 
+            ";;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------"
         ]
         subarea_strings = []
         for subarea in subarea_list:
@@ -216,11 +217,37 @@ class subareas:
 
 @dataclass
 class infiltration_H: #For Horton/ Modified Horton
-    maxrate: Optional[float] = 0 # maximum infiltration rate on Horton curve (in/hr or mm/hr)
-    minrate: Optional[float] = 0 # minimum infiltration rate on Horton curve (in/hr or mm/hr)
-    decay: Optional[float] = 0 # decay rate constant of Horton curve (1/hr).
-    drytime: Optional[float] = 0 # time it takes for fully saturated soil to dry  (days).
-    maxinf: Optional[float] = 0 #maximum infiltration volume possible  (mm)
+    subname: str
+    maxrate: Optional[float] = 100 # maximum infiltration rate on Horton curve (in/hr or mm/hr)
+    minrate: Optional[float] = 5 # minimum infiltration rate on Horton curve (in/hr or mm/hr)
+    decay: Optional[float] = 6.5  # decay rate constant of Horton curve (1/hr).
+    drytime: Optional[float] = 7 # time it takes for fully saturated soil to dry  (days).
+    maxinf: Optional[float] =  0 #maximum infiltration volume possible  (mm)
+
+    def from_subcatchment(subcatchment_list: List) -> List['infiltration_H']:
+        infiltration_list = []
+        for subcatchment in subcatchment_list:
+            infiltration_sgl = infiltration_H(
+                subname = str(subcatchment.name),
+                maxrate = 100,
+                minrate= 5,
+                decay= 6.5,
+                drytime= 7,
+                maxinf= 0)
+            infiltration_list.append(infiltration_sgl)
+        return infiltration_list
+    def to_infiltration_string(infiltration_list: List, subcatchment_list: List) -> str:
+        infiltration_H.from_subcatchment(subcatchment_list)
+        header = [
+            "[INFILTRATION]",
+            ";;Subcatchment   MaxRate    MinRate    Decay      DryTime    MaxInfil",
+            ";;-------------- ---------- ---------- ---------- ---------- ----------"
+        ]
+        infiltration_strings = []
+        for infiltration in infiltration_list:
+            data = f"{infiltration.subname:<16} {infiltration.maxrate:<10} {infiltration.minrate:<10} {infiltration.decay:<10} {infiltration.drytime:<10} {infiltration.maxinf:<10}"
+            infiltration_strings.append(data)
+        return '\n'.join(header + infiltration_strings)
 
 @dataclass
 class infiltration_G: # Green- Ampt Infiltration
@@ -531,8 +558,8 @@ class backdrop:
 def create_inp(metadata, flaechen_list):
 
     subcatchment_list = subcatchments.from_flache(flaechen_list)
-    print(subcatchment_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
+    infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
 
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
@@ -554,3 +581,4 @@ def create_inp(metadata, flaechen_list):
         f.write(subareas.to_subarea_string(subarea_list, subcatchment_list))
         f.write("\n")
         f.write("\n")
+        f.write(infiltration_H.to_infiltration_string(infiltration_list, subcatchment_list))

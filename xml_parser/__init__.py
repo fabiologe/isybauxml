@@ -19,10 +19,14 @@ from xml_parser.bauwerk import parse_versickerungsanlage
 from xml_parser.bauwerk import parse_regenwassernutzungsanlage
 from xml_parser.bauwerk import parse_einlaufbauwerk
 from xml_parser.anschlusspunkt import parse_anschlusspunkt
+from xml_parser.flaechen import parse_flaeche
+from xml_parser.einzugsgebiete import parse_einzugsgebiete
 from xml_parser.schacht import schacht_list
 from xml_parser.haltung import haltung_list
 from xml_parser.leitung import leitung_list
 from xml_parser.bauwerk import bauwerke_list
+from xml_parser.flaechen import flaechen_list
+from xml_parser.einzugsgebiete import einzugsgebiete_list
 from xml_parser.anschlusspunkt import anschlusspunkt_list
 from xml_parser.parse_all import parse_all
 from xml_parser.parse_all import all_lists
@@ -51,11 +55,15 @@ __all__ = [
     "parse_regenwassernutzungsanlage",
     "parse_einlaufbauwerk",
     "parse_anschlusspunkt",
+    'parse_flaeche',
+    'parse_einzugsgebiete',
     'schacht_list',
     'haltung_list',
     'leitung_list',
     'bauwerke_list',
     'anschlusspunkt_list',
+    'flaechen_list',
+    'einzugsgebiete_list',
     'parse_all',
     'all_lists'
 ]

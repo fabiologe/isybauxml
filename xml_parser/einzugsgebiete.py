@@ -36,3 +36,4 @@ def parse_einzugsgebiete(root):
             einzugsgebiet.trockenwetterkennung = str(einzugsgebiet_objekt[0].firstChild.nodeValue)
         
         einzugsgebiete_list.append(einzugsgebiet)
+    return einzugsgebiete_list

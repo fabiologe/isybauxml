@@ -2,7 +2,6 @@ from xml_parser import *
 from massen_util.merge_elements import merger, find_status, sum_lengths
 from massen_util.csv_creator import export_leitung, export_to_csv
 from hydraulik.forge_inp import create_inp, SimulationMetadata
-from hydraulik.flaechen import flaechen_list
 import xml.dom.minidom
 import sys
 import codecs
@@ -24,8 +23,6 @@ def main():
         update_haltunghoehe(dom)
         delete_incomplete_points(dom)
         parse_all(root) 
-        
-
         for data_list in all_lists:
             data_list = kill_duplicates(data_list, 'objektbezeichnung')  
         massen_haltung_unique = merger(schacht_list, haltung_list)

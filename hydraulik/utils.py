@@ -1,5 +1,6 @@
-from hydraulik.flaechen import flaechen_list
 from xml_parser import *
+from typing import List
+
 
 class hydr_point: 
     def __init__(self,x, y, objekt):

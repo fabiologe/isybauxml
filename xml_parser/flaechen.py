@@ -36,7 +36,7 @@ class Polygon:
 @dataclass
 class Flaeche:
     flaechennummer: Optional[int] = None
-    flaechenbezeichnung: Optional[str] = None
+    objektbezeichnung: Optional[str] = None
     flaechenart: Optional[int] = None # 1= befestigt ; 2= teilbefestigt ; 3= unbefestigt ; 4= natürlich ; 5= keine Infos
     flaecheneigenschaften: Optional[int] = None
     flaechenfunktion : Optional[int] = None
@@ -67,17 +67,16 @@ class Flaeche:
         pass 
     '''For creating INP needs to calculate the width of the polygon'''
 
-
 def parse_flaeche(root):
     # Extract the data into custom classes
-    for flaeche_objekt in root.getElementsByTagName('Flaechen'):
+    for flaeche_objekt in root.getElementsByTagName('Flaeche'):
         flaeche = Flaeche()
         flaechennummer_element = flaeche_objekt.getElementsByTagName('Flaechennummer')
         if flaechennummer_element:
             flaeche.flaechennummer = int(flaechennummer_element[0].firstChild.nodeValue)
         flaechenbezeichnung_element = flaeche_objekt.getElementsByTagName('Flaechenbezeichnung')
         if flaechenbezeichnung_element:
-            flaeche.flaechenbezeichnung = str(flaechenbezeichnung_element[0].firstChild.nodeValue)
+            flaeche.objektbezeichnung = str(flaechenbezeichnung_element[0].firstChild.nodeValue)
         flaechenart_element = flaeche_objekt.getElementsByTagName('Flaechenart')
         if flaechenart_element: 
             flaeche.flaechenart = int(flaechenart_element[0].firstChild.nodeValue)
@@ -153,6 +152,9 @@ def parse_flaeche(root):
         if kst_wert_element:
              flaeche.kst_wert = float(flaeche_objekt[0].firstChild.nodeValue)
         flaechen_list.append(flaeche)
+    print(f"Number of Flaechen objects: {len(flaechen_list)}")
+    print(f"Number of unique Flaechen: {len(set(f.objektbezeichnung for f in flaechen_list))}")
+    return flaechen_list
 
 @dataclass
 class hoehenlinien:

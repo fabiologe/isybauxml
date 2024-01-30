@@ -1,5 +1,4 @@
 from xml_parser import *
-from hydraulik.flaechen import parse_flaeche
 
 def parse_all(root):
     parse_schacht(root)
@@ -18,7 +17,8 @@ def parse_all(root):
     parse_einlaufbauwerk(root)
     parse_anschlusspunkt(root)
     parse_flaeche(root)
+    parse_einzugsgebiete(root)
 
 all_lists = [
-    schacht_list, haltung_list, leitung_list, bauwerke_list, anschlusspunkt_list,  
+    schacht_list, haltung_list, leitung_list, bauwerke_list, anschlusspunkt_list,  flaechen_list, einzugsgebiete_list
 ]
