@@ -34,7 +34,7 @@ def main():
         massen_leitung
         export_leitung(massen_leitung, massen_index_leitung)
         metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
-        create_inp(metadata, flaechen_list)
+        create_inp(metadata, flaechen_list, schacht_list)
         
         sys.exit()
 

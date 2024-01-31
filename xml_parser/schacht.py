@@ -167,6 +167,10 @@ def parse_schacht(root):
                                     punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                     knoten.add_punkt(punkt)
                                 schacht.add_knoten(knoten)
+                        print(schacht.knoten[0].punkte[0].x)
+                        print(schacht.knoten[0].punkte[0].y)
+                        print(schacht.knoten[0].punkte[0].z)
+                        print(schacht.knoten[0].punkte[1].z)
                         schacht_list.append(schacht)
     # Debug statement to check if schacht_list is empty
     print(f"Number of Schacht objects: {len(schacht_list)}")

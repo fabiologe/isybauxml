@@ -1,5 +1,4 @@
-from xml_parser.parse_all import all_lists
-from xml_parser.flaechen import flaechen_list
+from xml_parser import * 
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -171,7 +170,7 @@ class subcatchments:
         ]
         subcatchment_strings = []
         for subcatchment in subcatchment_list:
-            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8} {subcatchment.imperv:<8} {subcatchment.width:<8} {subcatchment.slope:<8} {subcatchment.clength:<8}"#{subcatchment.spack:<8.2f}
+            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8} {subcatchment.imperv:<8} {subcatchment.width:<8} {subcatchment.slope:<8} {subcatchment.clength:<8}"#{subcatchment.spack:<8}
             subcatchment_strings.append(data)
         return '\n'.join(header + subcatchment_strings)
         
@@ -284,12 +283,37 @@ class lid_usage:
 @dataclass
 class junctions:
     name: str
-    elev: float
-    ymax : Optional[float] = 0
-    y0: Optional[float] = 0  
+    elev: float  #SH
+    ymax : Optional[float] = 0 #DH
+    y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
-    apond: Optional[float] = 0
+    apond: Optional[float] = 0  #ueberflutungsflaeche
 
+    def from_schacht(schacht_list : List) -> List['junctions']:
+        junction_list = []
+        for schacht in schacht_list:
+            junction_sgl = junctions(
+                name = str(schacht.objektbezeichnung),
+                elev= float(schacht.knoten[0].punkte[0].z),
+                y0= float(schacht.knoten[0].punkte[1].z),
+                ysur = 0,
+                apond = 0
+            )
+            junction_list.append(junction_sgl)
+        return junction_list
+    def to_junction_string(junction_list: List) -> str:
+        header = [
+            "[JUNCTIONS]",
+            ";;               Invert     Max.       Init.      Surcharge  Ponded ",
+            ";;Name           Elev.      Depth      Depth      Depth      Area ",
+            ";;-------------- ---------- ---------- ---------- ---------- ----------"
+        ]
+        junction_strings = []
+        for junction in junction_list:
+            print(junction.elev)
+            data = data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
+            junction_strings.append(data)
+        return '\n'.join(header + junction_strings)
 @dataclass
 class divider:
     name: str
@@ -555,11 +579,12 @@ class backdrop:
     pass 
 
 
-def create_inp(metadata, flaechen_list):
+def create_inp(metadata, flaechen_list, schacht_list):
 
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
+    junction_list = junctions.from_schacht(schacht_list)
 
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
@@ -582,3 +607,6 @@ def create_inp(metadata, flaechen_list):
         f.write("\n")
         f.write("\n")
         f.write(infiltration_H.to_infiltration_string(infiltration_list, subcatchment_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(junctions.to_junction_string(junction_list))
