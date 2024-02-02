@@ -2,6 +2,7 @@ from xml_parser.xml_fixer import update_punkthoehe
 from xml_parser.xml_fixer import update_haltunghoehe
 from xml_parser.xml_fixer import delete_incomplete_points
 from xml_parser.xml_fixer import kill_duplicates
+from xml_parser.xml_fixer import analyze_xml
 from xml_parser.schacht import parse_schacht
 from xml_parser.haltung import parse_haltung
 from xml_parser.leitung import parse_leitung
@@ -34,6 +35,7 @@ from xml_parser.parse_all import all_lists
 
 
 __all__ = [
+    "analyze_xml",
     "kill_duplicates",
     "update_punkthoehe",
     "update_haltunghoehe",

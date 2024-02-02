@@ -288,7 +288,6 @@ class junctions:
     y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
-
     def from_schacht(schacht_list : List) -> List['junctions']:
         junction_list = []
         for schacht in schacht_list:

@@ -5,67 +5,84 @@ from typing import List
 
 schacht_list = []
 @dataclass
+class Punkt:
+    x: float
+    y: float
+    z: float
+    def __str__(self):
+        return f"Punkt(x={self.x}, y={self.y}, z={self.z})"
+
+@dataclass
+class Start:
+    punkt: Punkt
+    tag: Optional[str] = 'S'
+
+
+@dataclass
+class Ende:
+    punkt: Punkt
+    tag: Optional[str] = 'S'
+
+
+@dataclass
+class Kante:
+    start: Start
+    ende: Ende
+    
+@dataclass
+class Polygon:
+    kante: Kante
+    points= []
+    
+@dataclass
 class Schacht:
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
+    objektbezeichnung: Optional[str] = 'NOT-GIVEN'
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten = []
+    kanten = []
+    polygon = []
         #Geometrie Schaechtelement:
-        self.aufbauform:Optional[str] = None
-        self.konus: Optional[bool] = None
-        self.laenge_aufbau: Optional[float] = None
-        self.breite_aufbau: Optional[float] = None
-        self.hoehe_aufbau: Optional[float] = None
-        self.material: Optional[str] = None
+    aufbauform:Optional[str] = None
+    konus: Optional[bool] = None
+    laenge_aufbau: Optional[float] = None
+    breite_aufbau: Optional[float] = None
+    hoehe_aufbau: Optional[float] = None
+    material: Optional[str] = None
         #weiters:
-        self.schacht_funktion: Optional[str] = None
-        self.schachttiefe: Optional[float] = None
-        self.einstieghilfe: Optional[bool] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.material_steighilfen: Optional[str] = None
-        self.innenschutz: Optional[str] = None
-        self.anzahl_anschluesse: Optional[int] = None
-        self.uebergabeschacht: Optional[bool] = None
-        self.auflagering: Optional[str] = None
-        self.aufbau: Optional[str] = None
-        self.untere_schachtzone: Optional[str] = None
-        self.unterteil: Optional[str] = None
+    schacht_funktion: Optional[str] = None
+    schachttiefe: Optional[float] = None
+    einstieghilfe: Optional[bool] = None
+    art_einstieghilfe: Optional[str] = None
+    material_steighilfen: Optional[str] = None
+    innenschutz: Optional[str] = None
+    anzahl_anschluesse: Optional[int] = None
+    uebergabeschacht: Optional[bool] = None
+    auflagering: Optional[str] = None
+    aufbau: Optional[str] = None
+    untere_schachtzone: Optional[str] = None
+    unterteil: Optional[str] = None
     def add_knoten(self, punkt):
         self.knoten.append(punkt)
-    def __str__(self):
-        return f"Schachtbezeichnung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nAufbauform: {self.aufbauform}\nSchachtFunktion: {self.schacht_funktion}"
-    def get_coordinates(self) -> List[List[float]]:
-        coordinates = []
-        for knoten in self.knoten:
-            for punkt in knoten.punkte:
-                coordinates.append([punkt.x, punkt.y, punkt.z])
-        return coordinates
-
+    def add_kante(self, kante: Kante):
+        self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+        self.polygon.append(polygon)
 
 @dataclass
 class Knoten:
-    def __init__(self):
-        self.punkte = []
-        self.tag = str()
+    punkte = []
+    tag: Optional[str] = 'S'
     def add_punkt(self, punkt):
         self.punkte.append(punkt)
-    def __str__(self):
-        punkte_str = ", ".join(str(punkt) for punkt in self.punkte)
-        return f"Knoten(punkte=[{punkte_str},tag={self.tag})])"
-@dataclass
-class Punkt:
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-    def __str__(self):
-        return f"Punkt(x={self.x}, y={self.y}, z={self.z})"
+
+
+    
 def parse_schacht(root):
     # Extract the data into custom classes
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
@@ -156,21 +173,43 @@ def parse_schacht(root):
                         #unterteil_element = abwasser_objekt.getElementsByTagName('Unterteil')
                         #if unterteil_element:
                         #    schacht.unterteil = unterteil_element[0].firstChild.nodeValue
+                        for aufbauform_element in aufbauform_element:
+                            if aufbauform_element.firstChild.nodeValue in ['E', 'Z']:
+                                    for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    schacht.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            schacht.add_polygon(polygon)
                         for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                             punkt_elements = knoten_element.getElementsByTagName('Punkt')
                             if punkt_elements:
                                 knoten = Knoten()
                                 for punkt_element in punkt_elements:
-                                    punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                  y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                  z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                    punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                    y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                    z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                     punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                     knoten.add_punkt(punkt)
                                 schacht.add_knoten(knoten)
-                        print(schacht.knoten[0].punkte[0].x)
-                        print(schacht.knoten[0].punkte[0].y)
-                        print(schacht.knoten[0].punkte[0].z)
-                        print(schacht.knoten[0].punkte[1].z)
                         schacht_list.append(schacht)
     # Debug statement to check if schacht_list is empty
     print(f"Number of Schacht objects: {len(schacht_list)}")

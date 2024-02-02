@@ -13,7 +13,7 @@ import codecs
 
 
 def main():
-    file_path = ("input/Model.xml")
+    file_path = ("input/6096 A6.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -22,8 +22,20 @@ def main():
         update_punkthoehe(dom)
         update_haltunghoehe(dom)
         delete_incomplete_points(dom)
+        analysis_results = analyze_xml(root)
+        print(analysis_results)
         parse_all(root) 
-        for data_list in all_lists:
+        print(len(schacht_list))
+
+        '''for schacht in schacht_list:
+            print(len(schacht.knoten[0].punkte))
+            print(schacht.knoten[0].punkte[0].x)
+            print(schacht.knoten[0].punkte[0].y)
+            print(schacht.knoten[0].punkte[0].z)
+            print(schacht.knoten[0].punkte[1].x)
+            print(schacht.knoten[0].punkte[1].y)
+            print(schacht.knoten[0].punkte[1].z)'''
+        '''for data_list in all_lists:
             data_list = kill_duplicates(data_list, 'objektbezeichnung')  
         massen_haltung_unique = merger(schacht_list, haltung_list)
         massen_index_haltung = ['Status','Schacht Nr. oben', 'Schacht Nr. unten', 'Deckelhoehe oben', 'Deckelhoehe unten',
@@ -32,7 +44,7 @@ def main():
         export_to_csv(massen_haltung_unique, massen_index_haltung)
         massen_leitung = sum_lengths(leitung_list)
         massen_leitung
-        export_leitung(massen_leitung, massen_index_leitung)
+        export_leitung(massen_leitung, massen_index_leitung)'''
         metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
         create_inp(metadata, flaechen_list, schacht_list)
         
