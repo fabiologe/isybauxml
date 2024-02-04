@@ -31,10 +31,12 @@ from xml_parser.einzugsgebiete import einzugsgebiete_list
 from xml_parser.anschlusspunkt import anschlusspunkt_list
 from xml_parser.parse_all import parse_all
 from xml_parser.parse_all import all_lists
+from xml_parser.schacht import SchachtManager
 
 
 
 __all__ = [
+    "SchachtManager",
     "analyze_xml",
     "kill_duplicates",
     "update_punkthoehe",

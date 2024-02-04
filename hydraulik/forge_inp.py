@@ -288,18 +288,40 @@ class junctions:
     y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
-    def from_schacht(schacht_list : List) -> List['junctions']:
+    def from_schacht(schacht_list: List) -> List['junctions']:
         junction_list = []
         for schacht in schacht_list:
+            elev = None
+            y0 = None
+            if schacht.knoten:
+                knoten = schacht.knoten[0]
+                print(f"Schacht: {schacht.objektbezeichnung}")
+                print(f"Number of Knoten: {len(schacht.knoten)}")
+                for i, knoten in enumerate(schacht.knoten):
+                    print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        elev = float(punkt.z)
+                        print(f"    Elevation (elev): {elev}")
+                        if len(knoten.punkte) > 1:
+                            y0 = float(knoten.punkte[1].z)
+                            print(f"    Y0 (second Punkt): {y0}")
+                        else:
+                            y0 = 0
+                            print("    Y0 (second Punkt): Not available, using default (0)")
+                    else:
+                        print("    No Punkte in this Knoten")
+
             junction_sgl = junctions(
-                name = str(schacht.objektbezeichnung),
-                elev= float(schacht.knoten[0].punkte[0].z),
-                y0= float(schacht.knoten[0].punkte[1].z),
-                ysur = 0,
-                apond = 0
+                name=str(schacht.objektbezeichnung),
+                elev=elev,
+                y0=y0,
+                ysur=0,
+                apond=0
             )
             junction_list.append(junction_sgl)
         return junction_list
+
     def to_junction_string(junction_list: List) -> str:
         header = [
             "[JUNCTIONS]",
@@ -313,6 +335,7 @@ class junctions:
             data = data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
             junction_strings.append(data)
         return '\n'.join(header + junction_strings)
+    
 @dataclass
 class divider:
     name: str

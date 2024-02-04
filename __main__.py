@@ -13,7 +13,7 @@ import codecs
 
 
 def main():
-    file_path = ("input/6096 A6.xml")
+    file_path = ("input/6096A6.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -26,6 +26,15 @@ def main():
         print(analysis_results)
         parse_all(root) 
         print(len(schacht_list))
+        # Create an instance of SchachtManager
+        schacht_manager = SchachtManager(schacht_list)
+
+# Call the method to retrieve knoten elements and corresponding punkte
+        result = schacht_manager.print_punkte(objektbezeichnung="R1234")
+
+# Print the result
+        print(result)
+
 
         '''for schacht in schacht_list:
             print(len(schacht.knoten[0].punkte))

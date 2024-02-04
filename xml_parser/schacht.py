@@ -1,7 +1,7 @@
 
 from typing import Optional, Union
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
 schacht_list = []
 @dataclass
@@ -11,6 +11,22 @@ class Punkt:
     z: float
     def __str__(self):
         return f"Punkt(x={self.x}, y={self.y}, z={self.z})"
+@dataclass
+class Knoten:
+    obj: Optional[str] = 'NA'
+    tag: Optional[str] = 'S'
+    punkte: List[Punkt] = None
+
+    def add_punkt(self, *punkte: Punkt):
+        if self.punkte is None:
+            self.punkte = []
+        self.punkte.extend(punkte)
+
+    def __hash__(self):
+        return hash(self.obj)
+    
+    def __eq__(self, other):
+        return isinstance(other, Knoten) and self.obj == other.obj
 
 @dataclass
 class Start:
@@ -44,7 +60,7 @@ class Schacht:
     geo_objekttyp: Optional[str]= None
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
-    knoten = []
+    knoten: Optional[List['Knoten']] = None
     kanten = []
     polygon = []
         #Geometrie Schaechtelement:
@@ -67,21 +83,40 @@ class Schacht:
     aufbau: Optional[str] = None
     untere_schachtzone: Optional[str] = None
     unterteil: Optional[str] = None
-    def add_knoten(self, punkt):
-        self.knoten.append(punkt)
+    def add_knoten(self, knoten: 'Knoten'):
+        if self.knoten is None:
+            self.knoten = []
+        self.knoten.append(knoten)
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
     def add_polygon(self, polygon: Polygon):
         self.polygon.append(polygon)
 
 @dataclass
-class Knoten:
-    punkte = []
-    tag: Optional[str] = 'S'
-    def add_punkt(self, punkt):
-        self.punkte.append(punkt)
+class SchachtManager:
+    schacht_list: List[Schacht]
 
-
+    def print_punkte(self, objektbezeichnung: str) -> List[Tuple[Knoten, List[Tuple[float, float, float]]]]:
+        """
+        Get the Knoten elements and corresponding Punkte for a given objektbezeichnung.
+        
+        Args:
+            objektbezeichnung (str): The objektbezeichnung to search for.
+        
+        Returns:
+            List[Tuple[Knoten, List[Tuple[float, float, float]]]]: A list of tuples containing Knoten elements and corresponding Punkte.
+        """
+        result = []
+        for schacht in self.schacht_list:
+            if schacht.objektbezeichnung == objektbezeichnung:
+                knoten_punkte_dict = {}
+                for knoten in schacht.knoten:
+                    knoten_punkte = []
+                    for punkt in knoten.punkte:
+                        knoten_punkte.append((punkt.x, punkt.y, punkt.z))
+                    knoten_punkte_dict[knoten] = knoten_punkte
+                result.append(knoten_punkte_dict)
+        return result
     
 def parse_schacht(root):
     # Extract the data into custom classes
@@ -200,9 +235,10 @@ def parse_schacht(root):
                                                     polygon= Polygon(kante=kante)
                                             schacht.add_polygon(polygon)
                         for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                            knoten = Knoten()
+                            knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                             punkt_elements = knoten_element.getElementsByTagName('Punkt')
                             if punkt_elements:
-                                knoten = Knoten()
                                 for punkt_element in punkt_elements:
                                     punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
                                                     y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
