@@ -26,13 +26,13 @@ def main():
         print(analysis_results)
         parse_all(root) 
         print(len(schacht_list))
-        # Create an instance of SchachtManager
+
         schacht_manager = SchachtManager(schacht_list)
 
-# Call the method to retrieve knoten elements and corresponding punkte
+
         result = schacht_manager.print_punkte(objektbezeichnung="R1234")
 
-# Print the result
+
         print(result)
 
 
