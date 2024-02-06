@@ -1,69 +1,95 @@
 
 from typing import Optional, Union
 from dataclasses import dataclass
+from typing  import List
+import string
+import random
 bauwerke_list = []
-
+def generate_unique_id(length=7) -> str:
+    characters = string.ascii_letters + string.digits
+    unique_id = ''.join(random.choices(characters, k=length))
+    return unique_id
 
 '''NOT FINISHED YET'''
 @dataclass
-class Polygon:
-    def __init__(self):
-        self.knoten = []
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
+class Punkt:
+    x: float
+    y: float
+    z: float
     def __str__(self):
-        print("Inside __str__")
-        return f"Polygon: {self.knoten}"
+        return f"Punkt(x={self.x}, y={self.y}, z={self.z})"
 @dataclass
 class Knoten:
-    def __init__(self):
-        self.punkte = []
-    def add_punkt(self, punkt):
-        self.punkte.append(punkt)
-    def __str__(self):
-        punkte_str = ", ".join(str(punkt) for punkt in self.punkte)
-        return f"Knoten(punkte=[{punkte_str}])"
+    obj: Optional[str] = 'NA'
+    tag: Optional[str] = 'S'
+    punkte: List[Punkt] = None
+
+    def add_punkt(self, *punkte: Punkt):
+        if self.punkte is None:
+            self.punkte = []
+        self.punkte.extend(punkte)
+
+    def __hash__(self):
+        return hash(self.obj)
+    
+    def __eq__(self, other):
+        return isinstance(other, Knoten) and self.obj == other.obj
+
 @dataclass
-class Punkt:
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.tag = str()
-    def __str__(self):
-        return f"Punkt(x={self.x}, y={self.y}, z={self.z}, tag={self.tag})"
+class Start:
+    punkt: Punkt
+    tag: Optional[str] = 'S'
+
+
+@dataclass
+class Ende:
+    punkt: Punkt
+    tag: Optional[str] = 'S'
+
+
+@dataclass
+class Kante:
+    start: Start
+    ende: Ende
+    
+@dataclass
+class Polygon:
+    kante: Kante
+    points= []
+
 @dataclass
 class Pumpwerk:   #1
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+        objektbezeichnung: Optional[str] = str(generate_unique_id)
+        entwaesserungsart = Optional[str]
+        status: Optional[Union[str, int]] = None
+        baujahr: Optional[float]= None
+        geo_objektart: Optional[int] = None
+        geo_objekttyp: Optional[str]= None
+        lagegenauigkeitsklasse: Optional[str]= None
+        hoehengenauigkeitsklasse: Optional[int]= None
+        knoten: Optional[List['Knoten']] = None
+        kanten = []
+        polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
-        self.grundflaeche: Optional[float]= None
-        self.max_laenge: Optional[float]= None
-        self.max_breite: Optional[float]= None
-        self.max_hoehe: Optional[float]= None
-        self.raum_hochbau: Optional[float]= None
-        self.raum_tiefbau:Optional[float]= None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Objektbezeichnung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+        hersteller_typ: Optional[str] = None
+        adresse_hersteller: Optional[str] = None
+        ufis_baunummer: Optional[int] = None
+        art_einstieghilfe: Optional[str] = None
+        uebergabebauwerk: Optional[bool] = None
+        grundflaeche: Optional[float]= None
+        max_laenge: Optional[float]= None
+        max_breite: Optional[float]= None
+        max_hoehe: Optional[float]= None
+        raum_hochbau: Optional[float]= None
+        raum_tiefbau:Optional[float]= None
+        def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+        def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+        def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
 def parse_pumpwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -135,82 +161,97 @@ def parse_pumpwerk(root):
                             raum_tiefbau_element = abwasser_objekt.getElementsByTagName('RaumTiefbau')
                             if raum_tiefbau_element:
                                 pumpwerk.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    pumpwerk.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            pumpwerk.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     pumpwerk.add_knoten(knoten)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    polygon = Polygon()
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                        polygon.add_punkt(punkt)
-                                    pumpwerk.add_polygon(polygon)
                             bauwerke_list.append(pumpwerk)
+    print(f"Number of Bauwerke objects: {len(bauwerke_list)}")
+    print(f"Number of unique Bauwerke: {len(set(b.objektbezeichnung for b in bauwerke_list))}")
+    return bauwerke_list                        
 
 
 @dataclass
 class Becken:   #2
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         #Class specific attributes:
-        self.beckenfunktion: Optional[str] = None
-        self.beckenart: Optional[int] = None
-        self.beckenbauart: Optional[int] = None
-        self.beckenform: Optional[int] = None
-        self.beckenausfuehrung: Optional[int] = None
-        self.beckenablauf: Optional[int] = None
-        self.grundflaeche: Optional[float]= None
-        self.max_laenge: Optional[float]= None
-        self.max_breite: Optional[float]= None
-        self.max_hoehe: Optional[float]= None
-        self.boechungsneigung: Optional[float]= None
-        self.nutzvolumen: Optional[float]= None
-        self.raum_hochbau: Optional[float]= None
-        self.raum_tiefbau:Optional[float]= None
-        self.anzahl_zulauf: Optional[int] = None
-        self.anzahl_ablauf: Optional[int] = None
-        self.anzahl_kammern: Optional[int] = None
-        self.filterschicht: Optional[float]= None
-        self.filtermaterial: Optional[int] = None
-        self.bepflanzung: Optional[int] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Becken: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    beckenfunktion: Optional[str] = None
+    beckenart: Optional[int] = None
+    beckenbauart: Optional[int] = None
+    beckenform: Optional[int] = None
+    beckenausfuehrung: Optional[int] = None
+    beckenablauf: Optional[int] = None
+    grundflaeche: Optional[float]= None
+    max_laenge: Optional[float]= None
+    max_breite: Optional[float]= None
+    max_hoehe: Optional[float]= None
+    boechungsneigung: Optional[float]= None
+    nutzvolumen: Optional[float]= None
+    raum_hochbau: Optional[float]= None
+    raum_tiefbau:Optional[float]= None
+    anzahl_zulauf: Optional[int] = None
+    anzahl_ablauf: Optional[int] = None
+    anzahl_kammern: Optional[int] = None
+    filterschicht: Optional[float]= None
+    filtermaterial: Optional[int] = None
+    bepflanzung: Optional[int] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_becken(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -324,70 +365,84 @@ def parse_becken(root):
                             bepflanzung_element = abwasser_objekt.getElementsByTagName('Bepflanzung')
                             if bepflanzung_element:
                                 becken.bepflanzung = int(bepflanzung_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    becken.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            becken.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     becken.add_knoten(knoten)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    polygon = Polygon()
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                        polygon.add_punkt(punkt)
-                                    becken.add_polygon(polygon)
                             bauwerke_list.append(becken)
+    print("Found objects Bauwerktyp 2")
+    return bauwerke_list
 
 @dataclass
 class Behandlungsanlage:   #3
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
-        self.behandlungsart: Optional[int] = None
-        self.bypass: Optional[bool] = None
-        self.aufstellungsart[int] = None
-        self.breite[float]= None
-        self.laenge[float] = None
-        self.hoehe[float] = None
-        self.hoehe_zulauf[float]= None
-        self.hoehe_ablauf[float]= None
-        self.material_anlage[str] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
+    behandlungsart: Optional[int] = None
+    bypass: Optional[bool] = None
+    aufstellungsart: Optional[int] = None
+    breite: Optional[float]= None
+    laenge: Optional[float] = None
+    hoehe: Optional[float] = None
+    hoehe_zulauf: Optional[float]= None
+    hoehe_ablauf: Optional[float]= None
+    material_anlage: Optional[str] = None
         #self.anlage ... kommt noch
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Behandlungsanlage: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_behandlungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -468,62 +523,76 @@ def parse_behandlungsanlage(root):
                             materialanlage_element = abwasser_objekt.getElementsByTagName('MaterialAnlage')
                             if materialanlage_element:
                                 behandlungsanlage.material_anlage = float([0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    behandlungsanlage.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            behandlungsanlage.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     behandlungsanlage.add_knoten(knoten)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    polygon = Polygon()
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                        polygon.add_punkt(punkt)
-                                    behandlungsanlage.add_polygon(polygon)
                             bauwerke_list.append(behandlungsanlage)
+    print("Found objects Bauwerktyp 3")
+    return bauwerke_list
 
 @dataclass
 class Klaeranlage:   #4
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str,int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
-        self.klaeranlagefunktion: Optional[int]= None
-        self.einwohnerwerte: Optional[int]= None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Klaeranlage: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
+    klaeranlagefunktion: Optional[int]= None
+    einwohnerwerte: Optional[int]= None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_klaeranlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -583,71 +652,85 @@ def parse_klaeranlage(root):
                             einwohnerwert_element = abwasser_objekt.getElementsByTagName('Einwohnerwerte')
                             if einwohnerwert_element:
                                 klaeranlage.einwohnerwerte = int(einwohnerwert_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    klaeranlage.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            klaeranlage.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     klaeranlage.add_knoten(knoten)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    polygon = Polygon()
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                        polygon.add_punkt(punkt)
-                                    klaeranlage.add_polygon(polygon)
                             bauwerke_list.append(klaeranlage)
+    print("Found objects Bauwerktyp 4")
+    return bauwerke_list
 
 @dataclass
 class Auslaufbauwerk:   #5
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[int,str]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         # Additional attributes:
-        self.art_auslaufbauwerk: Optional[int] = None
-        self.einleitungsart: Optional[int] = None
-        self.schutzgitter: Optional[int] = None
-        self.sohlsicherung: Optional[int] = None
-        self.boeschungssicherung: Optional[int] = None
-        self.material: Optional[str] = None
-        self.neigung: Optional[float] = None
-        self.laenge: Optional[float] = None
-        self.breite: Optional[float] = None
-        self.hoehe: Optional[float] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Auslaufbauwerk: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    art_auslaufbauwerk: Optional[int] = None
+    einleitungsart: Optional[int] = None
+    schutzgitter: Optional[int] = None
+    sohlsicherung: Optional[int] = None
+    boeschungssicherung: Optional[int] = None
+    material: Optional[str] = None
+    neigung: Optional[float] = None
+    laenge: Optional[float] = None
+    breite: Optional[float] = None
+    hoehe: Optional[float] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_auslaufbauwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -730,65 +813,79 @@ def parse_auslaufbauwerk(root):
                             hoehe_element = abwasser_objekt.getElementsByTagName('Hoehe')
                             if hoehe_element:
                                 auslaufbauwerk.hoehe = float(hoehe_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    auslaufbauwerk.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            auslaufbauwerk.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     auslaufbauwerk.add_knoten(knoten)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    polygon = Polygon()
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                        polygon.add_punkt(punkt)
-                                    auslaufbauwerk.add_polygon(polygon)
                             bauwerke_list.append(auslaufbauwerk)
+    print("Found objects Bauwerktyp 5")
+    return bauwerke_list
 
 @dataclass
 class Pumpe:   #6
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[int,str]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
-        self.leistungsaufnahme: Optional[float] = None
-        self.leistung: Optional[float] = None
-        self.foerderhoehe_gesamt: Optional[float] = None
-        self.foerderhoehe_manometrisch: Optional[float] = None
-        self.pumpenart: Optional[int] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Pumpe: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
+    leistungsaufnahme: Optional[float] = None
+    leistung: Optional[float] = None
+    foerderhoehe_gesamt: Optional[float] = None
+    foerderhoehe_manometrisch: Optional[float] = None
+    pumpenart: Optional[int] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_pumpe(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -856,55 +953,82 @@ def parse_pumpe(root):
                             pumpenart_element = abwasser_objekt.getElementsByTagName('Pumpenart')
                             if pumpenart_element:
                                 pumpe.pumpenart = int(pumpenart_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    pumpe.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            pumpe.add_polygon(polygon)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                 punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                 if punkt_elements:
-                                    knoten = Knoten()
                                     for punkt_element in punkt_elements:
-                                        punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                      y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                      z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                         punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        if punkt.tag_element:
-                                            punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                         knoten.add_punkt(punkt)
                                     pumpe.add_knoten(knoten)
                             bauwerke_list.append(pumpe)
+    print("Found objects Bauwerktyp 6")
+    return bauwerke_list
 
 @dataclass
 class Wehr:   #7
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status:Optional[Union[int,str]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
-        self.wehr_funktion: Optional[int] = None
-        self.wehr_typ: Optional[int] = None
-        self.oeffnungsweite: Optional[float] = None
-        self.schwellenhoehe_min: Optional[float] = None
-        self.schwellenhoehe_max: Optional[float] = None
-        self.laenge_wehrschwelle: Optional[float] = None
-        self.art_wehrkrone: Optional[int] = None
-        self.verfahrgeschwindigkeit: Optional[float] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Wehr: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"  # noqa: E501
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
+    wehr_funktion: Optional[int] = None
+    wehr_typ: Optional[int] = None
+    oeffnungsweite: Optional[float] = None
+    schwellenhoehe_min: Optional[float] = None
+    schwellenhoehe_max: Optional[float] = None
+    laenge_wehrschwelle: Optional[float] = None
+    art_wehrkrone: Optional[int] = None
+    verfahrgeschwindigkeit: Optional[float] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_wehr(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -983,63 +1107,77 @@ def parse_wehr(root):
                                 verfahrgeschwindigkeit_element = abwasser_objekt.getElementsByTagName('Verfahrgeschwindigkeit')
                                 if verfahrgeschwindigkeit_element:
                                     wehr.verfahrgeschwindigkeit = float(verfahrgeschwindigkeit_element[0].firstChild.nodeValue)
-                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        knoten = Knoten()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            knoten.add_punkt(punkt)
-                                        wehr.add_knoten(knoten)
-                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                    punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        polygon = Polygon()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            polygon.add_punkt(punkt)
-                                        wehr.add_polygon(polygon)
-                                bauwerke_list.append(wehr)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    wehr.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            wehr.add_polygon(polygon)
+                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                if punkt_elements:
+                                    for punkt_element in punkt_elements:
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                        knoten.add_punkt(punkt)
+                                    wehr.add_knoten(knoten)
+                            bauwerke_list.append(wehr)
+    print("Found objects Bauwerktyp 7")
+    return bauwerke_list
 
 @dataclass
 class Drossel:   #8
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         # Additional attributes:
-        self.ablaufart: Optional[int] = None
-        self.nennleistung: Optional[float] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Drossel: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    ablaufart: Optional[int] = None
+    nennleistung: Optional[float] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_drossel(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1100,54 +1238,80 @@ def parse_drossel(root):
                                 nennleistung_element = abwasser_objekt.getElementsByTagName('Nennleistung')
                                 if nennleistung_element:
                                     drossel.nennleistung = float(nennleistung_element[0].firstChild.nodeValue)
-                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        knoten = Knoten()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            knoten.add_punkt(punkt)
-                                        drossel.add_knoten(knoten)
-                                bauwerke_list.append(drossel)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    drossel.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            drossel.add_polygon(polygon)
+                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                if punkt_elements:
+                                    for punkt_element in punkt_elements:
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                        knoten.add_punkt(punkt)
+                                    drossel.add_knoten(knoten)
+                            bauwerke_list.append(drossel)
+    print("Found objects Bauwerktyp 8")
+    return bauwerke_list
 
 @dataclass
 class Schieber:   #9
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[int,str]]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         # Additional attributes:
-        self.schieber_funktion: Optional[int] = None
-        self.schieber_art: Optional[int] = None
-        self.schieber_breite: Optional[float] = None
-        self.schieber_nulllage: Optional[float] = None
-        self.hubhoehe_max: Optional[float] = None
-        self.verfahrgeschwindigkeit: Optional[float] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Schieber: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    schieber_funktion: Optional[int] = None
+    schieber_art: Optional[int] = None
+    schieber_breite: Optional[float] = None
+    schieber_nulllage: Optional[float] = None
+    hubhoehe_max: Optional[float] = None
+    verfahrgeschwindigkeit: Optional[float] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
 def parse_schieber(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1220,70 +1384,83 @@ def parse_schieber(root):
                                 verfahrgeschwindigkeit_element = abwasser_objekt.getElementsByTagName('Verfahrgeschwindigkeit')
                                 if verfahrgeschwindigkeit_element:
                                     schieber.verfahrgeschwindigkeit = float(verfahrgeschwindigkeit_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    schieber.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            schieber.add_polygon(polygon)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                     punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                     if punkt_elements:
-                                        knoten = Knoten()
                                         for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                             knoten.add_punkt(punkt)
                                         schieber.add_knoten(knoten)
-                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                    punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        polygon = Polygon()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            polygon.add_punkt(punkt)
-                                        schieber.add_polygon(polygon)
-                                    bauwerke_list.append(schieber)
+                                bauwerke_list.append(schieber)
+    print("Found objects Bauwerktyp 9")
     return bauwerke_list
 
 @dataclass
 class Rechen:   #10
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[str,int]] =None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         # Additional attributes:
-        self.rechentyp: Optional[int] = None
-        self.rechenrost: Optional[int] = None
-        self.aufstellungsart: Optional[int] = None
-        self.breite: Optional[float] = None
-        self.laenge: Optional[float] = None
-        self.hoehe: Optional[float] = None
-        self.reinigereingriff: Optional[int] = None
-        self.material: Optional[str] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Rechen: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    rechentyp: Optional[int] = None
+    rechenrost: Optional[int] = None
+    aufstellungsart: Optional[int] = None
+    breite: Optional[float] = None
+    laenge: Optional[float] = None
+    hoehe: Optional[float] = None
+    reinigereingriff: Optional[int] = None
+    material: Optional[str] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_rechen(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1362,67 +1539,81 @@ def parse_rechen(root):
                                 material_element = abwasser_objekt.getElementsByTagName('Material')
                                 if material_element:
                                     rechen.material = float(material_element[0].firstChild.nodeValue)
-                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        knoten = Knoten()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            knoten.add_punkt(punkt)
-                                        rechen.add_knoten(knoten)
-                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                    punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        polygon = Polygon()
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            polygon.add_punkt(punkt)
-                                        rechen.add_polygon(polygon)
-                                bauwerke_list.append(rechen)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    rechen.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            rechen.add_polygon(polygon)
+                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                if punkt_elements:
+                                    for punkt_element in punkt_elements:
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                        knoten.add_punkt(punkt)
+                                    rechen.add_knoten(knoten)
+                            bauwerke_list.append(rechen)
+    print("Found objects Bauwerktyp 10")
+    return bauwerke_list
 
 @dataclass
 class Sieb:   #11
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[str,int]]= None    
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         #Additional attributes:
-        self.siebtyp: Optional[int] = None
-        self.siebkoerper: Optional[int] = None
-        self.aufstellungsart: Optional[int] = None
-        self.einbauart: Optional[int] = None
-        self.siebflaeche: Optional[int] = None
-        self.material: Optional[str] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Sieb: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    siebtyp: Optional[int] = None
+    siebkoerper: Optional[int] = None
+    aufstellungsart: Optional[int] = None
+    einbauart: Optional[int] = None
+    siebflaeche: Optional[int] = None
+    material: Optional[str] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_sieb(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
             objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1495,68 +1686,81 @@ def parse_sieb(root):
                                     material_element = abwasser_objekt.getElementsByTagName('Material')
                                     if material_element:
                                         sieb.material = str(material_element[0].firstChild.nodeValue)
-                                    for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                        punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                        if punkt_elements:
-                                            knoten = Knoten()
-                                            for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                                knoten.add_punkt(punkt)
-                                            sieb.add_knoten(knoten)
-                                    for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                        punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                        if punkt_elements:
-                                            polygon = Polygon()
-                                            for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                                polygon.add_punkt(punkt)
+                                    for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    sieb.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
                                             sieb.add_polygon(polygon)
-                                    bauwerke_list.append(sieb)
+                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                knoten = Knoten()
+                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                if punkt_elements:
+                                    for punkt_element in punkt_elements:
+                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                        knoten.add_punkt(punkt)
+                                    sieb.add_knoten(knoten)
+                            bauwerke_list.append(sieb)
+    print("Found objects Bauwerktyp 11")
     return bauwerke_list
 
 @dataclass
 class Versickerungsanlage:   #12
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[str,int]]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         #Additional attributes:
-        self.versickerungsanlagetyp: Optional[int] = None
-        self.datum_inbetriebnahme: Optional[str] = None
-        self.art_flaechenanschluss: Optional[int] = None
-        self.bemessungshaeufigkeit: Optional[float] = None
-        self.max_versickerungsleistung: Optional[float] = None
-        self.umfeld: Optional[str] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Versickerungsanlage: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    versickerungsanlagetyp: Optional[int] = None
+    datum_inbetriebnahme: Optional[str] = None
+    art_flaechenanschluss: Optional[int] = None
+    bemessungshaeufigkeit: Optional[float] = None
+    max_versickerungsleistung: Optional[float] = None
+    umfeld: Optional[str] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_versickerungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
             objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1629,77 +1833,90 @@ def parse_versickerungsanlage(root):
                                     umfeld_element = abwasser_objekt.getElementsByTagName('Umfeld')
                                     if umfeld_element:
                                         versickerungsanlage.umfeld = str(umfeld_element[0].firstChild.nodeValue)
+                                    for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    versickerungsanlage.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            versickerungsanlage.add_polygon(polygon)
                                     for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                        knoten = Knoten()
+                                        knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
                                         punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                         if punkt_elements:
-                                            knoten = Knoten()
                                             for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                                y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                                z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                                 punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
                                                 knoten.add_punkt(punkt)
                                             versickerungsanlage.add_knoten(knoten)
-                                    for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                        punkt_elements = polygon_element.getElementsByTagName('Punkt')
-                                        if punkt_elements:
-                                            polygon = Polygon()
-                                            for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                                polygon.add_punkt(punkt)
-                                            versickerungsanlage.add_polygon(polygon)
                                     bauwerke_list.append(versickerungsanlage)
+    print("Found objects Bauwerktyp 12")
     return bauwerke_list
 
 @dataclass
-class Regenwassernuntzungsanlage:   #13
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[str,int]]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+class Regenwassernutzungsanlage:   #13
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         #Additional attributes:
-        self.regenwassernutzung_funktion: Optional[int] = None
-        self.laenge: Optional[float] = None
-        self.breite: Optional[float] = None
-        self.tiefe: Optional[float] = None
-        self.hoehe: Optional[float] = None
-        self.durchmesser: Optional[float] = None
-        self.grundflaeche_rn: Optional[float] = None
-        self.bauart: Optional[int] = None
-        self.material_rn: Optional[int] = None
-        self.filterart: Optional[int] = None
-        self.art_flaechenanschluss: Optional[int] = None
-        self.angeschlossene_flaeche: Optional[int] = None
-        self.volumen_nutzbar: Optional[float] = None
-        self.rueckhaltevolumen: Optional[float] = None
-        self.drosselabfluss: Optional[float] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Regenwassernutzungsanlage: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    regenwassernutzung_funktion: Optional[int] = None
+    laenge: Optional[float] = None
+    breite: Optional[float] = None
+    tiefe: Optional[float] = None
+    hoehe: Optional[float] = None
+    durchmesser: Optional[float] = None
+    grundflaeche_rn: Optional[float] = None
+    bauart: Optional[int] = None
+    material_rn: Optional[int] = None
+    filterart: Optional[int] = None
+    art_flaechenanschluss: Optional[int] = None
+    angeschlossene_flaeche: Optional[int] = None
+    volumen_nutzbar: Optional[float] = None
+    rueckhaltevolumen: Optional[float] = None
+    drosselabfluss: Optional[float] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_regenwassernutzungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1714,7 +1931,7 @@ def parse_regenwassernutzungsanlage(root):
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 13:
-                                regenwassernutzungsanlage = Regenwassernuntzungsanlage()
+                                regenwassernutzungsanlage = Regenwassernutzungsanlage()
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     regenwassernutzungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1800,64 +2017,77 @@ def parse_regenwassernutzungsanlage(root):
                                 drosselabfluss_element = abwasser_objekt.getElementsByTagName('Drosselabfluss')
                                 if drosselabfluss_element:
                                     regenwassernutzungsanlage.drosselabfluss = float(drosselabfluss_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    regenwassernutzungsanlage.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            regenwassernutzungsanlage.add_polygon(polygon)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                        punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                        if punkt_elements:
-                                            knoten = Knoten()
-                                            for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                                knoten.add_punkt(punkt)
-                                            regenwassernutzungsanlage.add_knoten(knoten)
-                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                    punkt_elements = polygon_element.getElementsByTagName('Punkt')
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                     if punkt_elements:
-                                        polygon = Polygon()
                                         for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            polygon.add_punkt(punkt)
-                                        regenwassernutzungsanlage.add_polygon(polygon)
+                                            knoten.add_punkt(punkt)
+                                        regenwassernutzungsanlage.add_knoten(knoten)
                                 bauwerke_list.append(regenwassernutzungsanlage)
+    print("Found objects Bauwerktyp 13")
     return bauwerke_list
 
 @dataclass
-class Einlauf:   #14
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.baujahr: Optional[float]= None
-        self.status: Optional[Union[str,int]]=None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.knoten = []
-        self.polygone = []
+class Einlaufbauwerk:   #14
+    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    entwaesserungsart = Optional[str]
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
         #Objektspezifische Attribute:
-        self.hersteller_typ: Optional[str] = None
-        self.adresse_hersteller: Optional[str] = None
-        self.ufis_baunummer: Optional[int] = None
-        self.art_einstieghilfe: Optional[str] = None
-        self.uebergabebauwerk: Optional[bool] = None
+    hersteller_typ: Optional[str] = None
+    adresse_hersteller: Optional[str] = None
+    ufis_baunummer: Optional[int] = None
+    art_einstieghilfe: Optional[str] = None
+    uebergabebauwerk: Optional[bool] = None
         #Additional attributes:
-        self.art_einlaufbauwerk: Optional[int] = None
-        self.schutzgitter: Optional[int] = None
-    def add_knoten(self, knoten):
-        self.knoten.append(knoten)
-    def add_polygon(self, polygon):
-        self.polygone.append(polygon)
-    def __str__(self):
-        print("Inside __str__")
-        return f"Einlauf: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nBaujahr: {self.baujahr}\nGeoObjektart: {self.geo_objektart}\nGeoObjekttyp: {self.geo_objekttyp}"
+    art_einlaufbauwerk: Optional[int] = None
+    schutzgitter: Optional[int] = None
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+            self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+            self.polygon.append(polygon)
+
 def parse_einlaufbauwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1872,7 +2102,7 @@ def parse_einlaufbauwerk(root):
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 13:
-                                einlaufbauwerk = Regenwassernuntzungsanlage()
+                                einlaufbauwerk = Einlaufbauwerk()
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     einlaufbauwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1918,31 +2148,42 @@ def parse_einlaufbauwerk(root):
                                 schutzgitter_element = abwasser_objekt.getElementsByTagName('Schutzgitter')
                                 if schutzgitter_element:
                                     einlaufbauwerk.schutzgitter = int(schutzgitter_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        if polygon_element:
+                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                if kanten_element:
+                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_s= Punkt(x=x, y=y, z=z)
+
+                                                    start = Start(punkt=punkt_s)
+
+                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                    punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                    ende = Ende(punkt=punkt_e)
+
+                                                    kante = Kante(start=start, ende=ende)
+                                                    einlaufbauwerk.add_kante(kante)
+                                                    polygon= Polygon(kante=kante)
+                                            einlaufbauwerk.add_polygon(polygon)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                        punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                        if punkt_elements:
-                                            knoten = Knoten()
-                                            for punkt_element in punkt_elements:
-                                                punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                              y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                              z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                                if punkt.tag_element:
-                                                    punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                                knoten.add_punkt(punkt)
-                                            einlaufbauwerk.add_knoten(knoten)
-                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):
-                                    punkt_elements = polygon_element.getElementsByTagName('Punkt')
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
                                     if punkt_elements:
-                                        polygon = Polygon()
                                         for punkt_element in punkt_elements:
-                                            punkt = Punkt(x=punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue,
-                                                          y=punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue,
-                                                          z=punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            if punkt.tag_element:
-                                                punkt.tag = punkt.tag_element[0].firstChild.nodeValue
-                                            polygon.add_punkt(punkt)
-                                        einlaufbauwerk.add_polygon(polygon)
+                                            knoten.add_punkt(punkt)
+                                        einlaufbauwerk.add_knoten(knoten)
                                 bauwerke_list.append(einlaufbauwerk)
+    print("Found objects Bauwerktyp 14")
     return bauwerke_list

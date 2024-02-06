@@ -337,7 +337,7 @@ class junctions:
         return '\n'.join(header + junction_strings)
     
 @dataclass
-class divider:
+class divider: #gets skipped not cant find it inside ISYBAUXML
     name: str
     elev: Optional[float] = 0
     divlink: Optional[str] = None 
@@ -358,8 +358,45 @@ class outfalls:  #AUSLASS
     stage: Optional[float] = None
     tcurve: Optional[str] = None
     tseries: Optional[str] = None
-    gated: Optional[bool] = False
+    gated: Optional[str] = None
     routeto: Optional[str] = None
+    def check_outfall(self, schacht_list, bauwerke_list) -> List['outfalls']:
+        outfall_list = []
+        for bauwerk in bauwerke_list:
+            if isinstance(bauwerk, Auslaufbauwerk):
+                print("Found Auslaufbauwerk")
+                outfall_sgl = outfalls(
+                    name= str(bauwerk.objektbezeichnung),
+                    
+                )
+            else:
+                print("No given Auslaufbauwerk")
+                num_otufall = int(input("How many outfalls are needed:"))
+                for i in range(num_otufall):
+                    outfall_sgl= self.search_set(schacht_list)
+                    outfall_list.append(outfall_sgl)
+        return outfall_list
+    def search_set(schacht_list):
+        while True:
+            outfall_name = input("Enter outfall name: ")
+            for schacht in schacht_list:
+                if schacht.objektbezeichnung == outfall_name:
+                    print(f"Found Schacht {outfall_name}. Setting as outfall.")
+                    for knoten in schacht.knoten:
+                        elev = knoten.punkte[1].z
+                        print(f"Elevation of {outfall_name}: {elev}")
+                    outfall_sgl = outfalls(
+                        name=str(outfall_name),
+                        elev=elev,
+                        gated='NO',
+                        tcurve='',
+                        tseries='',
+                        routeto=''
+                    )
+                    return outfall_sgl  # Assuming you want to return the outfall object
+            print(f"No Schacht found with name {outfall_name}. Please enter a valid name.")
+
+
 
 
 @dataclass

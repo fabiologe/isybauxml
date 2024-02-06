@@ -4,6 +4,19 @@ from xml_parser.xml_fixer import delete_incomplete_points
 from xml_parser.xml_fixer import kill_duplicates
 from xml_parser.xml_fixer import analyze_xml
 from xml_parser.schacht import parse_schacht
+from xml_parser.bauwerk import Auslaufbauwerk
+from xml_parser.bauwerk import Pumpe
+from xml_parser.bauwerk import Wehr
+from xml_parser.bauwerk import Drossel
+from xml_parser.bauwerk import Schieber
+from xml_parser.bauwerk import Rechen
+from xml_parser.bauwerk import Sieb
+from xml_parser.bauwerk import Versickerungsanlage
+from xml_parser.bauwerk import Regenwassernutzungsanlage
+from xml_parser.bauwerk import Einlaufbauwerk
+from xml_parser.bauwerk import Becken
+from xml_parser.bauwerk import Behandlungsanlage
+from xml_parser.bauwerk import Klaeranlage
 from xml_parser.haltung import parse_haltung
 from xml_parser.leitung import parse_leitung
 from xml_parser.bauwerk import parse_becken
@@ -69,5 +82,18 @@ __all__ = [
     'flaechen_list',
     'einzugsgebiete_list',
     'parse_all',
-    'all_lists'
+    'all_lists',
+    "Auslaufbauwerk",
+    "Pumpe",
+    "Wehr",
+    "Drossel",
+    "Schieber",
+    "Rechen",
+    "Sieb",
+    "Versickerungsanlage",
+    "Regenwassernutzungsanlage",
+    "Einlaufbauwerk",
+    "Becken",
+    "Behandlungsanlage",
+    "Klaeranlage",
 ]

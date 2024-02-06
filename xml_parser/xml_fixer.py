@@ -34,6 +34,7 @@ def delete_incomplete_points(dom):
         #dom.unlink()       
 
 
+
 def kill_duplicates(data_list, attribute):
     return list({getattr(item, attribute): item for item in data_list}.values())
 '''def analyze_xml(root):
