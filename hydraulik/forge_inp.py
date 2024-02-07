@@ -331,14 +331,13 @@ class junctions:
         ]
         junction_strings = []
         for junction in junction_list:
-            print(junction.elev)
             data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
             junction_strings.append(data)
         return '\n'.join(header + junction_strings)
     
 @dataclass
 class divider: #gets skipped not cant find it inside ISYBAUXML
-    name: str
+    name: Optional[str] = None
     elev: Optional[float] = 0
     divlink: Optional[str] = None 
     Qmin: Optional[float] = 0
@@ -353,7 +352,7 @@ class divider: #gets skipped not cant find it inside ISYBAUXML
 
 @dataclass
 class outfalls:  #AUSLASS 
-    name: str
+    name: Optional[str] = None
     elev: Optional[float] = 0
     type: Optional[str] = 'FREE'
     stage: Optional[float] = None
@@ -361,26 +360,34 @@ class outfalls:  #AUSLASS
     tseries: Optional[str] = None
     gated: Optional[str] = None
     routeto: Optional[str] = None
+
     def check_outfall(self, schacht_list, bauwerke_list) -> List['outfalls']:
         outfall_list = []
+        found_auslaufbauwerk = False
+        
         for bauwerk in bauwerke_list:
             if isinstance(bauwerk, Auslaufbauwerk):
                 print("Found Auslaufbauwerk")
                 for knoten in bauwerk.knoten:
                     elev = knoten.punkte[1].z
                 outfall_sgl = outfalls(
-                    name= str(bauwerk.objektbezeichnung),
-                    elev= elev,
-                    type= 'FREE'
+                    name=bauwerk.objektbezeichnung,
+                    elev=elev,
+                    type='FREE'
                 )
-            else:
-                print("No given Auslaufbauwerk")
-                num_otufall = int(input("How many outfalls are needed:"))
-                for i in range(num_otufall):
-                    outfall_sgl= self.search_set(schacht_list)
-                    outfall_list.append(outfall_sgl)
+                outfall_list.append(outfall_sgl)
+                found_auslaufbauwerk = True
+
+        if not found_auslaufbauwerk:
+            print("No given Auslaufbauwerk")
+            num_outfall = int(input("How many outfalls are needed:"))
+            for i in range(num_outfall):
+                outfall_sgl = self.search_set(schacht_list)
+                outfall_list.append(outfall_sgl)
+        
         return outfall_list
-    def search_set(schacht_list):
+
+    def search_set(self, schacht_list):
         while True:
             outfall_name = input("Enter outfall name: ")
             for schacht in schacht_list:
@@ -400,7 +407,8 @@ class outfalls:  #AUSLASS
                     )
                     return outfall_sgl  
             print(f"No Schacht found with name {outfall_name}. Please enter a valid name.")
-    def to_outfall_string(outfall_list: List) -> str:
+
+    def to_outfall_string(self, outfall_list: List) -> str:
         header = [
             "[OUTFALLS]",
             ";;               Invert     Outfall    Stage/Table      Tide",
@@ -409,7 +417,7 @@ class outfalls:  #AUSLASS
         ]
         outfall_strings = []
         for outfall in outfall_list:
-            data = f"{outfall.name:<16} {outfall.elev:<10} {outfall.type:<10}{outfall.ymax:<10} {outfall.y0:<10} {outfall.ysur:<10} {outfall.apond:<10}"
+            data = f"{outfall.name:<16} {outfall.elev:<10} {outfall.type:<10} {outfall.tseries:<16} {outfall.gated:<5}"
             outfall_strings.append(data)
         return '\n'.join(header + outfall_strings)
 
@@ -687,12 +695,16 @@ class backdrop:
     pass 
 
 
-def create_inp(metadata, flaechen_list, schacht_list):
+def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
 
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junctions.from_schacht(schacht_list)
+
+    outfall = outfalls()
+    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
+
 
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
@@ -718,3 +730,6 @@ def create_inp(metadata, flaechen_list, schacht_list):
         f.write("\n")
         f.write("\n")
         f.write(junctions.to_junction_string(junction_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(outfall.to_outfall_string(outfall_list))

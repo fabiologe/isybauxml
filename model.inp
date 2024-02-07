@@ -1,7 +1,7 @@
 [TITLE]
 Kohn's Wasserwirtschaft
 Fabio Q.
-2024-02-04
+2024-02-07
 
 [OPTIONS]
 flow_units           CMS
@@ -695,3 +695,9 @@ E9               227.202    0          228.743    0          0
 97               238.148    0          240.444    0          0         
 98               237.402    0          239.666    0          0         
 99               236.714    0          238.971    0          0         
+
+[OUTFALLS]
+;;               Invert     Outfall    Stage/Table      Tide
+;;Name           Elev.      Type       Time Series      Gate
+;;-------------- ---------- ---------- ---------------- ----
+99               238.971    FREE                        NO   
