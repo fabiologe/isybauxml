@@ -332,7 +332,7 @@ class junctions:
         junction_strings = []
         for junction in junction_list:
             print(junction.elev)
-            data = data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
+            data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
             junction_strings.append(data)
         return '\n'.join(header + junction_strings)
     
@@ -355,6 +355,7 @@ class divider: #gets skipped not cant find it inside ISYBAUXML
 class outfalls:  #AUSLASS 
     name: str
     elev: Optional[float] = 0
+    type: Optional[str] = 'FREE'
     stage: Optional[float] = None
     tcurve: Optional[str] = None
     tseries: Optional[str] = None
@@ -365,9 +366,12 @@ class outfalls:  #AUSLASS
         for bauwerk in bauwerke_list:
             if isinstance(bauwerk, Auslaufbauwerk):
                 print("Found Auslaufbauwerk")
+                for knoten in bauwerk.knoten:
+                    elev = knoten.punkte[1].z
                 outfall_sgl = outfalls(
                     name= str(bauwerk.objektbezeichnung),
-                    
+                    elev= elev,
+                    type= 'FREE'
                 )
             else:
                 print("No given Auslaufbauwerk")
@@ -388,13 +392,26 @@ class outfalls:  #AUSLASS
                     outfall_sgl = outfalls(
                         name=str(outfall_name),
                         elev=elev,
+                        type= 'FREE',
                         gated='NO',
                         tcurve='',
                         tseries='',
                         routeto=''
                     )
-                    return outfall_sgl  # Assuming you want to return the outfall object
+                    return outfall_sgl  
             print(f"No Schacht found with name {outfall_name}. Please enter a valid name.")
+    def to_outfall_string(outfall_list: List) -> str:
+        header = [
+            "[OUTFALLS]",
+            ";;               Invert     Outfall    Stage/Table      Tide",
+            ";;Name           Elev.      Type       Time Series      Gate",
+            ";;-------------- ---------- ---------- ---------------- ----"
+        ]
+        outfall_strings = []
+        for outfall in outfall_list:
+            data = f"{outfall.name:<16} {outfall.elev:<10} {outfall.type:<10}{outfall.ymax:<10} {outfall.y0:<10} {outfall.ysur:<10} {outfall.apond:<10}"
+            outfall_strings.append(data)
+        return '\n'.join(header + outfall_strings)
 
 
 
@@ -406,11 +423,43 @@ class storage:
     ymax: Optional[float] = 0
     y0: Optional[float] = 0
     acurve: Optional[str] = 'TABULAR'
+    curv: Optional[str] = None
     apond: Optional[float] = 0
     fevap: Optional[float] = 0
     psi : Optional[float] = 0
     ksat: Optional[float] = 0
     imd : Optional[float] = 0
+    def load_storage(self, bauwerke_list) -> List['storage']:
+        storage_list = []
+        for bauwerk in bauwerke_list:
+            if isinstance(bauwerk, Becken):
+                for knoten in bauwerk.knoten:
+                    elev = knoten.punkte[1].z
+                print("Found Storage")
+                storage_sgl = storage(name=bauwerk.objektbezeichnung,
+                                      elev= elev,
+                                      ymax = bauwerk.max_hoehe,
+                                      y0 = 0,
+                                      acurve= 'TABULAR',
+                                      curve = bauwerk.objektbezeichnung
+                                      )
+                storage_list.append(storage_sgl)
+                return storage_list
+    def to_storage_string(storage_list: List) -> str:
+        header = [
+            "[STORAGE]",
+            ";;               Invert   Max.     Init.    Storage    Curve                      Ponded   Evap."   ,
+            ";;Name           Elev.    Depth    Depth    Curve      Params                     Area     Frac.    Infiltration Parameters",
+            ";;-------------- -------- -------- -------- ---------- -------- -------- -------- -------- -------- -----------------------",
+        ]
+        storage_strings = []
+        for storage in storage_list:
+            data = f"{storage.name:<15} {storage.elev:>8} {storage.ymax:>8} {storage.y0:>8} " \
+                   f"{storage.acurve:>10} {storage.curve:>8} {storage.apond:>8} {storage.fevap:>8}"
+            storage_strings.append(data)
+        return "\n".join(header + storage_strings)
+
+    
     
 @dataclass
 class conduits: #abflusswirksame Verbindungen
@@ -418,7 +467,7 @@ class conduits: #abflusswirksame Verbindungen
     node1: str
     node2: str
     length: float
-    n: Optional[float] = 0#roughness paramater
+    n: Optional[float] = 0 #roughness paramater
     z1: Optional[float] = 0
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
