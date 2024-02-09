@@ -1,0 +1,40 @@
+{"trench width depending on DN":{
+    "<225": {
+        "obstructed trench":  0.4,
+        "unobstructed trench b > 60°" : 0.4,
+        "unobstructed trench b < 60°" : 0.4
+
+    },
+    "225-350": {
+        "obstructed trench":  0.5,
+        "unobstructed trench b > 60°" : 0.5,
+        "unobstructed trench b < 60°" : 0.4
+
+    },
+    "350-700": {
+        "obstructed trench":  0.7,
+        "unobstructed trench b > 60°" : 0.7,
+        "unobstructed trench b < 60°" : 0.4
+
+    },
+    "700-1200": {
+        "obstructed trench":  0.85,
+        "unobstructed trench b > 60°" : 0.85,
+        "unobstructed trench b < 60°" : 0.4
+
+    },
+    ">1200": {
+        "obstructed trench":  1.0,
+        "unobstructed trench b > 60°" : 1.0,
+        "unobstructed trench b < 60°" : 0.4
+
+        }
+    },
+    "trench width depending on t":{
+        "<1.00": "NA",
+        "1.00-1.75" : 0.8,
+        "1.75-4.00" : 0.9,
+        ">4.00" : 1.00
+
+    }
+}
