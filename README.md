@@ -16,3 +16,11 @@ for example: manhole-cover (z-point) = schacht.knoten[0].punkte[0].z
 - adding cost calculation and serialize to GAEB and adding an json based building specifications DB
 - an serializer for ifc (currently struggeling with the creation of the geometrie but semantic is finished comming soon)
 - an branch for working with elevation and survey data 
+
+
+# install Windows : 
+python -m venv venv
+
+venv\Scripts\activate 
+
+pip install -r requirements.txt
