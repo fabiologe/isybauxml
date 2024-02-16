@@ -480,6 +480,37 @@ class conduits: #abflusswirksame Verbindungen
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
     Qmax: Optional[float] = 0 
+    def from_haltung(haltung_list : List) -> List['conduits']:
+        conduits_list = []
+        for haltung in haltung_list:
+            conduits_sgl = conduits(
+                name = haltung.objektbezeichung,
+                node1= haltung.zulauf,
+                node2= haltung.ablauf, 
+                length= haltung.laenge,
+                n= 0.01, # concrete 
+                z1 = haltung.zulauf_sh,
+                z2 = haltung.anlauf_sh,
+                Q0 = 0,
+                Qmax = 0            
+            )
+            conduits_list.append(conduits_sgl)
+        return conduits_list
+    def to_conduits_str(conduits_list  : List) -> str:
+        header = [
+        "[CONDUITS]",
+        ";;               Inlet            Outlet                      Manning    Inlet      Outlet     Init.      Max.",      
+        ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow",
+        ";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------"
+        ]
+        conduit_strings = []
+        for conduits in conduits_list:
+            data = f"{conduits.name:<15}{conduits.node1:<15}{conduits.node2:<15}{conduits.length:<10}{conduits.n:<8}"\
+                   f"{conduits.z1:<10}{conduits.z2:<10}{conduits.Q0:<8}{conduits.Qmax:<8}"
+            conduit_strings.append(data)
+        return  "\n".join(header + conduit_strings)
+
+
 
 @dataclass
 class pumps:
@@ -490,6 +521,14 @@ class pumps:
     status: bool = True
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
+    def get_pumpe(bauwerk_list : List)-> List['Pumpe']:
+        pumpe_list = []
+        for bauwerk in bauwerk_list:
+            if isinstance(bauwerk, Pumpe):
+                pumpe_list.append(bauwerk)
+        return pumpe_list
+    def split_pumpe(pumpe_list :List, haltung_list: List):
+        pass
 
 @dataclass
 class orifices: #SCHIEBER
@@ -529,7 +568,7 @@ class outlets: #DROSSEL
 
 @dataclass
 class xsection:
-    link: str
+    link: str  
     shape: str
     geom1: float
     geom2: Optional[float] = 0
@@ -539,6 +578,64 @@ class xsection:
     culvert: Optional[int] = None
     curve: Optional[str] = None
     tsec: Optional[str] = None
+    def from_haltung(haltung_list : List)-> List['xsection']:
+        xsection_list = []
+        for haltung in haltung_list:
+            if haltung.profilart == 0:
+                shape = 'CIRCULAR'
+                if haltung.profilhoehe is not None:
+                    geom1 = float(haltung.profilhoehe / 1000)
+                else:
+                    geom1 = float(haltung.profilbreite / 1000)
+
+            elif haltung.profilart == 1:
+                shape = 'EGG'
+            elif haltung.profilart == 2:
+                shape = 'CATENARY'
+            elif haltung.profilart == 3:
+                shape = 'RECT_CLOSED'
+            elif haltung.profilart == 5:
+                shape = 'RECT_OPEN'
+                if haltung.profilhoehe is not None:
+                    geom1  = float(haltung.profilhoehe/1000)
+                else: 
+                    geom1 = 1
+                if haltung.profilbreite is not None:
+                    geom2 = float(haltung.profilbreite/1000)
+                else:
+                    geom2 = 1 
+            elif haltung.profilart == 8:
+                shape = 'TRAPEZOIDAL'
+                if haltung.profilhoehe is not None:
+                    geom1 = float(haltung.profilhoehe/1000)
+                if haltung.profilbreite is not None:
+                    geom2 = float(haltung.proiflbreite/1000)
+                geom3 = 1
+                geom4 = 1
+            xsection_sgl = xsection(
+                link = haltung.objektbezeichung,
+                shape = shape,
+                geom1= geom1,
+                geom2 = geom2,
+                geom3 = geom3,
+                geom4 = geom4
+                                )
+            xsection_list.append(xsection_sgl)
+        return xsection_list
+    def to_xsection_string(xsection_list : List)-> str:
+        header = [
+            "[XSECTIONS]",
+            ";;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels",   
+            ";;-------------- ------------ ---------------- ---------- ---------- ---------- ----------",
+        ]
+        xsection_strings = []
+        for xsection in xsection_list:
+            data = f"{xsection.link:<15}{xsection.shape:<15}{xsection.geom1:<10}{xsection.geom2:<10}{xsection.geom3:<10}"\
+                   f"{xsection.geom4:<10}{xsection.barrels:<4}"
+            xsection_strings.append(data)
+        return"\n".join(header + xsection_strings)
+
+    
     
 
 @dataclass

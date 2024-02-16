@@ -1,0 +1,165 @@
+{
+    "Closed Conduits": [
+      {
+        "name": "Brass (Smooth)",
+        "manning_coefficients": [0.009, 0.010, 0.013]
+      },
+      {
+        "name": "Steel",
+        "types": [
+          {
+            "type": "Lockbar and Welded",
+            "manning_coefficients": [0.010, 0.012, 0.014]
+          },
+          {
+            "type": "Riveted and Spiral",
+            "manning_coefficients": [0.013, 0.016, 0.017]
+          }
+        ]
+      },
+      {
+        "name": "Cast Iron",
+        "types": [
+          {
+            "type": "Coated",
+            "manning_coefficients": [0.010, 0.013, 0.014]
+          },
+          {
+            "type": "Uncoated",
+            "manning_coefficients": [0.011, 0.014, 0.016]
+          }
+        ]
+      },
+      {
+        "name": "Wrought Iron",
+        "types": [
+          {
+            "type": "Black",
+            "manning_coefficients": [0.012, 0.014, 0.015]
+          },
+          {
+            "type": "Galvanized",
+            "manning_coefficients": [0.013, 0.016, 0.017]
+          }
+        ]
+      },
+      {
+        "name": "Corrugated Metal",
+        "types": [
+          {
+            "type": "Subdrain",
+            "manning_coefficients": [0.017, 0.019, 0.021]
+          },
+          {
+            "type": "Stormdrain",
+            "manning_coefficients": [0.021, 0.024, 0.030]
+          }
+        ]
+      },
+      {
+        "name": "Cement",
+        "types": [
+          {
+            "type": "Neat Surface",
+            "manning_coefficients": [0.010, 0.011, 0.013]
+          },
+          {
+            "type": "Mortar",
+            "manning_coefficients": [0.011, 0.013, 0.015]
+          }
+        ]
+      },
+      {
+        "name": "Concrete",
+        "types": [
+          {
+            "type": "Culvert, straight and free of debris",
+            "manning_coefficients": [0.010, 0.011, 0.013]
+          },
+          {
+            "type": "Culvert with bends, connections, and some debris",
+            "manning_coefficients": [0.011, 0.013, 0.014]
+          },
+          {
+            "type": "Finished",
+            "manning_coefficients": [0.011, 0.012, 0.014]
+          },
+          {
+            "type": "Sewer with manholes, inlet, etc., straight",
+            "manning_coefficients": [0.013, 0.015, 0.017]
+          },
+          {
+            "type": "Unfinished, steel form",
+            "manning_coefficients": [0.012, 0.013, 0.014]
+          },
+          {
+            "type": "Unfinished, smooth wood form",
+            "manning_coefficients": [0.012, 0.014, 0.016]
+          },
+          {
+            "type": "Unfinished, rough wood form",
+            "manning_coefficients": [0.015, 0.017, 0.020]
+          }
+          {
+            "name": "Wood",
+            "types": [
+              {
+                "type": "Stave",
+                "manning_coefficients": [0.010, 0.012, 0.014]
+              },
+              {
+                "type": "Laminated, treated",
+                "manning_coefficients": [0.015, 0.017, 0.020]
+              }
+            ]
+          },
+          {
+            "name": "Clay",
+            "types": [
+              {
+                "type": "Common drainage tile",
+                "manning_coefficients": [0.011, 0.013, 0.017]
+              },
+              {
+                "type": "Vitrified sewer",
+                "manning_coefficients": [0.011, 0.014, 0.017]
+              },
+              {
+                "type": "Vitrified sewer with manholes, inlet, etc.",
+                "manning_coefficients": [0.013, 0.015, 0.017]
+              },
+              {
+                "type": "Vitrified Subdrain with open joint",
+                "manning_coefficients": [0.014, 0.016, 0.018]
+              }
+            ]
+          },
+          {
+            "name": "Brickwork",
+            "types": [
+              {
+                "type": "Glazed",
+                "manning_coefficients": [0.011, 0.013, 0.015]
+              },
+              {
+                "type": "Lined with cement mortar",
+                "manning_coefficients": [0.012, 0.015, 0.017]
+              },
+              {
+                "type": "Sanitary sewers coated with sewage slime with bends and connections",
+                "manning_coefficients": [0.012, 0.013, 0.016]
+              },
+              {
+                "type": "Paved invert, sewer, smooth bottom",
+                "manning_coefficients": [0.016, 0.019, 0.020]
+              },
+              {
+                "type": "Rubble masonry, cemented",
+                "manning_coefficients": [0.018, 0.025, 0.030]
+            }
+        ]
+      }
+    ]
+      }
+    ]
+}
