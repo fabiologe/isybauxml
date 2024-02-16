@@ -13,7 +13,7 @@ import codecs
 
 
 def main():
-    file_path = ("input/6096A6.xml")
+    file_path = ("input/scaling.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
