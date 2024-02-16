@@ -99,7 +99,7 @@
           {
             "type": "Unfinished, rough wood form",
             "manning_coefficients": [0.015, 0.017, 0.020]
-          }
+          },
           {
             "name": "Wood",
             "types": [
