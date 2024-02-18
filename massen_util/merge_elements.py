@@ -21,11 +21,11 @@ def merger(schacht_list, haltung_list):
             if zulauf_schacht and ablauf_schacht:
                 current_haltung = {
                     'Schacht Nr. oben': zulauf_schacht.objektbezeichnung,
-                    'Deckelhoehe oben': float(zulauf_schacht.knoten[0].punkte[0].z),
-                    'Sohlhoehe oben': float(zulauf_schacht.knoten[0].punkte[1].z),
                     'Schacht Nr. unten': ablauf_schacht.objektbezeichnung,
-                    'Deckelhoehe unten': float(ablauf_schacht.knoten[0].punkte[0].z),
-                    'Sohlhoehe unten': float(ablauf_schacht.knoten[0].punkte[1].z),
+                    'Deckelhoehe oben': float(zulauf_schacht.knoten[0].punkte[1].z),
+                    'Deckelhoehe unten': float(ablauf_schacht.knoten[0].punkte[1].z),
+                    'Sohlhoehe oben': float(zulauf_schacht.knoten[0].punkte[0].z),
+                    'Sohlhoehe unten': float(ablauf_schacht.knoten[0].punkte[0].z),
                 }
 
                 if Haltung.rohrlaenge is not None:
