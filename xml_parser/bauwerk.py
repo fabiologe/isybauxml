@@ -59,7 +59,7 @@ class Polygon:
 
 @dataclass
 class Pumpwerk:   #1
-        objektbezeichnung: Optional[str] = str(generate_unique_id)
+        objektbezeichnung: Optional[str] 
         entwaesserungsart = Optional[str]
         status: Optional[Union[str, int]] = None
         baujahr: Optional[float]= None
@@ -205,7 +205,7 @@ def parse_pumpwerk(root):
 
 @dataclass
 class Becken:   #2
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -407,7 +407,7 @@ def parse_becken(root):
 
 @dataclass
 class Behandlungsanlage:   #3
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -565,7 +565,7 @@ def parse_behandlungsanlage(root):
 
 @dataclass
 class Klaeranlage:   #4
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -694,7 +694,7 @@ def parse_klaeranlage(root):
 
 @dataclass
 class Auslaufbauwerk:   #5
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -855,7 +855,7 @@ def parse_auslaufbauwerk(root):
 
 @dataclass
 class Pumpe:   #6
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -995,7 +995,7 @@ def parse_pumpe(root):
 
 @dataclass
 class Wehr:   #7
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1149,7 +1149,7 @@ def parse_wehr(root):
 
 @dataclass
 class Drossel:   #8
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1280,7 +1280,7 @@ def parse_drossel(root):
 
 @dataclass
 class Schieber:   #9
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1426,7 +1426,7 @@ def parse_schieber(root):
 
 @dataclass
 class Rechen:   #10
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1581,7 +1581,7 @@ def parse_rechen(root):
 
 @dataclass
 class Sieb:   #11
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1728,7 +1728,7 @@ def parse_sieb(root):
 
 @dataclass
 class Versickerungsanlage:   #12
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -1875,7 +1875,7 @@ def parse_versickerungsanlage(root):
 
 @dataclass
 class Regenwassernutzungsanlage:   #13
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
@@ -2059,7 +2059,7 @@ def parse_regenwassernutzungsanlage(root):
 
 @dataclass
 class Einlaufbauwerk:   #14
-    objektbezeichnung: Optional[str] = str(generate_unique_id)
+    objektbezeichnung: Optional[str] 
     entwaesserungsart = Optional[str]
     status: Optional[Union[str, int]] = None
     baujahr: Optional[float]= None
