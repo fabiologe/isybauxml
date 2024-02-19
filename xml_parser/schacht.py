@@ -77,7 +77,7 @@ class Schacht:
     art_einstieghilfe: Optional[str] = None
     material_steighilfen: Optional[str] = None
     innenschutz: Optional[str] = None
-    anzahl_anschluesse: Optional[int] = None
+    anzahl_anschluesse: Optional[int] = 0
     uebergabeschacht: Optional[bool] = None
     auflagering: Optional[str] = None
     aufbau: Optional[str] = None
@@ -247,7 +247,7 @@ def parse_schacht(root):
                                     knoten.add_punkt(punkt)
                                 schacht.add_knoten(knoten)
                         schacht_list.append(schacht)
-    # Debug statement to check if schacht_list is empty
     print(f"Number of Schacht objects: {len(schacht_list)}")
-    print(f"Number of unique Schacht: {len(set(s.objektbezeichnung for s in schacht_list))}")
+    print('\n')
+    #print(f"Number of unique Schacht: {len(set(s.objektbezeichnung for s in schacht_list))}")
     return schacht_list

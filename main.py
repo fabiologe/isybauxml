@@ -1,7 +1,7 @@
 from xml_parser import *
-from massen_util.merge_elements import merger, find_status, sum_lengths
-from massen_util.pyexcel import haltung_massen, column_assignments
-from massen_util.csv_creator import export_leitung, export_to_csv
+from massen_util.merge_elements import mass_haltung, find_status, mass_leitung, mass_schacht
+from massen_util.pyexcel import to_xsls_schacht, column_assignments, to_xsls_haltung
+from massen_util.csv_creator import to_csv_haltung, to_csv_leitung, to_csv_schacht
 from hydraulik.forge_inp import create_inp, SimulationMetadata
 import xml.dom.minidom
 import sys
@@ -15,7 +15,7 @@ import os
 
 
 def main():
-    file_path = ("input/scaling.xml")
+    file_path = ("input/Stammdaten_ISY.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -49,17 +49,17 @@ def main():
             print(schacht.knoten[0].punkte[1].z)'''
         for data_list in all_lists:
             data_list = kill_duplicates(data_list, 'objektbezeichnung')  
-        massen_haltung_unique = merger(schacht_list, haltung_list)
-        massen_index_haltung = ['Status','Schacht Nr. oben', 'Schacht Nr. unten', 'Deckelhoehe oben', 'Deckelhoehe unten','Sohlhoehe oben', 'Sohlhoehe unten', 'Laenge', 'DN']
-        massen_index_leitung = ['Status','DN','Rohrlaenge']
-        export_to_csv(massen_haltung_unique, massen_index_haltung)
-        massen_leitung = sum_lengths(leitung_list)
-        massen_leitung
-        export_leitung(massen_leitung, massen_index_leitung)
+        mass_haltung_res = mass_haltung(schacht_list,bauwerke_list, haltung_list)
+        to_csv_haltung(mass_haltung_res)
+        mass_schacht_res = mass_schacht(schacht_list, haltung_list)
+        to_csv_schacht(mass_schacht_res)
+        massen_leitung_res = mass_leitung(leitung_list)
+        to_csv_leitung(massen_leitung_res)
         print(os.getcwd())
-        haltung_massen(column_assignments)
-        metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
-        create_inp(metadata, flaechen_list, schacht_list, bauwerke_list)
+        to_xsls_haltung(column_assignments)
+        to_xsls_schacht()
+        #metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
+        #create_inp(metadata, flaechen_list, schacht_list, bauwerke_list)
         
         sys.exit()
 

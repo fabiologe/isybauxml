@@ -43,7 +43,7 @@ column_assignments = {
         "data_type": "float"
     }
 }
-def haltung_massen(column_assignments):
+def to_xsls_haltung(column_assignments):
     csv = os.path.abspath('massen_haltungen.csv')
     src = os.path.abspath('massen_util/src/src_haltung.xlsx')
     print(src)
@@ -84,3 +84,22 @@ def haltung_massen(column_assignments):
 
     wb.save('massen_haltungen.xlsx')
     return print("Data successfully written to your XLS file!")
+
+
+def to_xsls_schacht():
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv('massen_haltungen.csv')
+    # Iterate through each column containing "Schacht Nr. oben"
+    for col_oben in df.filter(like="Schacht Nr. oben"):
+        # Sort the column alphabetically
+        df[col_oben] = df[col_oben].sort_values()
+    
+    # Iterate through each column containing "Schacht Nr. unten"
+    for col_unten in df.filter(like="Schacht Nr. unten"):
+        # Sort the column alphabetically
+        df[col_unten] = df[col_unten].sort_values()
+    
+    # Output to CSV
+    df.to_csv("sorted_data.csv", index=False)
+    
+    print("Sorted data saved to sorted_data.csv")

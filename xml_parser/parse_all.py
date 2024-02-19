@@ -15,6 +15,7 @@ def parse_all(root):
     parse_versickerungsanlage(root)
     parse_regenwassernutzungsanlage(root)
     parse_einlaufbauwerk(root)
+    print('\n')
     parse_anschlusspunkt(root)
     parse_flaeche(root)
     parse_einzugsgebiete(root)

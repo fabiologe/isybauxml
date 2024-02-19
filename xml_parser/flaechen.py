@@ -153,7 +153,8 @@ def parse_flaeche(root):
              flaeche.kst_wert = float(flaeche_objekt[0].firstChild.nodeValue)
         flaechen_list.append(flaeche)
     print(f"Number of Flaechen objects: {len(flaechen_list)}")
-    print(f"Number of unique Flaechen: {len(set(f.objektbezeichnung for f in flaechen_list))}")
+    print('\n')
+    #print(f"Number of unique Flaechen: {len(set(f.objektbezeichnung for f in flaechen_list))}")
     return flaechen_list
 
 @dataclass

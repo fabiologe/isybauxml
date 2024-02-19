@@ -72,5 +72,6 @@ def parse_anschlusspunkt(root):
                                 anschlusspunkt.add_knoten(knoten)
                         anschlusspunkt_list.append(anschlusspunkt)
     print(f"Number of Anschluss objects: {len(anschlusspunkt_list)}")
-    print(f"Number of unique Anschlusspunkte: {len(set(h.objektbezeichnung for h in anschlusspunkt_list))}")
+    print('\n')
+    #print(f"Number of unique Anschlusspunkte: {len(set(h.objektbezeichnung for h in anschlusspunkt_list))}")
     return anschlusspunkt_list

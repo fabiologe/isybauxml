@@ -196,5 +196,6 @@ def parse_leitung(root):
                                 leitung.add_polygon(polygon)
                         leitung_list.append(leitung)
     print(f"Number of Leitung objects: {len(leitung_list)}")
-    print(f"Number of unique Leitungen: {len(set(h.objektbezeichnung for h in leitung_list))}")
+    print('\n')
+    #print(f"Number of unique Leitungen: {len(set(h.objektbezeichnung for h in leitung_list))}")
     return leitung_list

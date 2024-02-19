@@ -196,7 +196,8 @@ def parse_haltung(root):
                                 haltung.add_polygon(polygon)
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
-    print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
+    print('\n')
+    #print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
     return haltung_list
 
 
