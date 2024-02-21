@@ -49,6 +49,9 @@ def to_xsls_haltung(column_assignments):
     print(src)
     wb = xl.load_workbook(src)
     ws = wb["Massen_Haltung"]
+    ws2 = wb["Massen_Leitung"]
+    ws3 = wb["Massen_Schacht"]
+     
     df = pd.read_csv(csv)
     column_lists = {
     "Status": df["Status"].tolist(),
