@@ -54,11 +54,12 @@ def mass_haltung(schacht_list, bauwerk_list, haltung_list):
                     'Schacht Nr. oben': zulauf_schacht.objektbezeichnung,
                     'Schacht Nr. unten': ablauf_schacht.objektbezeichnung,
                     'Deckelhoehe oben': float(zulauf_schacht.knoten[0].punkte[1].z),
-                    'Deckelhoehe unten': float(ablauf_schacht.knoten[0].punkte[1].z),
-                    'Sohlhoehe oben': float(zulauf_schacht.knoten[0].punkte[0].z),
-                    'Sohlhoehe unten': float(ablauf_schacht.knoten[0].punkte[0].z),
+                    'Deckelhoehe unten': float(ablauf_schacht.knoten[0].punkte[1].z)
                 }
-
+                if haltung.zulauf_sh is not None:
+                    current_haltung["Sohlhoehe oben"] = float(haltung.zulauf_sh)
+                if haltung.ablauf_sh is not None:
+                    current_haltung["Sohlhoehe unten"] = float(haltung.ablauf_sh)
                 if haltung.rohrlaenge is not None:
                     current_haltung["Laenge"] = float(haltung.rohrlaenge)
                 if haltung.profilhoehe is not None:
