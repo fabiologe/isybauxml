@@ -34,39 +34,38 @@ class Polygon:
     kante: Kante
 @dataclass
 class Haltung:
-    def __init__(self):
-        self.objektbezeichnung = ""
-        self.entwaesserungsart = ""
-        self.status: Optional[Union[str, int]] = None
-        self.baujahr: Optional[float]= None
-        self.geo_objektart = int()
-        self.geo_objekttyp: Optional[str]= None
-        self.lagegenauigkeitsklasse: Optional[str]= None
-        self.hoehengenauigkeitsklasse: Optional[int]= None
-        self.kanten = []
-        #Objektspezifische Attribute:
-        self.haltungs_funtktion: Optional[int]= None
-        self.dmplaenge: Optional[float]= None
-        self.rohrlaenge: Optional[float]= None
-        self.inneschutz: Optional[str]= None
-        self.auskleidung: Optional[int]= None
-        self.nenndruck: Optional[int]= None
-        self.druckverfahren: Optional[int]= None
-        self.anschluss_bez: Optional[str]= None
-        self.entfernung: Optional[float]= None
-        #Geometriedaten:
-        self.polygons = []
-        self.zulauf: Optional[str]= None
-        self.ablauf: Optional[str]= None
-        self.zulauf_sh: Optional[float]= None
-        self.ablauf_sh: Optional[float]= None
-        self.strang: Optional[str]= None
-        self.laenge: Optional[float]= None
-        self.material: Optional[str]= None
-        self.profilart: Optional[int]= None
-        self.profilbreite: Optional[int]= None
-        self.profilhoehe: Optional[int]= None
-        self.aussendurchmesser: Optional[int]= None
+    objektbezeichnung: Optional[str] = None
+    entwaesserungsart: Optional[str] = None
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    kanten = []
+    #Objektspezifische Attribute:
+    haltungs_funtktion: Optional[int]= None
+    dmplaenge: Optional[float]= None
+    rohrlaenge: Optional[float]= None
+    inneschutz: Optional[str]= None
+    auskleidung: Optional[int]= None
+    nenndruck: Optional[int]= None
+    druckverfahren: Optional[int]= None
+    anschluss_bez: Optional[str]= None
+    entfernung: Optional[float]= None
+    #Geometriedaten:
+    polygons = []
+    zulauf: Optional[str]= None
+    ablauf: Optional[str]= None
+    zulauf_sh: Optional[float]= None
+    ablauf_sh: Optional[float]= None
+    strang: Optional[str]= None
+    laenge: Optional[float]= None
+    material: Optional[str]= None
+    profilart: Optional[int]= None
+    profilbreite: Optional[int]= None
+    profilhoehe: Optional[int]= None
+    aussendurchmesser: Optional[int]= None
     def add_polygon(self, polygon: Polygon):
         self.polygons.append(polygon)
 
@@ -74,6 +73,22 @@ class Haltung:
         self.kanten.append(kante)
     def __str__(self):
         return f"Haltung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nZulauf: {self.zulauf}\nAblauf: {self.ablauf}\nProfil: {self.profilart}\nKante: {self.kanten}"
+   
+    @staticmethod
+    def fix_orientation(self):
+        if self.zulauf_sh >= self.ablauf_sh:
+            return self.zulauf, self.ablauf, self.zulauf_sh, self.ablauf_sh
+        elif self.zulauf_sh <= self.ablauf_sh:
+            # Swap the values of zulauf, ablauf, zulauf_sh, and ablauf_sh
+            temp_zulauf = self.zulauf
+            self.zulauf = self.ablauf
+            self.ablauf = temp_zulauf
+            
+            temp_zulauf_sh = self.zulauf_sh
+            self.zulauf_sh = self.ablauf_sh
+            self.ablauf_sh = temp_zulauf_sh
+            
+            return self.zulauf, self.ablauf, self.zulauf_sh, self.ablauf_sh
 def parse_haltung(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -197,6 +212,7 @@ def parse_haltung(root):
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')
+    #Haltung.fix_orientation(self)
     #print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
     return haltung_list
 

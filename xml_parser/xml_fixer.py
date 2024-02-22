@@ -7,6 +7,14 @@ def update_punkthoehe(dom):
             new_punkthoehe.appendChild(dom.createTextNode('0.00'))
             punkt.appendChild(new_punkthoehe)
 
+def dwa_to_isy(dom):
+    all_status = dom.getElementsByTagName('Status')
+    for status in all_status:
+        if status.firstChild.nodeValue == "B":
+            status.firstChild.nodeValue = 0
+        elif status.firstChild.nodeValue == "P":
+            status.firstChild.nodeValue = 1 
+        
 def update_haltunghoehe(dom):
     all_start = dom.getElementsByTagName('Start')
     for punkt in all_start:

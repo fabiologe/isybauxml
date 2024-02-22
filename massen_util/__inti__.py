@@ -5,7 +5,7 @@ from massen_util.merge_elements import find_status
 from massen_util.merge_elements import mass_leitung
 from massen_util.merge_elements import mass_haltung
 from massen_util.merge_elements import mass_schacht
-from massen_util.pyexcel import to_xsls_haltung, column_assignments, to_xsls_schacht
+from massen_util.pyexcel import to_xsls_haltung, col_haltung, col_schacht , col_leitung
 
 __all__ = [
     'to_csv_haltung',
@@ -16,7 +16,8 @@ __all__ = [
     'mass_haltung',
     'mass_schacht',
     'to_xsls_haltung',
-    'column_assignments',
-    'to_xsls_schacht'
+   'col_haltung', 
+    'col_schacht' ,
+     'col_leitung'
 
 ]
