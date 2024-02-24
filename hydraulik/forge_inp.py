@@ -281,7 +281,7 @@ class lid_usage:
 '''MISSING CLASSES: AQUIFIER , GROUNDWATER , GWF , SNOWPACK ---> maybe when there is an project I gonna add them '''
 
 @dataclass
-class junctions:
+class junction:
     name: str
     elev: float  #SH
     ymax : Optional[float] = 0 #DH
@@ -328,8 +328,8 @@ class junctions:
                 fict_junc.append(junction_b)
         return fict_junc
 
-    def from_schacht(schacht_list: List) -> List['junctions']:
-        junction_list = []
+    def from_schacht(schacht_list: List) -> List['junction']:
+        junctions_list = []
         for schacht in schacht_list:
             elev = None
             y0 = None
@@ -352,17 +352,17 @@ class junctions:
                     else:
                         print("    No Punkte in this Knoten")
 
-            junction_sgl = junctions(
+            junction_sgl = junction(
                 name=str(schacht.objektbezeichnung),
                 elev=elev,
                 y0=y0,
                 ysur=0,
                 apond=0
             )
-            junction_list.append(junction_sgl)
-        return junction_list
+            junctions_list.append(junction_sgl)
+        return junctions_list
 
-    def to_junction_string(junction_list: List) -> str:
+    def to_junction_string(junctions_list: List) -> str:
         header = [
             "[JUNCTIONS]",
             ";;               Invert     Max.       Init.      Surcharge  Ponded ",
@@ -370,7 +370,7 @@ class junctions:
             ";;-------------- ---------- ---------- ---------- ---------- ----------"
         ]
         junction_strings = []
-        for junction in junction_list:
+        for junction in junctions_list:
             data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
             junction_strings.append(data)
         return '\n'.join(header + junction_strings)
@@ -391,7 +391,7 @@ class divider: #gets skipped not cant find it inside ISYBAUXML
 
 
 @dataclass
-class outfalls:  #AUSLASS 
+class outfall:  #AUSLASS 
     name: Optional[str] = None
     elev: Optional[float] = 0
     type: Optional[str] = 'FREE'
@@ -402,7 +402,7 @@ class outfalls:  #AUSLASS
     routeto: Optional[str] = None
 
     def check_outfall(self, schacht_list, bauwerke_list) -> List['outfalls']:
-        outfall_list = []
+        outfalls_list = []
         found_auslaufbauwerk = False
         
         for bauwerk in bauwerke_list:
@@ -410,12 +410,12 @@ class outfalls:  #AUSLASS
                 print("Found Auslaufbauwerk")
                 for knoten in bauwerk.knoten:
                     elev = knoten.punkte[1].z
-                outfall_sgl = outfalls(
+                outfall_sgl = outfall(
                     name=bauwerk.objektbezeichnung,
                     elev=elev,
                     type='FREE'
                 )
-                outfall_list.append(outfall_sgl)
+                outfalls_list.append(outfall_sgl)
                 found_auslaufbauwerk = True
 
         if not found_auslaufbauwerk:
@@ -423,9 +423,9 @@ class outfalls:  #AUSLASS
             num_outfall = int(input("How many outfalls are needed:"))
             for i in range(num_outfall):
                 outfall_sgl = self.search_set(schacht_list)
-                outfall_list.append(outfall_sgl)
+                outfalls_list.append(outfall_sgl)
         
-        return outfall_list
+        return outfalls_list
 
     def search_set(self, schacht_list):
         while True:
@@ -448,7 +448,7 @@ class outfalls:  #AUSLASS
                     return outfall_sgl  
             print(f"No Schacht found with name {outfall_name}. Please enter a valid name.")
 
-    def to_outfall_string(self, outfall_list: List) -> str:
+    def to_outfall_string(self, outfalls_list: List) -> str:
         header = [
             "[OUTFALLS]",
             ";;               Invert     Outfall    Stage/Table      Tide",
@@ -456,7 +456,7 @@ class outfalls:  #AUSLASS
             ";;-------------- ---------- ---------- ---------------- ----"
         ]
         outfall_strings = []
-        for outfall in outfall_list:
+        for outfall in outfalls_list:
             data = f"{outfall.name:<16} {outfall.elev:<10} {outfall.type:<10} {outfall.tseries:<16} {outfall.gated:<5}"
             outfall_strings.append(data)
         return '\n'.join(header + outfall_strings)
@@ -478,7 +478,7 @@ class storage:
     ksat: Optional[float] = 0
     imd : Optional[float] = 0
     def load_storage(self, bauwerke_list) -> List['storage']:
-        storage_list = []
+        storages_list = []
         for bauwerk in bauwerke_list:
             if isinstance(bauwerk, Becken):
                 for knoten in bauwerk.knoten:
@@ -491,9 +491,9 @@ class storage:
                                       acurve= 'TABULAR',
                                       curve = bauwerk.objektbezeichnung
                                       )
-                storage_list.append(storage_sgl)
-                return storage_list
-    def to_storage_string(storage_list: List) -> str:
+                storages_list.append(storage_sgl)
+                return storages_list
+    def to_storage_string(storages_list: List) -> str:
         header = [
             "[STORAGE]",
             ";;               Invert   Max.     Init.    Storage    Curve                      Ponded   Evap."   ,
@@ -501,7 +501,7 @@ class storage:
             ";;-------------- -------- -------- -------- ---------- -------- -------- -------- -------- -------- -----------------------",
         ]
         storage_strings = []
-        for storage in storage_list:
+        for storage in storages_list:
             data = f"{storage.name:<15} {storage.elev:>8} {storage.ymax:>8} {storage.y0:>8} " \
                    f"{storage.acurve:>10} {storage.curve:>8} {storage.apond:>8} {storage.fevap:>8}"
             storage_strings.append(data)
@@ -510,7 +510,7 @@ class storage:
     
     
 @dataclass
-class conduits: #abflusswirksame Verbindungen
+class conduit: #abflusswirksame Verbindungen
     name: str
     node1: str
     node2: str
@@ -520,8 +520,8 @@ class conduits: #abflusswirksame Verbindungen
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
     Qmax: Optional[float] = 0 
-    def fict_cond(fict_cond: List) -> List['conduits']:
-        for element in fict_cond:
+    def fict_cond(fict_conds: List) -> List['conduit']:
+        for element in fict_conds:
             zn = None
             if element.knoten:
                 knoten = schacht.knoten[0]
@@ -535,7 +535,7 @@ class conduits: #abflusswirksame Verbindungen
                         print(f"    Elevation (elev): {zn}")
                     else:
                         print("    No Punkte in this Knoten")
-            conduits_sgl = condutis(
+            conduit_sgl = conduit(
                 name = element.objektbezeichnung,
                 node1 = element.objektbezeichnung + '_B',
                 node2 = element.objektbezeichnung + '_A',
@@ -546,12 +546,12 @@ class conduits: #abflusswirksame Verbindungen
                 Q0 = 0,
                 Qmax = 0   
             )
-            fict_cond.append(conduits_sgl)
-        return fict_cond
-    def from_haltung(haltung_list : List) -> List['conduits']:
+            fict_conds.append(conduit_sgl)
+        return fict_conds
+    def from_haltung(haltung_list : List) -> List['conduit']:
         conduits_list = []
         for haltung in haltung_list:
-            conduits_sgl = conduits(
+            conduits_sgl = conduit(
                 name = haltung.objektbezeichung,
                 node1= haltung.zulauf,
                 node2= haltung.ablauf, 
@@ -571,59 +571,101 @@ class conduits: #abflusswirksame Verbindungen
         ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow",
         ";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------"
         ]
-        conduit_strings = []
-        for conduits in conduits_list:
-            data = f"{conduits.name:<15}{conduits.node1:<15}{conduits.node2:<15}{conduits.length:<10}{conduits.n:<8}"\
-                   f"{conduits.z1:<10}{conduits.z2:<10}{conduits.Q0:<8}{conduits.Qmax:<8}"
-            conduit_strings.append(data)
-        return  "\n".join(header + conduit_strings)
+        conduits_strings = []
+        for conduit in conduits_list:
+            data = f"{conduit.name:<15}{conduit.node1:<15}{conduit.node2:<15}{conduit.length:<10}{conduit.n:<8}"\
+                   f"{conduit.z1:<10}{conduit.z2:<10}{conduit.Q0:<8}{conduit.Qmax:<8}"
+            conduits_strings.append(data)
+        return  "\n".join(header + conduits_strings)
 
 
 
 @dataclass
-class pumps:
+class pump:
     name: str
     node1: str
     node2: str
     pcurve: str
-    status: bool = True
+    status: str
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
+    
     def get_pump(bauwerk_list : List)-> List['Pumpe']:
-        pump_list = []
+        '''returns isybau pumpen from bauwerke '''
+        pumps_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Pumpe):
-                pumpe_list.append(bauwerk)
-        return pump_list
-    def split_pumpe(pump_list :List, junction_list: List):
-        for pump in pump_list:
-            fict_junc = junctions.fict_junc(pump_list)
-            junction_list.append(fict_junc)
+                pumps_list.append(bauwerk)
+        return pumpe_list
+    def to_junctions(pumps_list :List, junctions_list: List):
+        for pump in pumps_list:
+            fict_junc = junction.fict_junc(pumps_list)
+            junctions_list.append(fict_junc)
         return junction_list
-    def set_pump(pump_list: List, conduit_list: List):
-        for pump in pump_list:
-            fict_cont = conduitS.fict_cond(pump_list)
-            conduit_list.append(fict_cont)
-        return conduit_list
+    def to_conduit(pumps_list: List, conduits_list: List):
+        for pump in pumps_list:
+            fict_cont = conduitS.fict_cond(pumps_list)
+            conduits_list.append(fict_cont)
+        return conduits_list
+    def from_pumpe(pumpe_list: List)-> List['pump']:
+        pumps_list = []
+        for pumpe in pumpe_list:
+            
+            pump_sgl = pump(
+                name = pumpe.objektbezeichnung,
+                node1 = pumpe.objektbezeichnung + '_B',
+                node2 = pumpe.objektbezeichnung + '_A',
+                pcurve= 'coming',  #-------------------------------------------->
+                status = 'ON',
+                startup = 0,
+                shutoff = 0
+            )
+            pumps_list.append(pump_sgl)
+        return pumps_list
+    def to_pumps_string(pumps_list: List) -> str:
+        header = [
+            "[PUMPS]",
+            ";;               Inlet            Outlet                                 Start      Shut",
+            ";;Name           Node             Node             Pcurve     Status     up         off",
+            ";;-------------- ---------------- ---------------- ---------- ---------- ---------- ----------"
+        ]
+        pumps_string = []
+        for pump in pumps_list:
+            # Adjusting field lengths for better alignment
+            data = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
+            pumps_string.append(data)
+        return '\n'.join(header + pumps_string)
 
-        
 
 @dataclass
-class orifices: #SCHIEBER
+class orifice: #SCHIEBER
     name: str
     node1: str
     node2: str
-    type : str='SIDE'  # can also be BOTTOM
+    typ: str='SIDE'  # can also be BOTTOM
     offset: Optional[float] = 0
     cd: Optional[float] = 0
     flap:  str='NO'
     orate: Optional[float] = 0
     def get_orifices(bauwerk_list: List)-> List['Schieber']:
-        orifices_list = []
+        schieber_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Schieber):
-                orifices_list.append(bauwerk)
-        return orifices_list
+                schieber_list.append(bauwerk)
+        return schieber_list
+    def to_junctions(orifices_list :List, junctions_list: List):
+        for orifice in orifices_list:
+            fict_junc = junction.fict_junc(pumps_list)
+            junctions_list.append(fict_junc)
+        return junction_list
+    def to_conduit(orifices_list: List, conduits_list: List):
+        for orifice in orifices_list:
+            fict_cont = conduitS.fict_cond(pumps_list)
+            conduits_list.append(fict_cont)
+        return conduits_list
+    def from_orifices(schieber_list: List)->List['orifice']:
+        pass
+        
 
 @dataclass
 class weirs:   # WEHR
@@ -897,9 +939,8 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junctions.from_schacht(schacht_list)
-    pump_list = pumps.get_pump(bauwerk_list)
-    junction_list = pumps.split_pump(pump_list, junction_list)
-    conduit_list = pumps.set_pump(pump_list, conduit_list)
+    pumps_list = pumps.get_pump(bauwerk_list)
+    junction_list = pumps.to_junctions(pumps_list, junction_list)
     #orc etc
     outfall = outfalls()
     outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
