@@ -1,12 +1,11 @@
 from xml_parser import *
-from typing import Union
+from typing import Union, List
 from collections import defaultdict
 
 def find_status(schacht_list, haltung_list):
     for Haltung in haltung_list:
         try:
             if Haltung.status == 1 and Haltung.status is not None:
-                mass_haltung(schacht_list, haltung_list)
                 print("Found planning objects")
         except ValueError:
             print("Could not find planning objects") 
@@ -14,30 +13,30 @@ def find_status(schacht_list, haltung_list):
 def mass_schacht(schacht_list, haltung_list):
     mass_schacht = []
     for schacht in schacht_list:
-        zulauf = next((haltung for haltung in haltung_list if haltung.zulauf == schacht.objektbezeichnung), None)
-        ablauf = next((haltung for haltung in haltung_list if haltung.ablauf == schacht.objektbezeichnung), None)
-        if zulauf and ablauf:
-            current_schacht = {
-                'Schacht': schacht.objektbezeichnung,
-                'Tiefe': schacht.schachttiefe
-            }
-            if zulauf.profilhoehe is not None:
-                current_schacht['DN Zulauf'] = float(zulauf.profilhoehe)
-            if ablauf.profilhoehe is not None:
-                current_schacht['DN Ablauf'] = float(ablauf.profilhoehe)
-            if schacht.anzahl_anschluesse >= 3:
-                range = schacht.anzahl_anschluesse
-                print(f'More then 2 connection at schacht:{schacht.objektbezeichung}')
-                for i in range:
-                    current_schacht['DN X'] = 0
-            mass_schacht.append(current_schacht)
-        else:
-            if zulauf and not ablauf:
-                print(f"Only one zulauf found for schacht: {schacht.objektbezeichnung}")
-            elif not zulauf and ablauf:
-                print(f"Only one ablauf found for schacht: {schacht.objektbezeichnung}")
+            zulauf = next((haltung for haltung in haltung_list if haltung.zulauf == schacht.objektbezeichnung), None)
+            ablauf = next((haltung for haltung in haltung_list if haltung.ablauf == schacht.objektbezeichnung), None)
+            if zulauf and ablauf:
+                current_schacht = {
+                    'Schacht': schacht.objektbezeichnung,
+                    'Tiefe': schacht.schachttiefe
+                }
+                if zulauf.profilhoehe is not None:
+                    current_schacht['DN Zulauf'] = float(zulauf.profilhoehe)
+                if ablauf.profilhoehe is not None:
+                    current_schacht['DN Ablauf'] = float(ablauf.profilhoehe)
+                if schacht.anzahl_anschluesse >= 3:
+                    range = schacht.anzahl_anschluesse
+                    print(f'More then 2 connection at schacht:{schacht.objektbezeichung}')
+                    for i in range:
+                        current_schacht['DN X'] = 0
+                mass_schacht.append(current_schacht)
             else:
-                print(f"Neither zulauf nor ablauf found in haltung_list for schacht: {schacht.objektbezeichnung}")
+                if zulauf and not ablauf:
+                    print(f"Only one zulauf found for schacht: {schacht.objektbezeichnung}")
+                elif not zulauf and ablauf:
+                    print(f"Only one ablauf found for schacht: {schacht.objektbezeichnung}")
+                else:
+                    print(f"Neither zulauf nor ablauf found in haltung_list for schacht: {schacht.objektbezeichnung}")
     return mass_schacht
 
 

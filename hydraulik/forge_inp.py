@@ -480,6 +480,10 @@ class conduits: #abflusswirksame Verbindungen
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
     Qmax: Optional[float] = 0 
+    def fict_cond(fict_cond: List) -> List['conduits']:
+        
+
+        return
     def from_haltung(haltung_list : List) -> List['conduits']:
         conduits_list = []
         for haltung in haltung_list:
@@ -522,12 +526,12 @@ class pumps:
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
     def get_pumpe(bauwerk_list : List)-> List['Pumpe']:
-        pumpe_list = []
+        pump_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Pumpe):
                 pumpe_list.append(bauwerk)
-        return pumpe_list
-    def split_pumpe(pumpe_list :List, haltung_list: List):
+        return pump_list
+    def split_pumpe(pump_list :List, haltung_list: List):
         pass
 
 @dataclass
@@ -540,6 +544,13 @@ class orifices: #SCHIEBER
     cd: Optional[float] = 0
     flap:  str='NO'
     orate: Optional[float] = 0
+    def get_orifices(bauwerk_list: List)-> List['Schieber']:
+        orifices_list = []
+        for bauwerk in bauwerk_list:
+            if isinstance(bauwerk, Schieber):
+                orifices_list.append(bauwerk)
+        return orifices_list
+
 @dataclass
 class weirs:   # WEHR
     name: str
@@ -554,6 +565,13 @@ class weirs:   # WEHR
     sur: str = 'YES' 
     width: Optional[float] = 0
     surface: Optional[str] = None
+    def get_weirs(bauwerk_list: List)-> List['Wehr']:
+        weirs_list = []
+        for bauwerk in bauwerk_list:
+            if isinstance (bauwerk, Wehr):
+                weirs_list.append(bauwerk)
+        return weirs_list
+
 @dataclass
 class outlets: #DROSSEL
     name: str
@@ -564,6 +582,12 @@ class outlets: #DROSSEL
     c1: Optional[float] = 0
     c2: Optional[float] = 0
     gated: str= 'NO'
+    def get_outlets(bauwerk_list: List)->List['Drossel']:
+        outlets_list = []
+        for bauwerk in bauwerk_list:
+            if isinstance(bauwerk, Drossel):
+                outlets_list.append(bauwerk)
+        return outlets_list
 
 
 @dataclass
@@ -793,7 +817,7 @@ class backdrop:
 
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
-
+    fict_cond = []
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)

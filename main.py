@@ -57,7 +57,6 @@ def main():
         to_csv_leitung(massen_leitung_res)
         print(os.getcwd())
         to_xsls_haltung(col_haltung, col_schacht , col_leitung)
-        to_xsls_schacht()
         #metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
         #create_inp(metadata, flaechen_list, schacht_list, bauwerke_list)
         
