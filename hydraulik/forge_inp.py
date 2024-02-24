@@ -288,6 +288,46 @@ class junctions:
     y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
+    def fict_junc(fict_junc: List):
+        for element in fict_list:
+            elev = None
+            y0 = None
+            if element-knoten:
+                knoten = element.knoten[0]
+                print(f"Fictional Element: {element.objektbezeichnung}")
+                print(f"Number of Knoten: {len(element.knoten)}")
+                for i, knoten in enumerate(element.knoten):
+                    print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        elev = float(punkt.z)
+                        print(f"    Elevation (elev): {elev}")
+                        if len(knoten.punkte) > 1:
+                            y0 = float(knoten.punkte[1].z)
+                            print(f"    Y0 (second Punkt): {y0}")
+                        else:
+                            y0 = 0
+                            print("    Y0 (second Punkt): Not available, using default (0)")
+                    else:
+                        print("    No Punkte in this Knoten")
+                junction_a = junctions(
+                            name = element.objektbezeichnung + '_A',
+                            elev = elev,
+                            y0 = y0 ,
+                            ysur=0,
+                            apond=0
+                                )
+                junction_b = junctions(
+                            name = element.objektbezeichnung + '_B',
+                            elev = elev + 0.1 ,
+                            y0 = y0 + 0.1 ,
+                            ysur=0,
+                            apond=0
+                                )
+                fict_junc.append(junction_a)
+                fict_junc.append(junction_b)
+        return fict_junc
+
     def from_schacht(schacht_list: List) -> List['junctions']:
         junction_list = []
         for schacht in schacht_list:
@@ -481,9 +521,33 @@ class conduits: #abflusswirksame Verbindungen
     Q0: Optional[float] = 0
     Qmax: Optional[float] = 0 
     def fict_cond(fict_cond: List) -> List['conduits']:
-        
-
-        return
+        for element in fict_cond:
+            zn = None
+            if element.knoten:
+                knoten = schacht.knoten[0]
+                print(f"Fict haltung: {element.objektbezeichnung}")
+                print(f"Number of Knoten: {len(element.knoten)}")
+                for i, knoten in enumerate(element.knoten):
+                    print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        zn = float(punkt.z)
+                        print(f"    Elevation (elev): {zn}")
+                    else:
+                        print("    No Punkte in this Knoten")
+            conduits_sgl = condutis(
+                name = element.objektbezeichnung,
+                node1 = element.objektbezeichnung + '_B',
+                node2 = element.objektbezeichnung + '_A',
+                length = 0.1,
+                n = 0.01,
+                z1 = zn + 0.1 ,
+                z2 = zn, 
+                Q0 = 0,
+                Qmax = 0   
+            )
+            fict_cond.append(conduits_sgl)
+        return fict_cond
     def from_haltung(haltung_list : List) -> List['conduits']:
         conduits_list = []
         for haltung in haltung_list:
@@ -525,14 +589,24 @@ class pumps:
     status: bool = True
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
-    def get_pumpe(bauwerk_list : List)-> List['Pumpe']:
+    def get_pump(bauwerk_list : List)-> List['Pumpe']:
         pump_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Pumpe):
                 pumpe_list.append(bauwerk)
         return pump_list
-    def split_pumpe(pump_list :List, haltung_list: List):
-        pass
+    def split_pumpe(pump_list :List, junction_list: List):
+        for pump in pump_list:
+            fict_junc = junctions.fict_junc(pump_list)
+            junction_list.append(fict_junc)
+        return junction_list
+    def set_pump(pump_list: List, conduit_list: List):
+        for pump in pump_list:
+            fict_cont = conduitS.fict_cond(pump_list)
+            conduit_list.append(fict_cont)
+        return conduit_list
+
+        
 
 @dataclass
 class orifices: #SCHIEBER
@@ -818,11 +892,15 @@ class backdrop:
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     fict_cond = []
+    
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junctions.from_schacht(schacht_list)
-
+    pump_list = pumps.get_pump(bauwerk_list)
+    junction_list = pumps.split_pump(pump_list, junction_list)
+    conduit_list = pumps.set_pump(pump_list, conduit_list)
+    #orc etc
     outfall = outfalls()
     outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
 
