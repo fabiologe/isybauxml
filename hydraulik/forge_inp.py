@@ -644,6 +644,7 @@ class orifice: #SCHIEBER
     node2: str
     typ: str='SIDE'  # can also be BOTTOM
     offset: Optional[float] = 0
+    crest : Optional[float] = 0
     cd: Optional[float] = 0
     flap:  str='NO'
     orate: Optional[float] = 0
@@ -663,8 +664,53 @@ class orifice: #SCHIEBER
             fict_cont = conduitS.fict_cond(pumps_list)
             conduits_list.append(fict_cont)
         return conduits_list
-    def from_orifices(schieber_list: List)->List['orifice']:
-        pass
+    def from_orifices(schieber_list: List, haltung_list: List)->List['orifice']:
+        orifices_list = []
+        for schieber in schieber_list:
+            for haltung in haltung_list:
+                from_schieber = next((node for node in node_list if node.objektbezeichnung == haltung.zulauf), None)
+                if from_schieber:
+                    if haltung.zulauf_sh is not None:
+                        sh_orifice = haltung.zulauf_sh
+            if schieber.knoten:
+                knoten = schieber.knoten[0]
+                print(f"Schieber: {schieber.objektbezeichnung}")
+                print(f"Number of Knoten: {len(schieber.knoten)}")
+                for i, knoten in enumerate(schieber.knoten):
+                    print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        elev = float(punkt.z)
+                        print(f"    Elevation (elev): {elev}")
+                    else:
+                        print("No Punkte in this Knoten")
+            if elev is not None and sh_orifice is not None:
+                crest_height = abs(sh_orifice - elev) 
+            orifice_sgl = orifice(
+                name = schieber.objektbezeichnung,
+                ode1 = pumpe.objektbezeichnung + '_B',
+                node2 = pumpe.objektbezeichnung + '_A',
+                typ = 'SIDE',
+                offset = 0,
+                crest= crest_height,
+                cd = 0.65,
+                flap = 'NO',
+                orate= 0
+            )
+            orifices_list.append(orifice_sgl)
+        return orifices_list
+    def to_orifices_string(orifices_list: List)-> str:
+        header = [
+            "[ORIFICES]",
+            ";;               Inlet            Outlet           Orifice      Crest      Disch.     Flap Open/Close",
+            ";;Name           Node             Node             Type         Height     Coeff.     Gate Time",      
+            ";;-------------- ---------------- ---------------- ------------ ---------- ---------- ---- ----------"
+        ]
+        orifice_strings = []
+        for orifice in orifices_list:
+            data = f"{orifice.name:<15} {orifice.ode1:<16} {orifice.node2:<16} {orifice.typ:<12} {orifice.crest:<10} {orifice.cd:<10} {orifice.flap:<4} {orifice.orate:<4}"
+            orifice_strings.append(data)
+            return '\n'.join(header + orifice_strings)
         
 
 @dataclass
