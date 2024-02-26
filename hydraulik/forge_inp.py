@@ -288,8 +288,7 @@ class junction:
     y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
-    def fict_junc(fict_junc: List):
-        for element in fict_list:
+    def fict_junc(element):
             elev = None
             y0 = None
             if element-knoten:
@@ -326,7 +325,7 @@ class junction:
                                 )
                 fict_junc.append(junction_a)
                 fict_junc.append(junction_b)
-        return fict_junc
+            return fict_junc
 
     def from_schacht(schacht_list: List) -> List['junction']:
         junctions_list = []
@@ -654,14 +653,14 @@ class orifice: #SCHIEBER
             if isinstance(bauwerk, Schieber):
                 schieber_list.append(bauwerk)
         return schieber_list
-    def to_junctions(orifices_list :List, junctions_list: List):
-        for orifice in orifices_list:
-            fict_junc = junction.fict_junc(pumps_list)
+    def to_junctions(schieber_list :List, junctions_list: List):
+        for schieber in schieber_list:
+            fict_junc = junction.fict_junc(schieber)
             junctions_list.append(fict_junc)
         return junction_list
-    def to_conduit(orifices_list: List, conduits_list: List):
-        for orifice in orifices_list:
-            fict_cont = conduitS.fict_cond(pumps_list)
+    def to_conduit(schieber_list: List, conduits_list: List):
+        for schieber in schieber_list:
+            fict_cont = conduitS.fict_cond(schieber)
             conduits_list.append(fict_cont)
         return conduits_list
     def from_orifices(schieber_list: List, haltung_list: List)->List['orifice']:
@@ -688,8 +687,8 @@ class orifice: #SCHIEBER
                 crest_height = abs(sh_orifice - elev) 
             orifice_sgl = orifice(
                 name = schieber.objektbezeichnung,
-                ode1 = pumpe.objektbezeichnung + '_B',
-                node2 = pumpe.objektbezeichnung + '_A',
+                node1 = schieber.objektbezeichnung + '_B',
+                node2 = schieber.objektbezeichnung + '_A',
                 typ = 'SIDE',
                 offset = 0,
                 crest= crest_height,
@@ -718,7 +717,7 @@ class weirs:   # WEHR
     name: str
     node1: str
     node2: str
-    type: str #TRANSVERSE, SIDEFLOW, V-NOTCH, TRAPEZOIDAL or ROADWAY
+    typ: str #TRANSVERSE, SIDEFLOW, V-NOTCH, TRAPEZOIDAL or ROADWAY
     crestht: Optional[float] = 0
     cd: float = 3322
     gated: str = 'NO' #YES if flap gate present to prevent reverse flow, NO if not (default is NO)
@@ -727,13 +726,94 @@ class weirs:   # WEHR
     sur: str = 'YES' 
     width: Optional[float] = 0
     surface: Optional[str] = None
+    def get_cresth(wehr, haltung_list: List)->str:
+        for haltung in haltung_list:
+            from_wehr = next((node for node in node_list if node.objektbezeichnung == haltung.zulauf), None)
+            if from_wehr:
+                if haltung.zulauf_sh is not None:
+                    sh_weirs = haltung.zulauf_sh
+            if wehr.knoten:
+                knoten = wehr.knoten[0]
+                print(f"Schieber: {wehr.objektbezeichnung}")
+                print(f"Number of Knoten: {len(wehr.knoten)}")
+                for i, knoten in enumerate(wehr.knoten):
+                    print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        elev = float(punkt.z)
+                        print(f"    Elevation (elev): {elev}")
+                    else:
+                        print("No Punkte in this Knoten")
+            if elev is not None and sh_orifice is not None:
+                crest_height = abs(sh_orifice - elev) 
+        return crest_heigh
+    def get_type (wehr)->str:
+        if wehr.wehrtyp == 1:
+            typ = 'TRANSVERSE'
+            return typ
+        if wehr.wehrtyp == 2: 
+            typ = 'SIDEFLOW'
+            return typ
+        else:
+            print('no fitting weirs-type using TRANSVERSE')
+            typ = 'TRANSVERSE'
+            return typ 
+    def get_gated(wehr)-> str: 
+        if wehr.wehrtyp == 3 or 4:
+            gated = 'YES'
+            return gated
+        else: 
+            gated = 'NO'
+            return gated
     def get_weirs(bauwerk_list: List)-> List['Wehr']:
-        weirs_list = []
+        wehr_list = []
         for bauwerk in bauwerk_list:
             if isinstance (bauwerk, Wehr):
-                weirs_list.append(bauwerk)
+                wehr_list.append(bauwerk)
+        return wehr_list
+    def to_junctions(wehr_list :List, junctions_list: List):
+        for wehr in wehr_list:
+            fict_junc = junction.fict_junc(wehr)
+            junctions_list.append(fict_junc)
+        return junction_list
+    def to_conduit(wehr_list: List, conduits_list: List):
+        for wehr in wehr_list:
+            fict_cont = conduitS.fict_cond(wehr)
+            conduits_list.append(fict_cont)
+        return conduits_list
+    def from_weirs(wehr_list: List, haltung_list: List)-> List: ['weirs']:
+        weirs_list = []
+        for wehr in wehr_list:
+            typ = get_type(wehr)
+            crestht = get_cresth(wehr, haltung_list)
+            gated = get_gated(wehr)
+            weirs_sgl = weirs(
+                name = wehr.objektbezeichnung.,
+                node1 = wehr.objektbezeichnung + '_B',
+                node2 = wehr.objektbezeichnung + '_A',
+                typ = typ ,
+                crestht = crestht,
+                cd = 3, #---------
+                gated = gated,
+                ec = 0,
+                cd2 = 3322,
+                sur = 'YES',
+                width = 0,
+                surface = None
+            ) 
         return weirs_list
-
+    def to_weirs_strings(weirs_list: List)-> str:
+        header = [
+        "[WEIRS]",
+        ";;               Inlet            Outlet           Weir         Crest      Disch.     Flap End      End",       
+        ";;Name           Node             Node             Type         Height     Coeff.     Gate Con.     Coeff.",    
+        ";;-------------- ---------------- ---------------- ------------ ---------- ---------- ---- -------- ----------"
+        ]
+        weir_strings = []
+        for weir in weirs_list:
+            data = f"{weir.name:<(15)} {weir.node1:<(16)} {weir.node2:<(16)} {weir.typ:<(12)} {str(weir.crestht):<(10)} {str(weir.cd):<(10)} {weir.gated:<(4)}"
+            weir_strings.append(data)
+        return '\n'.join(header + weir_strings)
 @dataclass
 class outlets: #DROSSEL
     name: str
