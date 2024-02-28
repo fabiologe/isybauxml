@@ -588,7 +588,16 @@ class pump:
     status: str
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
-    
+    '''
+     Drossel and Pumpe getting put together and stored as pump
+     ----because most of Drossel getting as input an continuous laminar flow-----
+    '''
+    def get_drossel(bauwerk_lsit : List)-> List['Drossel']:
+        drossel_list = []
+        for bauwerk in bauwerk_lsit:
+            if isinstance(bauwerk, Drossel):
+                drossel_list.append(bauwerk)
+        return drossel_list
     def get_pump(bauwerk_list : List)-> List['Pumpe']:
         '''returns isybau pumpen from bauwerke '''
         pumps_list = []
@@ -596,16 +605,33 @@ class pump:
             if isinstance(bauwerk, Pumpe):
                 pumps_list.append(bauwerk)
         return pumpe_list
-    def to_junctions(pumps_list :List, junctions_list: List):
+    def to_junctions(pumps_list :List,drossel_list: List, junctions_list: List):
         for pump in pumps_list:
-            fict_junc = junction.fict_junc(pumps_list)
-            junctions_list.append(fict_junc)
+            p_fict_junc = junction.fict_junc(pumps_list)
+            junctions_list.append(p_fict_junc)
+        for drossel in drossel_list:
+            d_fict_junc = junction.fict_junc(drossel_list)
+            junctions_list.append(d_fict_junc)
         return junction_list
-    def to_conduit(pumps_list: List, conduits_list: List):
+    def to_conduit(pumps_list: List,drossel_list: List, conduits_list: List):
         for pump in pumps_list:
             fict_cont = conduitS.fict_cond(pumps_list)
             conduits_list.append(fict_cont)
         return conduits_list
+    def from_drossel(drossel_list: List)-> List['pump']:
+        pumps_list_d = []
+        for drossel in drossel_list:
+            drossel_sgl = pump(
+                name= drossel.objektbezeichnung,
+                node1 = drossel.objektbezeichnung + '_B',
+                node2 = drossel.objektbezeichnung + '_A',
+                pcurve= 'coming',  #-------------------------------------------->
+                status = 'ON',
+                startup = 0,
+                shutoff = 0
+            )
+            pumps_list_d.append(drossel_sgl)
+        return pumps_list_d
     def from_pumpe(pumpe_list: List)-> List['pump']:
         pumps_list = []
         for pumpe in pumpe_list:
@@ -621,7 +647,7 @@ class pump:
             )
             pumps_list.append(pump_sgl)
         return pumps_list
-    def to_pumps_string(pumps_list: List) -> str:
+    def to_pumps_string(pumps_list: List, pumps_list_d) -> str:
         header = [
             "[PUMPS]",
             ";;               Inlet            Outlet                                 Start      Shut",
@@ -633,11 +659,14 @@ class pump:
             # Adjusting field lengths for better alignment
             data = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
             pumps_string.append(data)
+        for throtle in pumps_list_d:
+            data_d = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
+            pumps_string.append(data_d)
         return '\n'.join(header + pumps_string)
 
 
 @dataclass
-class orifice: #SCHIEBER
+class orifice: #SCHIEBER / DROSSEL
     name: str
     node1: str
     node2: str
@@ -647,7 +676,7 @@ class orifice: #SCHIEBER
     cd: Optional[float] = 0
     flap:  str='NO'
     orate: Optional[float] = 0
-    def get_orifices(bauwerk_list: List)-> List['Schieber']:
+    def get_schieber(bauwerk_list: List)-> List['Schieber']:
         schieber_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Schieber):
@@ -663,7 +692,7 @@ class orifice: #SCHIEBER
             fict_cont = conduitS.fict_cond(schieber)
             conduits_list.append(fict_cont)
         return conduits_list
-    def from_orifices(schieber_list: List, haltung_list: List)->List['orifice']:
+    def from_schieber(schieber_list: List, haltung_list: List)->List['orifice']:
         orifices_list = []
         for schieber in schieber_list:
             for haltung in haltung_list:
@@ -781,7 +810,7 @@ class weirs:   # WEHR
             fict_cont = conduitS.fict_cond(wehr)
             conduits_list.append(fict_cont)
         return conduits_list
-    def from_weirs(wehr_list: List, haltung_list: List)-> List: ['weirs']:
+    def from_wehr(wehr_list: List, haltung_list: List)-> List: ['weirs']:
         weirs_list = []
         for wehr in wehr_list:
             typ = get_type(wehr)
@@ -814,8 +843,10 @@ class weirs:   # WEHR
             data = f"{weir.name:<(15)} {weir.node1:<(16)} {weir.node2:<(16)} {weir.typ:<(12)} {str(weir.crestht):<(10)} {str(weir.cd):<(10)} {weir.gated:<(4)}"
             weir_strings.append(data)
         return '\n'.join(header + weir_strings)
+
+'''Dont know if this needs to be used '''
 @dataclass
-class outlets: #DROSSEL
+class outlets: 
     name: str
     node1: str
     node2: str
@@ -824,14 +855,8 @@ class outlets: #DROSSEL
     c1: Optional[float] = 0
     c2: Optional[float] = 0
     gated: str= 'NO'
-    def get_outlets(bauwerk_list: List)->List['Drossel']:
-        outlets_list = []
-        for bauwerk in bauwerk_list:
-            if isinstance(bauwerk, Drossel):
-                outlets_list.append(bauwerk)
-        return outlets_list
-
-
+   
+    
 @dataclass
 class xsection:
     link: str  
@@ -903,7 +928,7 @@ class xsection:
 
     
     
-
+'''Only needed when DYNAMIC WAVE in Options'''
 @dataclass
 class losses:
     conduit: str
@@ -912,6 +937,7 @@ class losses:
     kavg: Optional[float]
     flap: str = 'YES'
     seepage: float= 0
+'''Only needed when river and other irregulare shape'''
 @dataclass
 class transects:
     name: str 
@@ -927,6 +953,7 @@ class transects:
     elev: Optional[float] = 0
     station: Optional[float] = 0
 '''NO SUPPORT FOR CONTROLS'''
+'''pullutants will be later added need to search data first'''
 @dataclass
 class pollutants:
     name: str
