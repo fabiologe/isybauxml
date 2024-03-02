@@ -476,22 +476,29 @@ class storage:
     psi : Optional[float] = 0
     ksat: Optional[float] = 0
     imd : Optional[float] = 0
-    def load_storage(self, bauwerke_list) -> List['storage']:
-        storages_list = []
+    def set_area(becken_list: List)-> List['curves']:
+        pass
+    def get_becken(self, bauwerke_list) -> List['Becken']:
+        becken_list = []
         for bauwerk in bauwerke_list:
             if isinstance(bauwerk, Becken):
-                for knoten in bauwerk.knoten:
-                    elev = knoten.punkte[1].z
+                becken_list.append(bauwerk)
+        return becken_list
+    def get_storage(becken_list: List)-> List['storage']:
+        storages_list = []
+        for becken in becken_list:
+            for knoten in becken.knoten:
+                elev = knoten.punkte[1].z
                 print("Found Storage")
-                storage_sgl = storage(name=bauwerk.objektbezeichnung,
+            storage_sgl = storage(name=becken.objektbezeichnung,
                                       elev= elev,
-                                      ymax = bauwerk.max_hoehe,
+                                      ymax = becken.max_hoehe,
                                       y0 = 0,
                                       acurve= 'TABULAR',
-                                      curve = bauwerk.objektbezeichnung
+                                      curve = becken.objektbezeichnung
                                       )
-                storages_list.append(storage_sgl)
-                return storages_list
+            storages_list.append(storage_sgl)
+            return storages_list
     def to_storage_string(storages_list: List) -> str:
         header = [
             "[STORAGE]",
@@ -1040,9 +1047,40 @@ class hydrographs:
 @dataclass
 class curves:
     name: str
-    type: str
+    typ: str
     x_values: List[float]
     y_values: List[float]
+from typing import List
+
+def set_curve(element) -> List[float]:
+    height_steps = []
+    height = float(element.knoten[0].punkte[1].z) - float(element.knoten[0].punkte[0].z)
+    
+    
+    if height is None or height < 0.5:
+        height_steps = [0.4]  
+    else:
+        
+        for step in range(1, int(height * 10) + 1):
+            height_steps.append(step * 0.1)
+    
+    return height_steps
+
+
+    def get_curves(storages_list: List, pumps_list: List, pumps_list_d: List) -> List['curves']:
+    curves_list = []
+    for storage in storages_list:
+    
+        x_values = set_curve(storage)  
+        curve_sgl = curves(
+            name=storage.name,
+            typ='STORAGE', #x_y values in m²
+            x_values=x_values  
+        )
+        curves_list.append(curve_sgl)
+    return curves_list
+
+        
     
 @dataclass
 class timeseries:
