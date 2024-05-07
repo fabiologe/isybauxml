@@ -8,23 +8,21 @@ def rain_wrapper(x, y):
     rain_data = {}
     durations = [15, 60]
     yearly_rain_types = ['3a', '5a', '10a']
-
-    index_rc = generate_index_rc(x, y, raster_csv)
+    index_rc = generate_index_rc(x, y)
     if index_rc:
         print(index_rc)
         for duration in durations:
             rain_data[duration] = {}
             for yearly_rain_type in yearly_rain_types:
                 try:
-                    rain_mm = get_rain_mm(duration, yearly_rain_type, index_rc, csv_folder)
+                    rain_mm = get_rain_mm(duration, yearly_rain_type, index_rc)
                     rain_data[duration][yearly_rain_type] = rain_mm
                     steps = 3  # Assuming 3-minute steps
                     euler_data = generate_euler_type2_rain(rain_mm, duration, steps)
                     rain_data[duration][yearly_rain_type + '_euler'] = euler_data
                 except ValueError as e:
                     rain_data[duration][yearly_rain_type] = str(e)
-        
-                with open(f"rain/{index_rc}_{duration}_{yearly_rain_type}.txt", "w") as file:
+                with open(f"hydraulik/rain_tabels/rain/{index_rc}_{duration}_{yearly_rain_type}.txt", "w") as file:
                     file.write("[TIMESERIES]\n")
                     file.write(";;Name           Date       Time       Value\n")
                     file.write(";;-------------- ---------- ---------- ----------\n")
@@ -38,10 +36,10 @@ def rain_wrapper(x, y):
 
     return rain_data
 
+ 
 
-
-
-def generate_index_rc(x, y, raster_csv):
+def generate_index_rc(x, y):
+    raster_csv = "hydraulik/rain_tabels/data/raster.csv"
     with open(raster_csv, newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';')
         for row in reader:
@@ -53,15 +51,14 @@ def generate_index_rc(x, y, raster_csv):
                 return row['index_rc']
     return None
 
+  # Specify the path to your CSV file
 
-raster_csv = "data/raster.csv"  # Specify the path to your CSV file
-
-def get_rain_mm(duration, yearly_rain_type, index_rc, csv_folder):
+def get_rain_mm(duration, yearly_rain_type, index_rc):
     # Convert the index_rc value to match the format in the DataFrame
     index_rc_str = str(index_rc).zfill(6)  
     index_rc_int = int(index_rc_str)
     
-    csv_file = f"{csv_folder}/2020_D{duration}.csv"
+    csv_file = f"hydraulik/rain_tabels/data/2020_D{duration}.csv"
     
     if yearly_rain_type == '3a':
         columns_to_use = ['HN_003A']
@@ -112,10 +109,10 @@ def generate_euler_type2_rain(rain_mm, duration, steps):
     return euler_data
 
 
-x = 6.99641136598768
+'''x = 6.99641136598768
 y = 49.2853524841828
 rain_wrapper(x,y)
-'''
+
 # Example usage
 rain_mm = 15 # Total rainfall amount in mm
 duration = 15  # Total duration in minutes

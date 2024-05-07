@@ -1,4 +1,5 @@
 from xml_parser import * 
+from hydraulik.rain_tabels.load_rain import rain_wrapper
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -288,7 +289,10 @@ class junction:
     y0: Optional[float] = 0   #Wasserspiegel
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
-    def fict_junc(element):
+
+    '''SOMETHING NOT RIGTH--------------------------------------------------'''
+    def fict_junc(fict_junc: List, element) -> List['conduit']:
+            fict_junc_L = []
             elev = None
             y0 = None
             if element-knoten:
@@ -309,23 +313,23 @@ class junction:
                             print("    Y0 (second Punkt): Not available, using default (0)")
                     else:
                         print("    No Punkte in this Knoten")
-                junction_a = junctions(
+                junction_a = junction(
                             name = element.objektbezeichnung + '_A',
                             elev = elev,
                             y0 = y0 ,
                             ysur=0,
                             apond=0
                                 )
-                junction_b = junctions(
+                junction_b = junction(
                             name = element.objektbezeichnung + '_B',
                             elev = elev + 0.1 ,
                             y0 = y0 + 0.1 ,
                             ysur=0,
                             apond=0
                                 )
-                fict_junc.append(junction_a)
-                fict_junc.append(junction_b)
-            return fict_junc
+                fict_junc_L.append(junction_a)
+                fict_junc_L.append(junction_b)
+            return fict_junc_L
 
     def from_schacht(schacht_list: List) -> List['junction']:
         junctions_list = []
@@ -400,7 +404,7 @@ class outfall:  #AUSLASS
     gated: Optional[str] = None
     routeto: Optional[str] = None
 
-    def check_outfall(self, schacht_list, bauwerke_list) -> List['outfalls']:
+    def check_outfall(self, schacht_list, bauwerke_list) -> List['outfall']:
         outfalls_list = []
         found_auslaufbauwerk = False
         
@@ -435,7 +439,7 @@ class outfall:  #AUSLASS
                     for knoten in schacht.knoten:
                         elev = knoten.punkte[1].z
                         print(f"Elevation of {outfall_name}: {elev}")
-                    outfall_sgl = outfalls(
+                    outfall_sgl = outfall(
                         name=str(outfall_name),
                         elev=elev,
                         type= 'FREE',
@@ -526,6 +530,7 @@ class conduit: #abflusswirksame Verbindungen
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
     Qmax: Optional[float] = 0 
+    '''SOMETHING NOT RIGHT ------------------------------------------------------------------------------------'''
     def fict_cond(fict_conds: List) -> List['conduit']:
         for element in fict_conds:
             zn = None
@@ -599,9 +604,9 @@ class pump:
      Drossel and Pumpe getting put together and stored as pump
      ----because most of Drossel getting as input an continuous laminar flow-----
     '''
-    def get_drossel(bauwerk_lsit : List)-> List['Drossel']:
+    def get_drossel(bauwerk_list : List)-> List['Drossel']:
         drossel_list = []
-        for bauwerk in bauwerk_lsit:
+        for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Drossel):
                 drossel_list.append(bauwerk)
         return drossel_list
@@ -611,7 +616,7 @@ class pump:
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Pumpe):
                 pumps_list.append(bauwerk)
-        return pumpe_list
+        return pumps_list
     def to_junctions(pumps_list :List,drossel_list: List, junctions_list: List):
         for pump in pumps_list:
             p_fict_junc = junction.fict_junc(pumps_list)
@@ -619,10 +624,10 @@ class pump:
         for drossel in drossel_list:
             d_fict_junc = junction.fict_junc(drossel_list)
             junctions_list.append(d_fict_junc)
-        return junction_list
+        return junctions_list
     def to_conduit(pumps_list: List,drossel_list: List, conduits_list: List):
         for pump in pumps_list:
-            fict_cont = conduitS.fict_cond(pumps_list)
+            fict_cont = conduit.fict_cond(pumps_list)
             conduits_list.append(fict_cont)
         return conduits_list
     def from_drossel(drossel_list: List)-> List['pump']:
@@ -689,16 +694,16 @@ class orifice: #SCHIEBER / DROSSEL
             if isinstance(bauwerk, Schieber):
                 schieber_list.append(bauwerk)
         return schieber_list
-    def to_junctions(schieber_list :List, junctions_list: List):
+    def to_junctions(schieber_list :List, junction_list: List):
         for schieber in schieber_list:
             fict_junc = junction.fict_junc(schieber)
-            junctions_list.append(fict_junc)
+            junction_list.append(fict_junc)
         return junction_list
-    def to_conduit(schieber_list: List, conduits_list: List):
+    def to_conduit(schieber_list: List, conduit_list: List):
         for schieber in schieber_list:
-            fict_cont = conduitS.fict_cond(schieber)
-            conduits_list.append(fict_cont)
-        return conduits_list
+            fict_cont = conduit.fict_cond(schieber)
+            conduit_list.append(fict_cont)
+        return conduit_list
     def from_schieber(schieber_list: List, haltung_list: List)->List['orifice']:
         orifices_list = []
         for schieber in schieber_list:
@@ -807,17 +812,17 @@ class weirs:   # WEHR
             if isinstance (bauwerk, Wehr):
                 wehr_list.append(bauwerk)
         return wehr_list
-    def to_junctions(wehr_list :List, junctions_list: List):
+    def to_junctions(wehr_list :List, junction_list: List):
         for wehr in wehr_list:
             fict_junc = junction.fict_junc(wehr)
-            junctions_list.append(fict_junc)
+            junction_list.append(fict_junc)
         return junction_list
     def to_conduit(wehr_list: List, conduits_list: List):
         for wehr in wehr_list:
-            fict_cont = conduitS.fict_cond(wehr)
+            fict_cont = conduit.fict_cond(wehr)
             conduits_list.append(fict_cont)
         return conduits_list
-    def from_wehr(wehr_list: List, haltung_list: List)-> List: ['weirs']:
+    '''def from_wehr(wehr_list: List, haltung_list: List)-> List['weirs']:
         weirs_list = []
         for wehr in wehr_list:
             typ = get_type(wehr)
@@ -837,7 +842,7 @@ class weirs:   # WEHR
                 width = 0,
                 surface = None
             ) 
-        return weirs_list
+        return weirs_list'''
     def to_weirs_strings(weirs_list: List)-> str:
         header = [
         "[WEIRS]",
@@ -1067,18 +1072,18 @@ def set_curve(element) -> List[float]:
     return height_steps
 
 
-    def get_curves(storages_list: List, pumps_list: List, pumps_list_d: List) -> List['curves']:
-    curves_list = []
-    for storage in storages_list:
-    
-        x_values = set_curve(storage)  
-        curve_sgl = curves(
-            name=storage.name,
-            typ='STORAGE', #x_y values in m²
-            x_values=x_values  
-        )
-        curves_list.append(curve_sgl)
-    return curves_list
+def get_curves(storages_list: List, pumps_list: List, pumps_list_d: List) -> List['curves']:
+        curves_list = []
+        for storage in storages_list:
+        
+            x_values = set_curve(storage)  
+            curve_sgl = curves(
+                name=storage.name,
+                typ='STORAGE', #x_y values in m²
+                x_values=x_values  
+            )
+            curves_list.append(curve_sgl)
+        return curves_list
 
         
     
@@ -1089,6 +1094,26 @@ class timeseries:
     hour: str
     time: float
     value: str
+    def to_rain_string(x, y):
+        rain_data = rain_wrapper(x, y)
+        header = [
+            "[TIMESERIES]",
+            ";;Name           Date       Time       Value",
+            ";;-------------- ---------- ---------- ----------" 
+        ]
+        rain_strings = []
+
+        for duration in rain_data.keys():
+            for yearly_rain_type in rain_data[duration].keys():
+                if yearly_rain_type.endswith('_euler'):
+                    rain_string = ""
+                    rain_string += f"{yearly_rain_type[:-6]:<10}{'':14}"
+                    euler_data = rain_data[duration][yearly_rain_type]
+                    for time_point, rain_value in euler_data:
+                        rain_string += f"{time_point: >2d}:00{'':5}{rain_value:.2f}\n"
+                    rain_strings.append(rain_string)
+
+        return "\n".join(header + rain_strings)
 
 @dataclass
 class report:
@@ -1125,17 +1150,20 @@ class backdrop:
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     fict_cond = []
-    
+    x = 6.99641136598768
+    y = 49.2853524841828
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
-    junction_list = junctions.from_schacht(schacht_list)
-    pumps_list = pumps.get_pump(bauwerk_list)
-    junction_list = pumps.to_junctions(pumps_list, junction_list)
+    junction_list = junction.from_schacht(schacht_list)
+    pump_list = pump.get_pump(bauwerke_list)
+    '''drossel_list = pump.get_drossel(bauwerke_list)
+    junction_list = pump.to_junctions(pump_list, junction_list, drossel_list)'''
+   
     #orc etc
-    outfall = outfalls()
-    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
-
+    ''' outfall = outfall()
+    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)'''
+    
 
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
@@ -1160,7 +1188,11 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write(infiltration_H.to_infiltration_string(infiltration_list, subcatchment_list))
         f.write("\n")
         f.write("\n")
-        f.write(junctions.to_junction_string(junction_list))
+        f.write(junction.to_junction_string(junction_list))
         f.write("\n")
         f.write("\n")
-        f.write(outfall.to_outfall_string(outfall_list))
+        '''f.write(outfall.to_outfall_string(outfall_list))'''
+        f.write("\n")
+        f.write("\n")
+        f.write(timeseries.to_rain_string(x,y))
+
