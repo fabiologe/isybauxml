@@ -1055,35 +1055,34 @@ class curves:
     typ: str
     x_values: List[float]
     y_values: List[float]
-from typing import List
 
-def set_curve(element) -> List[float]:
-    height_steps = []
-    height = float(element.knoten[0].punkte[1].z) - float(element.knoten[0].punkte[0].z)
-    
-    
-    if height is None or height < 0.5:
-        height_steps = [0.4]  
-    else:
-        
-        for step in range(1, int(height * 10) + 1):
-            height_steps.append(step * 0.1)
-    
-    return height_steps
+    def set_curve(element) -> List[float]:
+        height_steps = []
+        height = float(element.knoten[0].punkte[1].z) - float(element.knoten[0].punkte[0].z)
 
 
-def get_curves(storages_list: List, pumps_list: List, pumps_list_d: List) -> List['curves']:
-        curves_list = []
-        for storage in storages_list:
-        
-            x_values = set_curve(storage)  
-            curve_sgl = curves(
-                name=storage.name,
-                typ='STORAGE', #x_y values in m²
-                x_values=x_values  
-            )
-            curves_list.append(curve_sgl)
-        return curves_list
+        if height is None or height < 0.5:
+            height_steps = [0.4]  
+        else:
+
+            for step in range(1, int(height * 10) + 1):
+                height_steps.append(step * 0.1)
+
+        return height_steps
+
+
+    def get_curves(storages_list: List, pumps_list: List, pumps_list_d: List) -> List['curves']:
+            curves_list = []
+            for storage in storages_list:
+            
+                x_values = curves.set_curve(storage)  
+                curve_sgl = curves(
+                    name=storage.name,
+                    typ='STORAGE', #x_y values in m²
+                    x_values=x_values  
+                )
+                curves_list.append(curve_sgl)
+            return curves_list
 
         
     
@@ -1119,7 +1118,34 @@ class timeseries:
 
 @dataclass
 class report:
-    pass
+    input: str = 'NO'
+    continuity: str = 'NO'
+    flowstats: str = 'NO'
+    controls: str = 'NO'
+    subcatchments: str = 'ALL'
+    nodes: str = 'ALL'
+    links: str = 'ALL'
+
+    def to_report_string(self) -> str:
+        # Create the header
+        header = ["[REPORT]"]
+
+        # Join the attribute values with newlines and add extra spaces for alignment
+        values = "\n".join([
+            f"INPUT     {self.input: <12} \nCONTINUITY     {self.continuity: <12}",     
+            f"FLOWSTATS     {self.flowstats: <12}\nCONTROLS     {self.controls: <12}",
+            f"SUBCATCHMENTS     {self.subcatchments: <12}\nNODES         {self.nodes: <12}",
+            f"LINKS     {self.links: <12}"
+        ])
+
+        return "\n".join(header + [values])
+
+@dataclass
+class map:
+    X1: int
+    Y1: int
+    X2: int
+    Y2: int
 
 @dataclass
 class tags:
@@ -1127,26 +1153,54 @@ class tags:
 
 @dataclass
 class cooordinates:
+    node: str
+    Xcoord: float
+    Ycoord: float
+
     pass
 
 @dataclass 
 class vertices:
+    link: str
+    Xcoord: float
+    Ycoord: float
+
     pass
 
 @dataclass
 class polygons:
+    subcat: str
+    Xcoord: float
+    Ycoord: float 
     pass
 
 @dataclass
 class symbols: 
+    gage: str
+    Xcoord: float
+    Ycoord: float
     pass 
 
 @dataclass
 class labels:
+    Xcoord: float
+    Ycoord: float
+    label: str
+    anchor: str
+    font: str
+    size: int
+    bold: str = 'NO'
+    italic: str = 'NO'
+    
     pass 
 
 @dataclass
 class backdrop:
+    fname: str
+    X1: float
+    Y1: float
+    X2: float
+    Y2: float
     pass 
 
 
@@ -1154,11 +1208,13 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     fict_cond = []
     x = 6.99641136598768
     y = 49.2853524841828
+    report_1 =report(input='NO', continuity='NO', flowstats='NO', controls='NO', subcatchments='ALL', nodes='ALL', links='ALL')
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junction.from_schacht(schacht_list)
     pump_list = pump.get_pump(bauwerke_list)
+    
     '''drossel_list = pump.get_drossel(bauwerke_list)
     junction_list = pump.to_junctions(pump_list, junction_list, drossel_list)'''
    
@@ -1197,4 +1253,9 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(timeseries.to_rain_string(x,y))
+        f.write("\n")
+        f.write("\n")
+        f.write(report_1.to_report_string())
+        
+
 

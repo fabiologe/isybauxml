@@ -292,3 +292,13 @@ W_Rï¿½           204.4      0          208.514    0          0
 10a                            51:00     0.00
 10a                            54:00     0.00
 10a                            57:00     0.00
+
+
+[REPORT]
+INPUT     NO           
+CONTINUITY     NO          
+FLOWSTATS     NO          
+CONTROLS     NO          
+SUBCATCHMENTS     ALL         
+NODES         ALL         
+LINKS     ALL         
