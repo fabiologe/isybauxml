@@ -1094,6 +1094,7 @@ class timeseries:
     hour: str
     time: float
     value: str
+    @staticmethod
     def to_rain_string(x, y):
         rain_data = rain_wrapper(x, y)
         header = [
@@ -1106,11 +1107,12 @@ class timeseries:
         for duration in rain_data.keys():
             for yearly_rain_type in rain_data[duration].keys():
                 if yearly_rain_type.endswith('_euler'):
-                    rain_string = ""
-                    rain_string += f"{yearly_rain_type[:-6]:<10}{'':14}"
+                    name = yearly_rain_type[:-6]
+                    max_name_length = max(len(name), 10)  # Adjust for minimum column width
                     euler_data = rain_data[duration][yearly_rain_type]
+                    rain_string = ""
                     for time_point, rain_value in euler_data:
-                        rain_string += f"{time_point: >2d}:00{'':5}{rain_value:.2f}\n"
+                        rain_string += f"{name:<{max_name_length}}{' ':13}{'':5}{time_point: >5}:00{'':5}{rain_value:.2f}\n"
                     rain_strings.append(rain_string)
 
         return "\n".join(header + rain_strings)
