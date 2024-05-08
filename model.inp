@@ -207,7 +207,11 @@ W_Rï¿½           204.4      0          208.514    0          0
 769              212.28     0          217.46     0          0         
 770              211.71     0          213.64     0          0         
 
-
+[OUTFALLS]
+;;               Invert     Outfall    Stage/Table      Tide
+;;Name           Elev.      Type       Time Series      Gate
+;;-------------- ---------- ---------- ---------------- ----
+769              217.46     FREE                        NO   
 
 [TIMESERIES]
 ;;Name           Date       Time       Value

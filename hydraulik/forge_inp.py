@@ -291,11 +291,10 @@ class junction:
     apond: Optional[float] = 0  #ueberflutungsflaeche
 
     '''SOMETHING NOT RIGTH--------------------------------------------------'''
-    def fict_junc(fict_junc: List, element) -> List['conduit']:
-            fict_junc_L = []
+    ''' def fict_junc(element_list: List, element) -> List['junction']:
             elev = None
             y0 = None
-            if element-knoten:
+            if element.knoten:
                 knoten = element.knoten[0]
                 print(f"Fictional Element: {element.objektbezeichnung}")
                 print(f"Number of Knoten: {len(element.knoten)}")
@@ -327,10 +326,9 @@ class junction:
                             ysur=0,
                             apond=0
                                 )
-                fict_junc_L.append(junction_a)
-                fict_junc_L.append(junction_b)
-            return fict_junc_L
-
+                junction_list.append(junction_a)
+                junction_list.append(junction_b)
+            return junction'''
     def from_schacht(schacht_list: List) -> List['junction']:
         junctions_list = []
         for schacht in schacht_list:
@@ -394,7 +392,7 @@ class divider: #gets skipped not cant find it inside ISYBAUXML
 
 
 @dataclass
-class outfall:  #AUSLASS 
+class outfall:  # AUSLASS 
     name: Optional[str] = None
     elev: Optional[float] = 0
     type: Optional[str] = 'FREE'
@@ -404,7 +402,8 @@ class outfall:  #AUSLASS
     gated: Optional[str] = None
     routeto: Optional[str] = None
 
-    def check_outfall(self, schacht_list, bauwerke_list) -> List['outfall']:
+    @classmethod
+    def check_outfall(cls, schacht_list, bauwerke_list) -> List['outfall']:
         outfalls_list = []
         found_auslaufbauwerk = False
         
@@ -413,7 +412,7 @@ class outfall:  #AUSLASS
                 print("Found Auslaufbauwerk")
                 for knoten in bauwerk.knoten:
                     elev = knoten.punkte[1].z
-                outfall_sgl = outfall(
+                outfall_sgl = cls(
                     name=bauwerk.objektbezeichnung,
                     elev=elev,
                     type='FREE'
@@ -425,12 +424,13 @@ class outfall:  #AUSLASS
             print("No given Auslaufbauwerk")
             num_outfall = int(input("How many outfalls are needed:"))
             for i in range(num_outfall):
-                outfall_sgl = self.search_set(schacht_list)
+                outfall_sgl = cls.search_set(schacht_list)
                 outfalls_list.append(outfall_sgl)
         
         return outfalls_list
 
-    def search_set(self, schacht_list):
+    @classmethod
+    def search_set(cls, schacht_list):
         while True:
             outfall_name = input("Enter outfall name: ")
             for schacht in schacht_list:
@@ -439,10 +439,10 @@ class outfall:  #AUSLASS
                     for knoten in schacht.knoten:
                         elev = knoten.punkte[1].z
                         print(f"Elevation of {outfall_name}: {elev}")
-                    outfall_sgl = outfall(
+                    outfall_sgl = cls(
                         name=str(outfall_name),
                         elev=elev,
-                        type= 'FREE',
+                        type='FREE',
                         gated='NO',
                         tcurve='',
                         tseries='',
@@ -451,7 +451,8 @@ class outfall:  #AUSLASS
                     return outfall_sgl  
             print(f"No Schacht found with name {outfall_name}. Please enter a valid name.")
 
-    def to_outfall_string(self, outfalls_list: List) -> str:
+    @classmethod
+    def to_outfall_string(cls, outfalls_list: List['outfall']) -> str:
         header = [
             "[OUTFALLS]",
             ";;               Invert     Outfall    Stage/Table      Tide",
@@ -535,7 +536,7 @@ class conduit: #abflusswirksame Verbindungen
         for element in fict_conds:
             zn = None
             if element.knoten:
-                knoten = schacht.knoten[0]
+                knoten = element.knoten[0]
                 print(f"Fict haltung: {element.objektbezeichnung}")
                 print(f"Number of Knoten: {len(element.knoten)}")
                 for i, knoten in enumerate(element.knoten):
@@ -617,19 +618,25 @@ class pump:
             if isinstance(bauwerk, Pumpe):
                 pumps_list.append(bauwerk)
         return pumps_list
-    def to_junctions(pumps_list :List,drossel_list: List, junctions_list: List):
+    '''NOT CLEAR WHAT NEEDS TO BE DONE HERE : ''' 
+    
+    
+    '''def to_junctions(pumps_list :List,drossel_list: List, junctions_list: List):
         for pump in pumps_list:
-            p_fict_junc = junction.fict_junc(pumps_list)
+            p_fict_junc = junction.fict_junc(pump)
             junctions_list.append(p_fict_junc)
         for drossel in drossel_list:
-            d_fict_junc = junction.fict_junc(drossel_list)
+            d_fict_junc = junction.fict_junc(drossel)
             junctions_list.append(d_fict_junc)
         return junctions_list
     def to_conduit(pumps_list: List,drossel_list: List, conduits_list: List):
         for pump in pumps_list:
-            fict_cont = conduit.fict_cond(pumps_list)
-            conduits_list.append(fict_cont)
-        return conduits_list
+            fict_contP = conduit.fict_cond(pump)
+            conduits_list.append(fict_contP)
+        for drossel in drossel_list:
+            fict_contD = conduit.fict_cond(drossel)
+            conduits_list.append(fict_contD)
+        return conduits_list'''
     def from_drossel(drossel_list: List)-> List['pump']:
         pumps_list_d = []
         for drossel in drossel_list:
@@ -678,7 +685,7 @@ class pump:
 
 
 @dataclass
-class orifice: #SCHIEBER / DROSSEL
+class orifice: #SCHIEBER 
     name: str
     node1: str
     node2: str
@@ -767,9 +774,9 @@ class weirs:   # WEHR
     sur: str = 'YES' 
     width: Optional[float] = 0
     surface: Optional[str] = None
-    def get_cresth(wehr, haltung_list: List)->str:
+    def get_cresth(wehr_list: List, haltung_list: List)->str:
         for haltung in haltung_list:
-            from_wehr = next((node for node in node_list if node.objektbezeichnung == haltung.zulauf), None)
+            from_wehr = next((wehr for wehr in wehr_list if wehr.objektbezeichnung == haltung.zulauf), None)
             if from_wehr:
                 if haltung.zulauf_sh is not None:
                     sh_weirs = haltung.zulauf_sh
@@ -1142,17 +1149,25 @@ class report:
 
 @dataclass
 class map:
-    X1: int
-    Y1: int
-    X2: int
-    Y2: int
+    X1: float
+    Y1: float
+    X2: float
+    Y2: float
+
+    @classmethod
+    def calc_dimensions(cls, coordinates_list: List['coordinates']):
+        Xs = [coord.Xcoord for coord in coordinates_list]
+        Ys = [coord.Ycoord for coord in coordinates_list]
+        X1, Y1 = min(Xs), min(Ys)
+        X2, Y2 = max(Xs), max(Ys)
+        return cls(X1, Y1, X2, Y2)
 
 @dataclass
 class tags:
     pass
 
 @dataclass
-class cooordinates:
+class coordinates:
     node: str
     Xcoord: float
     Ycoord: float
@@ -1205,7 +1220,6 @@ class backdrop:
 
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
-    fict_cond = []
     x = 6.99641136598768
     y = 49.2853524841828
     report_1 =report(input='NO', continuity='NO', flowstats='NO', controls='NO', subcatchments='ALL', nodes='ALL', links='ALL')
@@ -1214,13 +1228,11 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junction.from_schacht(schacht_list)
     pump_list = pump.get_pump(bauwerke_list)
+    drossel_list = pump.get_drossel(bauwerke_list)
     
-    '''drossel_list = pump.get_drossel(bauwerke_list)
-    junction_list = pump.to_junctions(pump_list, junction_list, drossel_list)'''
    
     #orc etc
-    ''' outfall = outfall()
-    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)'''
+    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
     
 
     with open("model.inp", "w") as f:
@@ -1249,7 +1261,7 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write(junction.to_junction_string(junction_list))
         f.write("\n")
         f.write("\n")
-        '''f.write(outfall.to_outfall_string(outfall_list))'''
+        f.write(outfall.to_outfall_string(outfall_list))
         f.write("\n")
         f.write("\n")
         f.write(timeseries.to_rain_string(x,y))
