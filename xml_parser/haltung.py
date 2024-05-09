@@ -32,6 +32,8 @@ class Kante:
 @dataclass
 class Polygon:
     kante: Kante
+ #Haltung: A57c, Number of edges: Polygon(kante=Kante(start=Start(punkt=Punkt(x=2564687.012, y=5461936.858, z=210.77), tag='RAP'), ende=Ende(punkt=Punkt(x=2564692.117, y=5461934.148, z=210.757), tag='RAP')))
+    
 @dataclass
 class Haltung:
     objektbezeichnung: Optional[str] = None
@@ -207,8 +209,8 @@ def parse_haltung(root):
                                         kante = Kante(start=start, ende=ende)
                                         haltung.add_kante(kante)
 
-                                polygon = Polygon(kante=kante)
-                                haltung.add_polygon(polygon)
+                            polygon = Polygon(kante=kante)
+                            haltung.add_polygon(polygon)
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')

@@ -1161,6 +1161,11 @@ class map:
         X1, Y1 = min(Xs), min(Ys)
         X2, Y2 = max(Xs), max(Ys)
         return cls(X1, Y1, X2, Y2)
+    def to_map_string(self)-> str : 
+        header = "[MAP]"
+        dimensions = f"DIMENSIONS  {self.X1} {self.Y1} {self.X2} {self.Y2}"
+        units = "UNITS     METERS"
+        return f"{header}\n{dimensions}\n{units}"
 
 @dataclass
 class tags:
@@ -1171,15 +1176,88 @@ class coordinates:
     node: str
     Xcoord: float
     Ycoord: float
+    
+    @classmethod
+    def from_schacht(cls, schacht_list: List) -> List['coordinates']:
+        coordinates_list = []
+        for schacht in schacht_list:
+            if schacht.knoten:
+                knoten = schacht.knoten[0]
+                node = schacht.objektbezeichnung
+                for i, knoten in enumerate(schacht.knoten):
+                    if knoten.punkte:
+                        punkt= knoten.punkte[0]
+                        Xcoord = float(punkt.x)
+                        Ycoord = float(punkt.y)
+                    else: 
+                        print("No PUNKTE in this KNOTEN")
+                node_sgl = cls(
+                    node=node,
+                    Xcoord=Xcoord,
+                    Ycoord=Ycoord
+                )            
+                coordinates_list.append(node_sgl)
+        return coordinates_list
+    
+    @staticmethod
+    def to_coordinates_string(coordinates_list: List['coordinates']) -> str: 
+        header = [
+            "[COORDINATES]",
+            ";;Node           X-Coord            Y-Coord  ",         
+            ";;-------------- ------------------ ------------------"
+        ]
+        coordinates_strings = []
+        for coordinate in coordinates_list:
+            data = f"{coordinate.node:<16} {coordinate.Xcoord:<20} {coordinate.Ycoord:<20}"
+            coordinates_strings.append(data)
+        return '\n'.join(header + coordinates_strings)
+  
 
-    pass
 
-@dataclass 
+@dataclass #still not working 
 class vertices:
     link: str
     Xcoord: float
     Ycoord: float
+    @classmethod
+    def from_haltung(cls, haltung_list: List) -> List['vertices']:
+        vertices_list = []
+        for haltung in haltung_list:
+            link = haltung.objektbezeichnung
+            if haltung.polygons:
+                for polygon in haltung.polygons:
+                    Xcoord_S = polygon.kante.start.punkt.x
+                    Ycoord_S = polygon.kante.start.punkt.y
+                    Xcoord_E = polygon.kante.ende.punkt.x
+                    Ycoord_E = polygon.kante.ende.punkt.y
+                    vertices_start = vertices(
+                        link=link,
+                        Xcoord=Xcoord_S,
+                        Ycoord=Ycoord_S
+                    )
+                    vertices_ende = vertices(
+                        link=link,
+                        Xcoord=Xcoord_E,
+                        Ycoord=Ycoord_E
+                    )
+                vertices_list.append(vertices_start)
+                vertices_list.append(vertices_ende)
+        return vertices_list
+    
+    def to_vertices_string(vertices_list = List)-> str: 
+        header = [
+            "[VERTICES]",
+            ";;Link           X-Coord            Y-Coord  ",
+            ";;-------------- ------------------ ------------------"
+        ]
+        vertices_strings = []
+        for vertice in vertices_list:
+            data = f"{vertice.link:>16} {vertice.Xcoord:<20}{vertice.Ycoord:<20}"
+            vertices_strings.append(data)
+            return '\n'.join(header + vertices_strings)
 
+
+                
     pass
 
 @dataclass
@@ -1233,6 +1311,8 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
    
     #orc etc
     outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
+    coordinate_list = coordinates.from_schacht(schacht_list)
+    vertices_list = vertices.from_haltung(haltung_list)
     
 
     with open("model.inp", "w") as f:
@@ -1268,6 +1348,13 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(report_1.to_report_string())
+        f.write("\n")
+        f.write("\n")
+        f.write(coordinates.to_coordinates_string(coordinate_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(vertices.to_vertices_string(vertices_list))
+
         
 
 
