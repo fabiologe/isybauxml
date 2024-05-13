@@ -1227,9 +1227,13 @@ class vertices:
             if haltung.polygons:
                 for polygon in haltung.polygons:
                     Xcoord_S = polygon.kante.start.punkt.x
+                    print(Xcoord_S)
                     Ycoord_S = polygon.kante.start.punkt.y
+                    print(Ycoord_S)
                     Xcoord_E = polygon.kante.ende.punkt.x
+                    print(Xcoord_E)
                     Ycoord_E = polygon.kante.ende.punkt.y
+                    print(Ycoord_E)
                     vertices_start = vertices(
                         link=link,
                         Xcoord=Xcoord_S,
@@ -1242,6 +1246,8 @@ class vertices:
                     )
                 vertices_list.append(vertices_start)
                 vertices_list.append(vertices_ende)
+        
+        print(vertices_list)
         return vertices_list
     
     def to_vertices_string(vertices_list = List)-> str: 
@@ -1251,14 +1257,15 @@ class vertices:
             ";;-------------- ------------------ ------------------"
         ]
         vertices_strings = []
-        for vertice in vertices_list:
-            data = f"{vertice.link:>16} {vertice.Xcoord:<20}{vertice.Ycoord:<20}"
+        for vertices in vertices_list:
+            data = f"{vertices.link:<16} {vertices.Xcoord:<20}{vertices.Ycoord:<20}"
             vertices_strings.append(data)
-            return '\n'.join(header + vertices_strings)
+        return '\n'.join(header + vertices_strings)
 
-
+'''Dont know if its working with Hatlung which have an polyline added for example when there
+are more then one kante inside the polygon'''
                 
-    pass
+
 
 @dataclass
 class polygons:

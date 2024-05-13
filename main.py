@@ -15,7 +15,7 @@ import os
 
 
 def main():
-    file_path = ("input/Stammdaten_ISY.xml")
+    file_path = ("input/AP_24_1.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
