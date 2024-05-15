@@ -1,5 +1,6 @@
 from xml_parser import * 
 from hydraulik.rain_tabels.load_rain import rain_wrapper
+from hydraulik.utils import site_middle
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -1250,7 +1251,7 @@ class vertices:
         print(vertices_list)
         return vertices_list
     
-    def to_vertices_string(vertices_list = List)-> str: 
+    def to_vertices_string(vertices_list: List)-> str: 
         header = [
             "[VERTICES]",
             ";;Link           X-Coord            Y-Coord  ",
@@ -1272,14 +1273,57 @@ class polygons:
     subcat: str
     Xcoord: float
     Ycoord: float 
-    pass
+    def from_flaeche(flaechen_list: List)-> List['polygons']:
+        polygons_list= []
+        for flaeche in flaeche_list:
+            subcat = flaeche.objektbezeichnung
+            if flaeche.polygon:
+                for polygon in flaeche.polygon:
+                    Xcoord_S = polygon.kante.start.punkt.x
+                    print(Xcoord_S)
+                    Ycoord_S = polygon.kante.start.punkt.y
+                    print(Ycoord_S)
+                    Xcoord_E = polygon.kante.ende.punkt.x
+                    print(Xcoord_E)
+                    Ycoord_E = polygon.kante.ende.punkt.y
+                    print(Ycoord_E)
+                    polygon_start = polygons(
+                        subcat = subcat,
+                        Xcoord = Xcoord_S,
+                        YCoord = Ycoord_S,
+                    )
+                    polygon_end = polygons(
+                        subcat = subcat,
+                        Xcoord = Xcoord_E,
+                        Ycoord = Ycoord_E
+                    )
+                polygons_list.append(polygon_start)
+                polygons_list.append(polygon_end)
+        print(polygons_list)
+        return polygons_list
+    def to_polygons_string(polygons: List)-> str:
+        header = [
+            "[Polygons]", 
+            ";;Subcatchment   X-Coord            Y-Coord",           
+            ";;-------------- ------------------ ------------------"
+            ]
+        polygons_strings = []
+        for polygons in polygons_list:
+            data = f"{polygons.subcat:<16}{polygons.Xcoord:<20}{polygons.Ycoord:<20}"
+            polygons_string.append(data)
+        return '\n'.join(header+    polygons_strings)
+
+
+
 
 @dataclass
 class symbols: 
     gage: str
     Xcoord: float
     Ycoord: float
-    pass 
+    def from_raingage(schacht_list: List)-> List['symbols']:
+
+
 
 @dataclass
 class labels:
@@ -1320,6 +1364,7 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
     coordinate_list = coordinates.from_schacht(schacht_list)
     vertices_list = vertices.from_haltung(haltung_list)
+    polygons_list = polygons.from_flaeche(flaechen_list)
     
 
     with open("model.inp", "w") as f:
@@ -1361,7 +1406,8 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(vertices.to_vertices_string(vertices_list))
-
-        
+        f.write("\n")
+        f.write("\n")
+        f.write(polygons.to_polygons_string(polygons_list))
 
 

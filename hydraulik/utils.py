@@ -107,4 +107,13 @@ def check_point_poly():
         for point in hydr_point_list:
             point_in_polygon(point, polygon_2D)
 
-    
+
+def site_middle(schacht_list: List):
+    schacht_coord = []
+    for schacht in schacht_list:
+        for knoten in schacht.knoten:
+            X = schacht.knoten.punkt[0].x
+            Y = schacht.knoten.punkt[0].y
+        schacht_coord.append(x)
+        schacht_coord.append(y)
+        
