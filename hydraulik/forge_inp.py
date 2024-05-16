@@ -1275,7 +1275,7 @@ class polygons:
     Ycoord: float 
     def from_flaeche(flaechen_list: List)-> List['polygons']:
         polygons_list= []
-        for flaeche in flaeche_list:
+        for flaeche in flaechen_list:
             subcat = flaeche.objektbezeichnung
             if flaeche.polygon:
                 for polygon in flaeche.polygon:
@@ -1290,7 +1290,7 @@ class polygons:
                     polygon_start = polygons(
                         subcat = subcat,
                         Xcoord = Xcoord_S,
-                        YCoord = Ycoord_S,
+                        Ycoord = Ycoord_S,
                     )
                     polygon_end = polygons(
                         subcat = subcat,
@@ -1301,7 +1301,7 @@ class polygons:
                 polygons_list.append(polygon_end)
         print(polygons_list)
         return polygons_list
-    def to_polygons_string(polygons: List)-> str:
+    def to_polygons_string(polygons_list: List)-> str:
         header = [
             "[Polygons]", 
             ";;Subcatchment   X-Coord            Y-Coord",           
@@ -1310,8 +1310,8 @@ class polygons:
         polygons_strings = []
         for polygons in polygons_list:
             data = f"{polygons.subcat:<16}{polygons.Xcoord:<20}{polygons.Ycoord:<20}"
-            polygons_string.append(data)
-        return '\n'.join(header+    polygons_strings)
+            polygons_strings.append(data)
+        return '\n'.join(header +    polygons_strings)
 
 
 
@@ -1322,8 +1322,25 @@ class symbols:
     Xcoord: float
     Ycoord: float
     def from_raingage(schacht_list: List)-> List['symbols']:
-
-
+        symbols_list = []
+        Xcoord, Ycoord = site_middle(schacht_list)
+        symbol_sgl = symbols(
+            gage = "RainGage",
+            Xcoord = Xcoord,
+            Ycoord = Ycoord
+        )
+        symbols_list.append(symbol_sgl)
+        return symbols_list
+    def to_symbols_strings(symbols_list: List)->str:
+        header = [  '[SYMBOLS]',
+                    ';;Gage           X-Coord            Y-Coord',           
+                    ';;-------------- ------------------ ------------------'
+        ]
+        symbols_strings = []
+        for symbol in symbols_list:
+            data = f"{symbol.gage:<16}{symbol.Xcoord:<20}{symbol.Ycoord:<20}"
+            symbols_strings.append(data)
+        return '\n'.join(header + symbols_strings)
 
 @dataclass
 class labels:
@@ -1365,7 +1382,7 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     coordinate_list = coordinates.from_schacht(schacht_list)
     vertices_list = vertices.from_haltung(haltung_list)
     polygons_list = polygons.from_flaeche(flaechen_list)
-    
+    symbols_list = symbols.from_raingage(schacht_list)
 
     with open("model.inp", "w") as f:
         f.write("[TITLE]\n")
@@ -1409,5 +1426,7 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(polygons.to_polygons_string(polygons_list))
-
+        f.write("\n")
+        f.write("\n")
+        f.write(symbols.to_symbols_strings(symbols_list))
 

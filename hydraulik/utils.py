@@ -110,10 +110,24 @@ def check_point_poly():
 
 def site_middle(schacht_list: List):
     schacht_coord = []
+    total_x = 0
+    total_y = 0
+    count = 0
+
     for schacht in schacht_list:
         for knoten in schacht.knoten:
-            X = schacht.knoten.punkt[0].x
-            Y = schacht.knoten.punkt[0].y
-        schacht_coord.append(x)
-        schacht_coord.append(y)
+            X = knoten.punkte[0].x
+            Y = knoten.punkte[0].y
+            total_x += X
+            total_y += Y
+            count += 1
+
+    if count == 0:
+        return None  
+
+    
+    middle_x = total_x / count
+    middle_y = total_y / count
+
+    return (middle_x, middle_y)
         
