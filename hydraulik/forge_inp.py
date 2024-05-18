@@ -1,6 +1,6 @@
 from xml_parser import * 
 from hydraulik.rain_tabels.load_rain import rain_wrapper
-from hydraulik.utils import site_middle
+from hydraulik.utils import site_middle, site_corner
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -1362,10 +1362,33 @@ class backdrop:
     Y1: float
     X2: float
     Y2: float
-    pass 
+    def from_utils(schacht_list: List):
+        points = site_corner(schacht_list)
+        if points is None:
+            raise ValueError("Not enough points to determine farthest points")
+
+        (X1, Y1), (X2, Y2) = points
+        current_time = datetime.now().strftime("%S%M%H%d%m%Y")
+        backdrop_sgl = backdrop(
+            fname=f'hg_{current_time}.png',
+            X1=X1,
+            Y1=Y1,
+            X2=X2,
+            Y2=Y2
+        )
+        return backdrop_sgl
+    def to_backdrop_string(self) -> str:
+        header = [
+            '[BACKDROP]',
+            ';;Filename          X1                 Y1                 X2                 Y2',
+            ';;----------------- ----------------- ----------------- ----------------- -----------------'
+        ]
+        data = f"{self.fname:<17} {self.X1:<17} {self.Y1:<17} {self.X2:<17} {self.Y2:<17}"
+        return '\n'.join(header + [data])
 
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
+    current_time = datetime.now().strftime("%S%M%H%d%m%Y")
     x = 6.99641136598768
     y = 49.2853524841828
     report_1 =report(input='NO', continuity='NO', flowstats='NO', controls='NO', subcatchments='ALL', nodes='ALL', links='ALL')
@@ -1383,8 +1406,9 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     vertices_list = vertices.from_haltung(haltung_list)
     polygons_list = polygons.from_flaeche(flaechen_list)
     symbols_list = symbols.from_raingage(schacht_list)
+    backdrop_sgl = backdrop.from_utils(schacht_list)
 
-    with open("model.inp", "w") as f:
+    with open(f"hydraulik/inp/model{current_time}.inp", "w") as f:
         f.write("[TITLE]\n")
         f.write(metadata.to_title_string())
         f.write("\n")
@@ -1429,4 +1453,6 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(symbols.to_symbols_strings(symbols_list))
-
+        f.write("\n")
+        f.write("\n")
+        f.write(backdrop.to_backdrop_string(backdrop_sgl))

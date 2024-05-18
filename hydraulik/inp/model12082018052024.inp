@@ -1,7 +1,7 @@
 [TITLE]
 Kohn's Wasserwirtschaft
 Fabio Q.
-2024-05-16
+2024-05-18
 
 [OPTIONS]
 flow_units           CMS
@@ -874,7 +874,7 @@ RainGage        INTENSITY 0:05   1.0    TIMESERIES 2 - y r
 ;;               Invert     Outfall    Stage/Table      Tide
 ;;Name           Elev.      Type       Time Series      Gate
 ;;-------------- ---------- ---------- ---------------- ----
-120022           37.64      FREE                        NO   
+120021           37.32      FREE                        NO   
 
 [TIMESERIES]
 ;;Name           Date       Time       Value
@@ -1553,3 +1553,8 @@ LINKS     ALL
 ;;Gage           X-Coord            Y-Coord
 ;;-------------- ------------------ ------------------
 RainGage        32570413.11409876   5828071.929876541   
+
+[BACKDROP]
+;;Filename          X1                 Y1                 X2                 Y2
+;;----------------- ----------------- ----------------- ----------------- -----------------
+hg_18082018052024.png 32570491.017      5828270.765       32570481.367      5827767.89       
