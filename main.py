@@ -3,6 +3,7 @@ from massen_util.merge_elements import mass_haltung, find_status, mass_leitung, 
 from massen_util.pyexcel import to_xsls_haltung, col_haltung, col_schacht , col_leitung
 from massen_util.csv_creator import to_csv_haltung, to_csv_leitung, to_csv_schacht
 from hydraulik.forge_inp import create_inp, SimulationMetadata
+from hydraulik.run_simulation import default_sim
 import xml.dom.minidom
 import sys
 import codecs
@@ -59,7 +60,7 @@ def main():
         to_xsls_haltung(col_haltung, col_schacht , col_leitung)'''
         metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
         create_inp(metadata, flaechen_list, schacht_list, bauwerke_list)
-        
+        default_sim()
         sys.exit()
 
 

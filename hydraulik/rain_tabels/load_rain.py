@@ -7,7 +7,7 @@ import pandas as pd
 def rain_wrapper(x, y):
     rain_data = {}
     durations = [15, 60]
-    yearly_rain_types = ['3a', '5a', '10a']
+    yearly_rain_types = ['3-yr', '5-yr', '10-yr']
     index_rc = generate_index_rc(x, y)
     if index_rc:
         print(index_rc)
@@ -60,11 +60,11 @@ def get_rain_mm(duration, yearly_rain_type, index_rc):
     
     csv_file = f"hydraulik/rain_tabels/data/2020_D{duration}.csv"
     
-    if yearly_rain_type == '3a':
+    if yearly_rain_type == '3-yr':
         columns_to_use = ['HN_003A']
-    elif yearly_rain_type == '5a':
+    elif yearly_rain_type == '5-yr':
         columns_to_use = ['HN_005A']
-    elif yearly_rain_type == '10a':
+    elif yearly_rain_type == '10-yr':
         columns_to_use = ['HN_010A']
     else:
         raise ValueError("Invalid yearly rain type")

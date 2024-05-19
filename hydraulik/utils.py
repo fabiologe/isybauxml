@@ -1,6 +1,9 @@
 from xml_parser import *
 from typing import List, Tuple
 import math
+import re 
+import os
+from datetime import datetime
 
 class hydr_point: 
     def __init__(self,x, y, objekt):
@@ -107,6 +110,9 @@ def check_point_poly():
         for point in hydr_point_list:
             point_in_polygon(point, polygon_2D)
 
+def remove_outfall_double(junction_list: List, outfall_list: List) -> List:
+    outfall_names = {outfall.name for outfall in outfall_list if outfall.name is not None}
+    return [junction for junction in junction_list if junction.name not in outfall_names]
 
 def site_middle(schacht_list: List):
     schacht_coord = []
@@ -158,3 +164,27 @@ def site_corner(schacht_list: List) -> Tuple[Tuple[float, float], Tuple[float, f
 
     return (point1, point2)    
         
+
+
+def latest_inp(directory: str, file_pattern: str) -> str:
+    # Define a regular expression to match the filenames
+    regex = re.compile(rf'{file_pattern}(\d{{8}}\d{{6}})\.inp')
+
+    files = os.listdir(directory)
+    dated_files = []
+
+    for filename in files:
+        match = regex.match(filename)
+        if match:
+            date_str = match.group(1)
+            date_obj = datetime.strptime(date_str, '%Y%m%d%H%M%S')
+            dated_files.append((date_obj, filename))
+
+    if not dated_files:
+        raise FileNotFoundError(f"No files matching the pattern {file_pattern} found in {directory}")
+
+    # Sort by datetime object and get the latest one
+    dated_files.sort(key=lambda x: x[0], reverse=True)
+    latest_file = dated_files[0][1]
+    
+    return os.path.join(directory, latest_file)

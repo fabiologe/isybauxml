@@ -1,6 +1,6 @@
 from xml_parser import * 
 from hydraulik.rain_tabels.load_rain import rain_wrapper
-from hydraulik.utils import site_middle, site_corner
+from hydraulik.utils import site_middle, site_corner, remove_outfall_double
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -124,13 +124,12 @@ class raingage:
             ";;Name           Type      Intrvl Catch  Source",    
             ";;-------------- --------- ------ ------ ----------"
         ]
-        # Create the value string. The source_info list is unrolled with space as separator
-        source_info_str = ' '.join(self.source_info) if self.source_info else ''
-        values = f"{self.name:<15s} {self.type:<9s} {self.interval:<6s} {str(self.catch):<6s} {self.source_type:<10s} {source_info_str}"
+        
+        values = f"{self.name:<15s} {self.type:<9s} {self.interval:<6s} {str(self.catch):<6s} {self.source_type:<10s} {self.source_info:<5}"
         # Join header and values with newline characters
         return "\n".join(header + [values])
     
-raingage_data = raingage(name="RainGage", type="INTENSITY", interval="0:05", catch=1.0, source_type="TIMESERIES", source_info="2-yr")
+raingage_data = raingage(name="RainGage", type="INTENSITY", interval="0:05", catch=1.0, source_type="TIMESERIES", source_info="3-yr")
 
 
 @dataclass
@@ -1368,7 +1367,7 @@ class backdrop:
             raise ValueError("Not enough points to determine farthest points")
 
         (X1, Y1), (X2, Y2) = points
-        current_time = datetime.now().strftime("%S%M%H%d%m%Y")
+        current_time = datetime.now().strftime("%Y%m%d%H%M%S")
         backdrop_sgl = backdrop(
             fname=f'hg_{current_time}.png',
             X1=X1,
@@ -1388,7 +1387,7 @@ class backdrop:
 
 
 def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
-    current_time = datetime.now().strftime("%S%M%H%d%m%Y")
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
     x = 6.99641136598768
     y = 49.2853524841828
     report_1 =report(input='NO', continuity='NO', flowstats='NO', controls='NO', subcatchments='ALL', nodes='ALL', links='ALL')
@@ -1407,6 +1406,8 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     polygons_list = polygons.from_flaeche(flaechen_list)
     symbols_list = symbols.from_raingage(schacht_list)
     backdrop_sgl = backdrop.from_utils(schacht_list)
+
+    junction_list = remove_outfall_double(junction_list, outfall_list)
 
     with open(f"hydraulik/inp/model{current_time}.inp", "w") as f:
         f.write("[TITLE]\n")
