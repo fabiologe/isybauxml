@@ -188,3 +188,26 @@ def latest_inp(directory: str, file_pattern: str) -> str:
     latest_file = dated_files[0][1]
     
     return os.path.join(directory, latest_file)
+
+def search_potential_out(schacht_list: List):
+    min_sh_heigth = float('inf')
+    min_schacht_name = None
+    for schacht in schacht_list:
+        sh_heigth = schacht.knoten[0].punkte[0].z
+        if sh_heigth != 0 and sh_heigth < min_sh_heigth:
+            min_sh_heigth = sh_heigth
+            min_schacht_name = schacht.objektbezeichnung
+
+            if min_schacht_name is not None:
+                print(f'suggestion:{min_schacht_name} at {min_sh_heigth}m (SH)')
+                return (min_schacht_name, min_sh_heigth)
+            else:
+                return None
+
+def num_potential_out(schacht_list:List, haltung_list: List):
+    sgl_schacht = []
+    zu_ab_lsit = []
+    for haltung in haltung_list: 
+        
+    
+    

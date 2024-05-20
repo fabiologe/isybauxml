@@ -1,6 +1,7 @@
 from xml_parser import * 
 from hydraulik.rain_tabels.load_rain import rain_wrapper
 from hydraulik.utils import site_middle, site_corner, remove_outfall_double
+from hydraulik.utils import search_potential_out, num_potential_out
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -422,6 +423,7 @@ class outfall:  # AUSLASS
 
         if not found_auslaufbauwerk:
             print("No given Auslaufbauwerk")
+            num_potential_out(schacht_list)
             num_outfall = int(input("How many outfalls are needed:"))
             for i in range(num_outfall):
                 outfall_sgl = cls.search_set(schacht_list)
@@ -432,6 +434,7 @@ class outfall:  # AUSLASS
     @classmethod
     def search_set(cls, schacht_list):
         while True:
+            search_potential_out(schacht_list)
             outfall_name = input("Enter outfall name: ")
             for schacht in schacht_list:
                 if schacht.objektbezeichnung == outfall_name:
@@ -1103,6 +1106,7 @@ class timeseries:
     @staticmethod
     def to_rain_string(x, y):
         rain_data = rain_wrapper(x, y)
+        date = '01/01/2007'
         header = [
             "[TIMESERIES]",
             ";;Name           Date       Time       Value",
@@ -1118,7 +1122,7 @@ class timeseries:
                     euler_data = rain_data[duration][yearly_rain_type]
                     rain_string = ""
                     for time_point, rain_value in euler_data:
-                        rain_string += f"{name:<{max_name_length}}{' ':13}{'':5}{time_point: >5}:00{'':5}{rain_value:.2f}\n"
+                        rain_string += f"{name:<{max_name_length}}{date:13}{'':5}{time_point: >5}:00{'':5}{rain_value:.2f}\n"
                     rain_strings.append(rain_string)
 
         return "\n".join(header + rain_strings)

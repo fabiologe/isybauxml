@@ -1,0 +1,300 @@
+
+  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.2 (Build 5.2.4)
+  PYSWMM TOOLKIT API - VERSION v1.0 (2024-04-17)
+  ------------------------------------------------------------
+
+  Kohn's Wasserwirtschaft 
+  Fabio Q. 
+  2024-05-20 
+  
+  ERROR 173: Time Series 3-yr has its data out of sequence. at 01/01/2007 00:00:00.
+  
+  ERROR 173: Time Series 5-yr has its data out of sequence. at 01/01/2007 00:00:00.
+  
+  ERROR 173: Time Series 10-yr has its data out of sequence. at 01/01/2007 00:00:00.
+  
+  ERROR 138: Node A029 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A049 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A057a has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A057b has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A057c has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A057d has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A071 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A079 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A093 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A099 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A101 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A105 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A125 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A129ZY has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A135 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A137 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A139-2 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A31 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node A61 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4002 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4003 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4004 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4005 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4009 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4010 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4012 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4013 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node BAPUE4014 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node FIKTIV has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-027 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-028 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-029 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-030 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-031 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-032 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-033 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-034 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-035 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-036 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-037 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-038 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-039 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node HS-040 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node H-025 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node H-025.2 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node H-026 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3540 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3541 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3542 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3543 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3544 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3545 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3546 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3547 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3548 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3549 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3550 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3551 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3553 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3554 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3555 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3556 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3557 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3558 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node M3559 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1321 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1322 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1323 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1324 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1325 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1325.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1327.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-2 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-3 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-4 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-5 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1331-6 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1332 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1333 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1334 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node N1337 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node Rï¿½-Auslauf has initial depth greater than maximum depth.
+  
+  ERROR 138: Node S107 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node S129 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node W_Rï¿½ has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1288 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1289 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1306 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1307 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1321 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1322 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1323 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1324 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1325 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1325.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1326 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1327 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1327.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1329 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1330 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1331 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1332 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1333 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1334 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1335 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1336 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1337 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1338 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1341 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1342RU has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1342.0AL has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1343 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1344 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1345 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1346 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1347 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1348 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1348.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1348.2 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1349 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 1350 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 23 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 24 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 24_Rï¿½ has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 744 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 745 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 746 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 747 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 747.1 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 747.2 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 748 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 749 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 762 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 762RU has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 763 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 764 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 765 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 766 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 767 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 767F has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 768 has initial depth greater than maximum depth.
+  
+  ERROR 138: Node 769 has initial depth greater than maximum depth.

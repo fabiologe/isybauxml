@@ -16,7 +16,7 @@ import os
 
 
 def main():
-    file_path = ("input/Model.xml")
+    file_path = ("input/Stammdaten_ISY.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:

@@ -5,9 +5,8 @@ for example: manhole-cover (z-point) = schacht.knoten[0].punkte[0].z
 
 
 # small TO DO's: 
-- fixing logic parentclass --> Knoten ---> Punkt
-- clearify Aufbauform : 'E' ; 'R' ; 'Z' 
 - reformatting xml_parser parentclasses to be more dynm.
+- adding coord system analyze
 
 
 # big TO DO's :

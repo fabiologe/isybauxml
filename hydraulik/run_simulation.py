@@ -1,4 +1,5 @@
 from pyswmm import Simulation
+import swmmio
 from hydraulik.utils import latest_inp
 
 def default_sim():  
@@ -19,3 +20,10 @@ def default_sim():
     except FileNotFoundError as e:
         print(e)
     return
+
+
+'''
+crs = 'epsg:25832' 
+simulation_info = swmmio.Model("hydraulik/inp/model20240520100320.inp", crs=crs)
+swmmio.create_map(simulation_info, filename="test.html")
+'''
