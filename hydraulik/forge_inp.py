@@ -2,6 +2,7 @@ from xml_parser import *
 from hydraulik.rain_tabels.load_rain import rain_wrapper
 from hydraulik.utils import site_middle, site_corner, remove_outfall_double
 from hydraulik.utils import search_potential_out, num_potential_out
+from hydraulik.dfs_routes import find_sewer_routes
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -286,8 +287,8 @@ class lid_usage:
 class junction:
     name: str
     elev: float  #SH
-    ymax : Optional[float] = 0 #DH
-    y0: Optional[float] = 0   #Wasserspiegel
+    ymax : Optional[float] = 0 #max Tiefe
+    y0: Optional[float] = 0   #DH
     ysur: Optional[float] = 0 
     apond: Optional[float] = 0  #ueberflutungsflaeche
 
@@ -334,6 +335,7 @@ class junction:
         junctions_list = []
         for schacht in schacht_list:
             elev = None
+            ymax = None
             y0 = None
             if schacht.knoten:
                 knoten = schacht.knoten[0]
@@ -346,18 +348,22 @@ class junction:
                         elev = float(punkt.z)
                         print(f"    Elevation (elev): {elev}")
                         if len(knoten.punkte) > 1:
-                            y0 = float(knoten.punkte[1].z)
-                            print(f"    Y0 (second Punkt): {y0}")
+                            ymax = float(knoten.punkte[1].z)
+                            print(f"    Y0 (second Punkt): {ymax}")
                         else:
-                            y0 = 0
+                            ymax = 1000
                             print("    Y0 (second Punkt): Not available, using default (0)")
+                        y0 = abs(ymax- elev)
+                        y0 = round(y0, 2)
+
                     else:
                         print("    No Punkte in this Knoten")
 
             junction_sgl = junction(
                 name=str(schacht.objektbezeichnung),
                 elev=elev,
-                y0=y0,
+                ymax = 0,
+                y0=0,
                 ysur=0,
                 apond=0
             )
@@ -404,7 +410,7 @@ class outfall:  # AUSLASS
     routeto: Optional[str] = None
 
     @classmethod
-    def check_outfall(cls, schacht_list, bauwerke_list) -> List['outfall']:
+    def check_outfall(cls, schacht_list, haltung_list, bauwerke_list) -> List['outfall']:
         outfalls_list = []
         found_auslaufbauwerk = False
         
@@ -423,7 +429,7 @@ class outfall:  # AUSLASS
 
         if not found_auslaufbauwerk:
             print("No given Auslaufbauwerk")
-            num_potential_out(schacht_list)
+            find_sewer_routes(schacht_list, haltung_list)
             num_outfall = int(input("How many outfalls are needed:"))
             for i in range(num_outfall):
                 outfall_sgl = cls.search_set(schacht_list)
@@ -1404,7 +1410,7 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     
    
     #orc etc
-    outfall_list = outfall.check_outfall(schacht_list, bauwerke_list)
+    outfall_list = outfall.check_outfall(schacht_list, haltung_list, bauwerke_list)
     coordinate_list = coordinates.from_schacht(schacht_list)
     vertices_list = vertices.from_haltung(haltung_list)
     polygons_list = polygons.from_flaeche(flaechen_list)

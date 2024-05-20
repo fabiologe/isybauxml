@@ -4,7 +4,7 @@ import math
 import re 
 import os
 from datetime import datetime
-
+from collections import Counter
 class hydr_point: 
     def __init__(self,x, y, objekt):
         self.x = x
@@ -205,9 +205,29 @@ def search_potential_out(schacht_list: List):
                 return None
 
 def num_potential_out(schacht_list:List, haltung_list: List):
-    sgl_schacht = []
-    zu_ab_lsit = []
-    for haltung in haltung_list: 
+    zu_ab_list = []
+    ablauf_set = set()
+    zulauf_set = set()
+    
+    for haltung in haltung_list:
+        zu_ab_list.append(haltung.ablauf)
+        ablauf_set.add(haltung.ablauf)
+        zulauf_set.add(haltung.zulauf)
+    
+    # Count occurrences of each objektbezeichnung in ablauf
+    schacht_counter = Counter(zu_ab_list)
+    
+    # Filter Schacht objects that appear only once in zu_ab_list and do not appear in zulauf_set
+    sgl_schacht = [schacht for schacht in schacht_list if schacht_counter[schacht.objektbezeichnung] == 1 and schacht.objektbezeichnung not in zulauf_set]
+    
+    # Print the results
+    num_pot = len(sgl_schacht)
+    print(f'Found {num_pot} possible Outfalls')
+    for pot in sgl_schacht:
+        print(pot.objektbezeichnung)
+    
+    return sgl_schacht
+        
         
     
     

@@ -4,6 +4,7 @@ from hydraulik.utils import filter_flaechen
 from hydraulik.utils import site_middle, site_corner, remove_outfall_double, latest_inp
 from hydraulik.utils import search_potential_out, num_potential_out
 from hydraulik.run_simulation import default_sim
+from hydraulik.dfs_routes import find_sewer_routes
 
 __all__ = [
     'create_inp',
@@ -15,5 +16,6 @@ __all__ = [
     'latest_inp',
     'default_sim',
     'search_potential_out',
-    'num_potential_out'
+    'num_potential_out',
+    'find_sewer_routes'
 ]
