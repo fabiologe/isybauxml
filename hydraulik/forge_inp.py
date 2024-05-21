@@ -145,7 +145,7 @@ class subcatchments:
     slope: float # gefaelle (DE)
     clength : Optional[float] = 0 # Bordsteinlaenge ??
     #spack: Optional[str] = '' # Name of the Snowpack if needed 
-
+    
     def from_flache(flaechen_list: List) -> List['subcatchments']:
         subcatchment_list = []
         for flaeche in flaechen_list:
@@ -1112,7 +1112,7 @@ class timeseries:
     @staticmethod
     def to_rain_string(x, y):
         rain_data = rain_wrapper(x, y)
-        date = '01/01/2007'
+        date = ''
         header = [
             "[TIMESERIES]",
             ";;Name           Date       Time       Value",

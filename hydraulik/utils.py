@@ -101,7 +101,19 @@ def flaeche_2D(flaeche):
             point = hydr_point(x,y, objekt)
             hydro_poly_list.append(point)
         return hydro_poly_list
+
+def name_flaeche(flaeche_list: List, schacht_list: List)-> List:
+    name_flaeche = []
+
+    # Create a set of Schacht objektbezeichnung for faster lookup
+    schacht_names = {schacht.objektbezeichnung for schacht in schacht_list}
+
+    for flaeche in flaeche_list:
+        if flaeche.objektbezeichnung in schacht_names:
+            flaeche.objektbezeichnung += "_unbef"
+        name_flaeche.append(flaeche.objektbezeichnung)
     
+    return name_flaeche 
 def check_point_poly():
     for flaeche in flaechen_list:
         polygon_2D = flaeche_2D(flaeche)
@@ -228,6 +240,20 @@ def num_potential_out(schacht_list:List, haltung_list: List):
     
     return sgl_schacht
         
-        
+def check_crs(schacht_list):
+    
+    x, y = site_middle(schacht_list)
+
+    # Determine the CRS based on the coordinate values
+    if -180 <= x <= 180 and -90 <= y <= 90:
+        epsg = '4326'  # WGS 84 (GPS)
+    elif 300000 <= x <= 600000 and 500000 <= y <= 10000000:
+        epsg = '25832'  # UTM zone 32N
+    elif 2500000 <= x <= 3000000 and 5300000 <= y <= 5600000:
+        epsg = '31466'  # GK2
+    else:
+        epsg = None  # EPSG code unknown
+    print(f"Determined EPSG code: {epsg}") 
+    return epsg
     
     

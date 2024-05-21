@@ -6,7 +6,7 @@ import pandas as pd
 
 def rain_wrapper(x, y):
     rain_data = {}
-    durations = [15, 60]
+    durations = [15]
     yearly_rain_types = ['3-yr', '5-yr', '10-yr']
     index_rc = generate_index_rc(x, y)
     if index_rc:
