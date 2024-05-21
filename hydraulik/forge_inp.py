@@ -131,7 +131,7 @@ class raingage:
         # Join header and values with newline characters
         return "\n".join(header + [values])
     
-raingage_data = raingage(name="RainGage", type="INTENSITY", interval="0:05", catch=1.0, source_type="TIMESERIES", source_info="3-yr")
+raingage_data = raingage(name="RainGage", type="INTENSITY", interval="0:05", catch=1.0, source_type="TIMESERIES", source_info="5-yr")
 
 
 @dataclass
@@ -150,7 +150,7 @@ class subcatchments:
         subcatchment_list = []
         for flaeche in flaechen_list:
             subcatchment_sgl = subcatchments(
-                name= str(flaeche.objektbezeichnung) if flaeche.objektbezeichnung is not None else str(generate_unique_id()),
+                name= {flaeche.objektbezeichnung},
                 raingage="RainGage",
                 outletID=str(flaeche.hydro_vertices[0]) or "NO_HYDRO",
                 imperv=float(flaeche.abflussbeiwert) if flaeche.abflussbeiwert is not None else 1,
@@ -167,13 +167,13 @@ class subcatchments:
         subcatchments.from_flache(flaechen_list)
         header = [
             "[SUBCATCHMENTS]",
-            ";;                                                 Total    Pcnt.             Pcnt.    Curb     Snow ",
-            ";;Name           Raingage         Outlet           Area     Imperv   Width    Slope    Length   Pack ",
-            ";;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- --------"
+            ";;                                                         Total        Pcnt.             Pcnt.    Curb     Snow ",
+            ";;Name                   Raingage         Outlet           Area         Imperv   Width    Slope    Length   Pack ",
+            ";;---------------------- ---------------- ---------------- ------------ -------- -------- -------- -------- --------"
         ]
         subcatchment_strings = []
         for subcatchment in subcatchment_list:
-            data = f"{subcatchment.name:<16} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<8} {subcatchment.imperv:<8} {subcatchment.width:<8} {subcatchment.slope:<8} {subcatchment.clength:<8}"#{subcatchment.spack:<8}
+            data = f"{subcatchment.name:<25} {subcatchment.raingage:<16} {subcatchment.outletID:<16} {subcatchment.area:<12} {subcatchment.imperv:<8} {subcatchment.width:<8} {subcatchment.slope:<8} {subcatchment.clength:<8}"#{subcatchment.spack:<8}
             subcatchment_strings.append(data)
         return '\n'.join(header + subcatchment_strings)
         
@@ -208,12 +208,12 @@ class subareas:
         subareas.from_subcatchment(subcatchment_list)
         header = [
             "[SUBAREAS]",
-            ";;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted ",
-            ";;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------"
+            ";;Subcatchment              N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted ",
+            ";;------------------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------"
         ]
         subarea_strings = []
         for subarea in subarea_list:
-            data = f"{subarea.subcat:<16} {subarea.nimp:<16} {subarea.nperv:<16} {subarea.simp:<8} {subarea.sperv:<8} {subarea.zero:<8} {subarea.route_to:<8} {subarea.routed:<8}"
+            data = f"{subarea.subcat:<30} {subarea.nimp:<10} {subarea.nperv:<10} {subarea.simp:<8} {subarea.sperv:<8} {subarea.zero:<8} {subarea.route_to:<8} {subarea.routed:<8}"
             subarea_strings.append(data)
         return '\n'.join(header + subarea_strings)
 
@@ -231,7 +231,7 @@ class infiltration_H: #For Horton/ Modified Horton
         for subcatchment in subcatchment_list:
             infiltration_sgl = infiltration_H(
                 subname = str(subcatchment.name),
-                maxrate = 100,
+                maxrate = 10,
                 minrate= 5,
                 decay= 6.5,
                 drytime= 7,
@@ -339,17 +339,17 @@ class junction:
             y0 = None
             if schacht.knoten:
                 knoten = schacht.knoten[0]
-                print(f"Schacht: {schacht.objektbezeichnung}")
-                print(f"Number of Knoten: {len(schacht.knoten)}")
+                #print(f"Schacht: {schacht.objektbezeichnung}")
+                #print(f"Number of Knoten: {len(schacht.knoten)}")
                 for i, knoten in enumerate(schacht.knoten):
-                    print(f"  Knoten {i + 1}:")
+                    #print(f"  Knoten {i + 1}:")
                     if knoten.punkte:
                         punkt = knoten.punkte[0]
                         elev = float(punkt.z)
-                        print(f"    Elevation (elev): {elev}")
+                        #print(f"    Elevation (elev): {elev}")
                         if len(knoten.punkte) > 1:
                             ymax = float(knoten.punkte[1].z)
-                            print(f"    Y0 (second Punkt): {ymax}")
+                            #print(f"    Y0 (second Punkt): {ymax}")
                         else:
                             ymax = 1000
                             print("    Y0 (second Punkt): Not available, using default (0)")
@@ -546,14 +546,14 @@ class conduit: #abflusswirksame Verbindungen
             zn = None
             if element.knoten:
                 knoten = element.knoten[0]
-                print(f"Fict haltung: {element.objektbezeichnung}")
-                print(f"Number of Knoten: {len(element.knoten)}")
+                #print(f"Fict haltung: {element.objektbezeichnung}")
+                #print(f"Number of Knoten: {len(element.knoten)}")
                 for i, knoten in enumerate(element.knoten):
-                    print(f"  Knoten {i + 1}:")
+                    #print(f"  Knoten {i + 1}:")
                     if knoten.punkte:
                         punkt = knoten.punkte[0]
                         zn = float(punkt.z)
-                        print(f"    Elevation (elev): {zn}")
+                        #print(f"    Elevation (elev): {zn}")
                     else:
                         print("    No Punkte in this Knoten")
             conduit_sgl = conduit(
@@ -1237,13 +1237,13 @@ class vertices:
             if haltung.polygons:
                 for polygon in haltung.polygons:
                     Xcoord_S = polygon.kante.start.punkt.x
-                    print(Xcoord_S)
+                    #print(Xcoord_S)
                     Ycoord_S = polygon.kante.start.punkt.y
-                    print(Ycoord_S)
+                    #print(Ycoord_S)
                     Xcoord_E = polygon.kante.ende.punkt.x
-                    print(Xcoord_E)
+                    #print(Xcoord_E)
                     Ycoord_E = polygon.kante.ende.punkt.y
-                    print(Ycoord_E)
+                    #print(Ycoord_E)
                     vertices_start = vertices(
                         link=link,
                         Xcoord=Xcoord_S,
@@ -1257,7 +1257,7 @@ class vertices:
                 vertices_list.append(vertices_start)
                 vertices_list.append(vertices_ende)
         
-        print(vertices_list)
+        #print(vertices_list)
         return vertices_list
     
     def to_vertices_string(vertices_list: List)-> str: 
@@ -1289,13 +1289,13 @@ class polygons:
             if flaeche.polygon:
                 for polygon in flaeche.polygon:
                     Xcoord_S = polygon.kante.start.punkt.x
-                    print(Xcoord_S)
+                    #print(Xcoord_S)
                     Ycoord_S = polygon.kante.start.punkt.y
-                    print(Ycoord_S)
+                    #print(Ycoord_S)
                     Xcoord_E = polygon.kante.ende.punkt.x
-                    print(Xcoord_E)
+                    #print(Xcoord_E)
                     Ycoord_E = polygon.kante.ende.punkt.y
-                    print(Ycoord_E)
+                    #print(Ycoord_E)
                     polygon_start = polygons(
                         subcat = subcat,
                         Xcoord = Xcoord_S,
@@ -1308,7 +1308,7 @@ class polygons:
                     )
                 polygons_list.append(polygon_start)
                 polygons_list.append(polygon_end)
-        print(polygons_list)
+        #print(polygons_list)
         return polygons_list
     def to_polygons_string(polygons_list: List)-> str:
         header = [

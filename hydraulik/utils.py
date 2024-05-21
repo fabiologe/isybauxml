@@ -55,9 +55,9 @@ hydr_point_list= []
 
 def zulauf_to_2d(haltung_list):
     for haltung in haltung_list:
-        print(f"Haltung:{haltung.objektbezeichnung}")
+        #print(f"Haltung:{haltung.objektbezeichnung}")
         num_kanten = len(haltung.kanten)
-        print(f"Anzahl Kanten{num_kanten}")
+        #print(f"Anzahl Kanten{num_kanten}")
         for i in range (0,num_kanten):
             x= float(haltung.kante[i].punkte[0].x)
             y= float(haltung.kante[i].punkte[0].y)
@@ -247,13 +247,11 @@ def check_crs(schacht_list):
     # Determine the CRS based on the coordinate values
     if -180 <= x <= 180 and -90 <= y <= 90:
         epsg = '4326'  # WGS 84 (GPS)
-    elif 300000 <= x <= 600000 and 500000 <= y <= 10000000:
+    elif 30000000 <= x <= 60000000 and 5000000 <= y <= 100000000:
         epsg = '25832'  # UTM zone 32N
     elif 2500000 <= x <= 3000000 and 5300000 <= y <= 5600000:
         epsg = '31466'  # GK2
     else:
         epsg = None  # EPSG code unknown
-    print(f"Determined EPSG code: {epsg}") 
+    #print(f"Determined EPSG code: {epsg}") 
     return epsg
-    
-    

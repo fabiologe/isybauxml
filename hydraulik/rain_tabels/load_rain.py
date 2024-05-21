@@ -30,7 +30,7 @@ def rain_wrapper(x, y):
                     # Write rain data sorted by yearly rain type
                     for time_point, rain_value in euler_data:
                         file.write(f"{yearly_rain_type: <10}     {' ' * 14}  {time_point: >2d}:00       {rain_value: .2f}\n")
-                print(rain_data)
+                #print(rain_data)
     else:
         print("Coordinates not found within any bounding box.")
 

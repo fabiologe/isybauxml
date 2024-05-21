@@ -4,6 +4,7 @@ def parse_all(root):
     parse_schacht(root)
     parse_haltung(root)
     parse_leitung(root)
+    parse_bauwerk_dump(root)
     parse_behandlungsanlage(root)
     parse_becken(root)
     parse_auslaufbauwerk(root)

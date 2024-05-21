@@ -56,7 +56,119 @@ class Kante:
 class Polygon:
     kante: Kante
     points= []
+@dataclass
+class Bauwerk_dump:
+    objektbezeichnung: Optional[str] = None
+    entwaesserungsart: Optional[str] = None
+    status: Optional[Union[str, int]] = None
+    baujahr: Optional[float]= None
+    geo_objektart: Optional[int] = None
+    geo_objekttyp: Optional[str]= None
+    lagegenauigkeitsklasse: Optional[str]= None
+    hoehengenauigkeitsklasse: Optional[int]= None
+    knoten: Optional[List['Knoten']] = None
+    kanten = []
+    polygon = []
+    def add_knoten(self, knoten: 'Knoten'):
+            if self.knoten is None:
+                self.knoten = []
+            self.knoten.append(knoten)
+    def add_kante(self, kante: Kante):
+        self.kanten.append(kante)
+    def add_polygon(self, polygon: Polygon):
+        self.polygon.append(polygon)
+def parse_bauwerk_dump(root):
+    for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
+        objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
+        if objektart_element:
+            objektart = int(objektart_element[0].firstChild.nodeValue)
+            if objektart == 2:
+                knoten_typ_element = abwasser_objekt.getElementsByTagName('KnotenTyp')
+                if knoten_typ_element:
+                    knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
+                    if knoten_typ == 2:
+                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element not in range(1, 15):
+                            print("bauwerkstyp_element is not between 1 and 14")
+                            bauwerk_dump= Bauwerk_dump()
+                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                            if objektbezeichnung_element:
+                                bauwerk_dump.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                            if entwaesserungsart_element:
+                                bauwerk_dump.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                            status_element = abwasser_objekt.getElementsByTagName('Status')
+                            if status_element:
+                                bauwerk_dump.status= status_element[0].firstChild.nodeValue
+                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                            if baujahr_element:
+                                bauwerk_dump.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                            if geo_objektart_element:
+                                bauwerk_dump.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                            if geo_objekttyp_element:
+                                bauwerk_dump.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                            if lagegenauigkeitsklasse_element:
+                                bauwerk_dump.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                            if hoehengenauigkeitsklasse_element:
+                                bauwerk_dump.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                            if hersteller_element:
+                                bauwerk_dump.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                            if adresse_hersteller_element:
+                                bauwerk_dump.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                            if ufis_baunummer_element:
+                                bauwerk_dump.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                            if art_einstieghilfe_element:
+                                bauwerk_dump.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                            if uebergabebauwerk_element:
+                                bauwerk_dump.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
+                                                        start = Start(punkt=punkt_s)
+
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
+
+                                                        ende = Ende(punkt=punkt_e)
+
+                                                        kante = Kante(start=start, ende=ende)
+                                                        bauwerk_dump.add_kante(kante)
+                                                        polygon= Polygon(kante=kante)
+                                                bauwerk_dump.add_polygon(polygon)
+                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        bauwerk_dump.add_knoten(knoten)
+                            bauwerke_list.append(bauwerk_dump)
+                            print(f"{bauwerk_dump.objektbezeichnung} saved in Bauwerk_dump")
+    return bauwerke_list
 @dataclass
 class Pumpwerk:   #1
         objektbezeichnung: Optional[str] = None
@@ -198,7 +310,7 @@ def parse_pumpwerk(root):
                                         knoten.add_punkt(punkt)
                                     pumpwerk.add_knoten(knoten)
                             bauwerke_list.append(pumpwerk)
-    print(f"Found objects Bauwerktyp 1 (Pumpwerk)")
+                            print(f"Found objects Bauwerktyp 1 (Pumpwerk)")
     return bauwerke_list                        
 
 
@@ -401,8 +513,7 @@ def parse_becken(root):
                                         knoten.add_punkt(punkt)
                                     becken.add_knoten(knoten)
                             bauwerke_list.append(becken)
-    
-    print(f"Found objects Bauwerktyp 2 (Becken)")
+                            print(f"Found objects Bauwerktyp 2 (Becken)")
     return bauwerke_list
 
 @dataclass
@@ -560,7 +671,7 @@ def parse_behandlungsanlage(root):
                                         knoten.add_punkt(punkt)
                                     behandlungsanlage.add_knoten(knoten)
                             bauwerke_list.append(behandlungsanlage)
-    print("Found objects Bauwerktyp 3 (Behandlungsanlage)")
+                            print("Found objects Bauwerktyp 3 (Behandlungsanlage)")
     return bauwerke_list
 
 @dataclass
@@ -689,7 +800,7 @@ def parse_klaeranlage(root):
                                         knoten.add_punkt(punkt)
                                     klaeranlage.add_knoten(knoten)
                             bauwerke_list.append(klaeranlage)
-    print("Found objects Bauwerktyp 4 (Klaeranlage)")
+                            print("Found objects Bauwerktyp 4 (Klaeranlage)")
     return bauwerke_list
 
 @dataclass
@@ -850,7 +961,7 @@ def parse_auslaufbauwerk(root):
                                         knoten.add_punkt(punkt)
                                     auslaufbauwerk.add_knoten(knoten)
                             bauwerke_list.append(auslaufbauwerk)
-    print("Found objects Bauwerktyp 5 (Auslaufbauwerk)")
+                            print("Found objects Bauwerktyp 5 (Auslaufbauwerk)")
     return bauwerke_list
 
 @dataclass
@@ -990,7 +1101,7 @@ def parse_pumpe(root):
                                         knoten.add_punkt(punkt)
                                     pumpe.add_knoten(knoten)
                             bauwerke_list.append(pumpe)
-    print("Found objects Bauwerktyp 6 (Pumpwerk)")
+                            print("Found objects Bauwerktyp 6 (Pumpwerk)")
     return bauwerke_list
 
 @dataclass
@@ -1144,7 +1255,7 @@ def parse_wehr(root):
                                             knoten.add_punkt(punkt)
                                         wehr.add_knoten(knoten)
                                 bauwerke_list.append(wehr)
-    print("Found objects Bauwerktyp 7 (Wehr)")
+                                print("Found objects Bauwerktyp 7 (Wehr)")
     return bauwerke_list
 
 @dataclass
@@ -1275,7 +1386,7 @@ def parse_drossel(root):
                                             knoten.add_punkt(punkt)
                                         drossel.add_knoten(knoten)
                                 bauwerke_list.append(drossel)
-    print("Found objects Bauwerktyp 8 (Drossel)")
+                                print("Found objects Bauwerktyp 8 (Drossel)")
     return bauwerke_list
 
 @dataclass
@@ -1421,7 +1532,7 @@ def parse_schieber(root):
                                             knoten.add_punkt(punkt)
                                         schieber.add_knoten(knoten)
                                 bauwerke_list.append(schieber)
-    print("Found objects Bauwerktyp 9 (Schieber)")
+                                print("Found objects Bauwerktyp 9 (Schieber)")
     return bauwerke_list
 
 @dataclass
@@ -1576,7 +1687,7 @@ def parse_rechen(root):
                                             knoten.add_punkt(punkt)
                                         rechen.add_knoten(knoten)
                                 bauwerke_list.append(rechen)
-    print("Found objects Bauwerktyp 10 (Rechen)")
+                                print("Found objects Bauwerktyp 10 (Rechen)")
     return bauwerke_list
 
 @dataclass
@@ -1723,7 +1834,7 @@ def parse_sieb(root):
                                                 knoten.add_punkt(punkt)
                                             sieb.add_knoten(knoten)
                                     bauwerke_list.append(sieb)
-    print("Found objects Bauwerktyp 11 (Sieb)")
+                                    print("Found objects Bauwerktyp 11 (Sieb)")
     return bauwerke_list
 
 @dataclass
@@ -1870,7 +1981,7 @@ def parse_versickerungsanlage(root):
                                                 knoten.add_punkt(punkt)
                                             versickerungsanlage.add_knoten(knoten)
                                     bauwerke_list.append(versickerungsanlage)
-    print("Found objects Bauwerktyp 12 (Versickerungsanlage)")
+                                    print("Found objects Bauwerktyp 12 (Versickerungsanlage)")
     return bauwerke_list
 
 @dataclass
@@ -2054,7 +2165,7 @@ def parse_regenwassernutzungsanlage(root):
                                             knoten.add_punkt(punkt)
                                         regenwassernutzungsanlage.add_knoten(knoten)
                                 bauwerke_list.append(regenwassernutzungsanlage)
-    print("Found objects Bauwerktyp 13 (Regenwassernutzungsanlage)")
+                                print("Found objects Bauwerktyp 13 (Regenwassernutzungsanlage)")
     return bauwerke_list
 
 @dataclass
@@ -2185,5 +2296,5 @@ def parse_einlaufbauwerk(root):
                                             knoten.add_punkt(punkt)
                                         einlaufbauwerk.add_knoten(knoten)
                                 bauwerke_list.append(einlaufbauwerk)
-    print("Found objects Bauwerktyp 14 (Einlaufbauwerk)")
+                                print("Found objects Bauwerktyp 14 (Einlaufbauwerk)")
     return bauwerke_list

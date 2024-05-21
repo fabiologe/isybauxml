@@ -37,11 +37,30 @@ def default_plot(schacht_list:List):
     try:
         latest_file = latest_inp(directory, file_pattern)
         print(f"The latest file is: {latest_file}")
+        
         crs_check = check_crs(schacht_list)
-        print(check_crs)
+        print(f"Determined CRS code: {crs_check}")
+        
         crs = f'epsg:{crs_check}' 
         simulation_info = swmmio.Model(latest_file, crs=crs)
-        swmmio.create_map(simulation_info, filename=f"{file_name}.html")
+        
+        # Validate the nodes' coordinates before creating the map
+        node_df = simulation_info.nodes.dataframe
+        if 'X' not in node_df.columns or 'Y' not in node_df.columns:
+            raise ValueError("Node dataframe does not contain 'X' or 'Y' coordinates.")
+        
+        valid_nodes = node_df.dropna(subset=['X', 'Y'])
+        if valid_nodes.empty:
+            raise ValueError("No valid node coordinates found for creating the map.")
+        
+        # Create map
+        swmmio.create_map(simulation_info, filename=file_name)
+        print(f"Map created successfully: {file_name}")
+        
     except FileNotFoundError as e:
-        print(e)
+        print(f"File not found: {e}")
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+    except Exception as ex:
+        print(f"An unexpected error occurred: {ex}")
     return

@@ -4,6 +4,7 @@ from xml_parser.xml_fixer import delete_incomplete_points
 from xml_parser.xml_fixer import kill_duplicates
 from xml_parser.xml_fixer import analyze_xml
 from xml_parser.schacht import parse_schacht
+from xml_parser.bauwerk import Bauwerk_dump
 from xml_parser.bauwerk import Auslaufbauwerk
 from xml_parser.bauwerk import Pumpe
 from xml_parser.bauwerk import Wehr
@@ -19,6 +20,7 @@ from xml_parser.bauwerk import Behandlungsanlage
 from xml_parser.bauwerk import Klaeranlage
 from xml_parser.haltung import parse_haltung
 from xml_parser.leitung import parse_leitung
+from xml_parser.bauwerk import parse_bauwerk_dump
 from xml_parser.bauwerk import parse_becken
 from xml_parser.bauwerk import parse_behandlungsanlage
 from xml_parser.bauwerk import parse_klaeranlage
@@ -26,8 +28,8 @@ from xml_parser.bauwerk import parse_pumpwerk
 from xml_parser.bauwerk import parse_auslaufbauwerk
 from xml_parser.bauwerk import parse_pumpe
 from xml_parser.bauwerk import parse_wehr
-from xml_parser.bauwerk import  parse_drossel
-from xml_parser.bauwerk import  parse_schieber
+from xml_parser.bauwerk import parse_drossel
+from xml_parser.bauwerk import parse_schieber
 from xml_parser.bauwerk import parse_rechen
 from xml_parser.bauwerk import parse_versickerungsanlage
 from xml_parser.bauwerk import parse_regenwassernutzungsanlage
@@ -96,4 +98,6 @@ __all__ = [
     "Becken",
     "Behandlungsanlage",
     "Klaeranlage",
+    "parse_bauwerk_dump",
+    "Bauwerk_dump"
 ]
