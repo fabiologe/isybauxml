@@ -42,8 +42,8 @@ def default_plot(schacht_list:List):
         print(f"Determined CRS code: {crs_check}")
         
         crs = f'epsg:{crs_check}' 
-        crs_test = 'epsg:3728'
-        simulation_info = swmmio.Model(latest_file, crs=crs_test)
+        #crs_test = 'epsg:3728'
+        simulation_info = swmmio.Model(latest_file, crs=crs)
         
         swmmio.create_map(simulation_info, filename=file_name)
         print(f"Map created successfully: {file_name}")

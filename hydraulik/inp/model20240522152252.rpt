@@ -1,0 +1,29 @@
+
+  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.2 (Build 5.2.4)
+  PYSWMM TOOLKIT API - VERSION v1.0 (2024-04-17)
+  ------------------------------------------------------------
+
+  Kohn's Wasserwirtschaft 
+  Fabio Q. 
+  2024-05-22 
+  
+  ****************
+  Analysis Options
+  ****************
+  Flow Units ............... CMS
+  Process Models:
+    Rainfall/Runoff ........ YES
+    RDII ................... NO
+    Snowmelt ............... NO
+    Groundwater ............ NO
+    Flow Routing ........... NO
+    Water Quality .......... NO
+  Starting Date ............ 01/01/2007 00:00:00
+  Ending Date .............. 01/01/2007 12:00:00
+  Antecedent Dry Days ...... 0.0
+  Report Time Step ......... 00:01:00
+  
+
+  Analysis begun on:  Wed May 22 15:23:03 2024
+  Analysis ended on:  Wed May 22 15:23:03 2024
+  Total elapsed time: < 1 sec
