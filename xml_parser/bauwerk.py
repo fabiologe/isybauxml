@@ -52,10 +52,7 @@ class Kante:
     start: Start
     ende: Ende
     
-@dataclass
-class Polygon:
-    kante: Kante
-    points= []
+
 @dataclass
 class Bauwerk_dump:
     objektbezeichnung: Optional[str] = None
@@ -73,10 +70,12 @@ class Bauwerk_dump:
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-        self.polygon.append(polygon)
+    def add_polygon(self, kante:Kante):
+        self.polygon.append(kante)
+        return
 def parse_bauwerk_dump(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -132,6 +131,7 @@ def parse_bauwerk_dump(root):
                                 bauwerk_dump.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                             if polygon_element:
+                                                bauwerk_dump.polygon = []
                                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                     if kanten_element:
                                                         start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -152,8 +152,7 @@ def parse_bauwerk_dump(root):
 
                                                         kante = Kante(start=start, ende=ende)
                                                         bauwerk_dump.add_kante(kante)
-                                                        polygon= Polygon(kante=kante)
-                                                bauwerk_dump.add_polygon(polygon)
+                                                        bauwerk_dump.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -198,10 +197,10 @@ class Pumpwerk:   #1
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
         def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-        def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
+            return
 def parse_pumpwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -274,6 +273,7 @@ def parse_pumpwerk(root):
                             if raum_tiefbau_element:
                                 pumpwerk.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                        pumpwerk.polygon = []
                                         if polygon_element:
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
@@ -295,8 +295,7 @@ def parse_pumpwerk(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     pumpwerk.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            pumpwerk.add_polygon(polygon)
+                                                    pumpwerk.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -358,11 +357,10 @@ class Becken:   #2
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_becken(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -478,6 +476,7 @@ def parse_becken(root):
                                 becken.bepflanzung = int(bepflanzung_element[0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            becken.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -498,8 +497,7 @@ def parse_becken(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     becken.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            becken.add_polygon(polygon)
+                                                    becken.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -549,11 +547,10 @@ class Behandlungsanlage:   #3
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_behandlungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -636,6 +633,7 @@ def parse_behandlungsanlage(root):
                                 behandlungsanlage.material_anlage = float([0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            behandlungsanlage.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -656,8 +654,7 @@ def parse_behandlungsanlage(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     behandlungsanlage.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            behandlungsanlage.add_polygon(polygon)
+                                                    behandlungsanlage.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -699,10 +696,10 @@ class Klaeranlage:   #4
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
+            return
 
 def parse_klaeranlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
@@ -765,6 +762,7 @@ def parse_klaeranlage(root):
                                 klaeranlage.einwohnerwerte = int(einwohnerwert_element[0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            klaeranlage.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -785,8 +783,7 @@ def parse_klaeranlage(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     klaeranlage.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            klaeranlage.add_polygon(polygon)
+                                                    klaeranlage.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -837,11 +834,10 @@ class Auslaufbauwerk:   #5
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_auslaufbauwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -946,8 +942,7 @@ def parse_auslaufbauwerk(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     auslaufbauwerk.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            auslaufbauwerk.add_polygon(polygon)
+                                                    auslaufbauwerk.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -992,11 +987,10 @@ class Pumpe:   #6
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_pumpe(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1066,6 +1060,7 @@ def parse_pumpe(root):
                                 pumpe.pumpenart = int(pumpenart_element[0].firstChild.nodeValue)
                             for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            pumpe.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1086,8 +1081,7 @@ def parse_pumpe(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     pumpe.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            pumpe.add_polygon(polygon)
+                                                    pumpe.polygon.append(kante)
                             for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                 knoten = Knoten()
                                 knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1135,11 +1129,10 @@ class Wehr:   #7
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_wehr(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1220,6 +1213,7 @@ def parse_wehr(root):
                                     wehr.verfahrgeschwindigkeit = float(verfahrgeschwindigkeit_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            wehr.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1240,8 +1234,7 @@ def parse_wehr(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     wehr.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            wehr.add_polygon(polygon)
+                                                    wehr.polygon.append(kante)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1284,11 +1277,10 @@ class Drossel:   #8
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_drossel(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1351,6 +1343,7 @@ def parse_drossel(root):
                                     drossel.nennleistung = float(nennleistung_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            drossel.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1371,8 +1364,8 @@ def parse_drossel(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     drossel.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            drossel.add_polygon(polygon)
+                                                    drossel.polygon.append(kante)
+                                                    
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1419,10 +1412,10 @@ class Schieber:   #9
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
+            return
 def parse_schieber(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1497,6 +1490,7 @@ def parse_schieber(root):
                                     schieber.verfahrgeschwindigkeit = float(verfahrgeschwindigkeit_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            schieber.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1517,8 +1511,7 @@ def parse_schieber(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     schieber.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            schieber.add_polygon(polygon)
+                                                    schieber.polygon.append(kante)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1567,11 +1560,11 @@ class Rechen:   #10
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
+            
 def parse_rechen(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1652,6 +1645,7 @@ def parse_rechen(root):
                                     rechen.material = float(material_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            rechen.polygon= []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1672,8 +1666,7 @@ def parse_rechen(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     rechen.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            rechen.add_polygon(polygon)
+                                                    rechen.polygon.append(kante)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1720,11 +1713,10 @@ class Sieb:   #11
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_sieb(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
             objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1799,6 +1791,7 @@ def parse_sieb(root):
                                         sieb.material = str(material_element[0].firstChild.nodeValue)
                                     for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            sieb.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1819,8 +1812,8 @@ def parse_sieb(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     sieb.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            sieb.add_polygon(polygon)
+                                                    sieb.polygon.append(kante)
+
                                     for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                         knoten = Knoten()
                                         knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -1867,11 +1860,10 @@ class Versickerungsanlage:   #12
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_versickerungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
             objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -1946,6 +1938,7 @@ def parse_versickerungsanlage(root):
                                         versickerungsanlage.umfeld = str(umfeld_element[0].firstChild.nodeValue)
                                     for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            versickerungsanlage.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -1966,8 +1959,7 @@ def parse_versickerungsanlage(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     versickerungsanlage.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            versickerungsanlage.add_polygon(polygon)
+                                                    versickerungsanlage.polygon.append(kante)
                                     for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                         knoten = Knoten()
                                         knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -2023,11 +2015,10 @@ class Regenwassernutzungsanlage:   #13
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_regenwassernutzungsanlage(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -2130,6 +2121,7 @@ def parse_regenwassernutzungsanlage(root):
                                     regenwassernutzungsanlage.drosselabfluss = float(drosselabfluss_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            regenwassernutzungsanlage.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -2150,8 +2142,7 @@ def parse_regenwassernutzungsanlage(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     regenwassernutzungsanlage.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            regenwassernutzungsanlage.add_polygon(polygon)
+                                                    regenwassernutzungsanlage.polygon.append(kante)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
@@ -2194,11 +2185,10 @@ class Einlaufbauwerk:   #14
             if self.knoten is None:
                 self.knoten = []
             self.knoten.append(knoten)
+            return
     def add_kante(self, kante: Kante):
             self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-            self.polygon.append(polygon)
-
+            return
 def parse_einlaufbauwerk(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
@@ -2261,6 +2251,7 @@ def parse_einlaufbauwerk(root):
                                     einlaufbauwerk.schutzgitter = int(schutzgitter_element[0].firstChild.nodeValue)
                                 for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            einlaufbauwerk.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -2281,8 +2272,7 @@ def parse_einlaufbauwerk(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     einlaufbauwerk.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            einlaufbauwerk.add_polygon(polygon)
+                                                    einlaufbauwerk.polygon.append(kante)
                                 for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                                     knoten = Knoten()
                                     knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)

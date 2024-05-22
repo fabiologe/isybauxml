@@ -45,10 +45,7 @@ class Kante:
     start: Start
     ende: Ende
     
-@dataclass
-class Polygon:
-    kante: Kante
-    points= []
+
     
 @dataclass
 class Schacht:
@@ -87,10 +84,10 @@ class Schacht:
         if self.knoten is None:
             self.knoten = []
         self.knoten.append(knoten)
+        return
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
-    def add_polygon(self, polygon: Polygon):
-        self.polygon.append(polygon)
+        return
 
 @dataclass
 class SchachtManager:
@@ -212,6 +209,7 @@ def parse_schacht(root):
                             if aufbauform_element.firstChild.nodeValue in ['E', 'Z']:
                                     for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                                         if polygon_element:
+                                            schacht.polygon = []
                                             for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                                 if kanten_element:
                                                     start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -232,8 +230,7 @@ def parse_schacht(root):
 
                                                     kante = Kante(start=start, ende=ende)
                                                     schacht.add_kante(kante)
-                                                    polygon= Polygon(kante=kante)
-                                            schacht.add_polygon(polygon)
+                                                    schacht.polygon.append(kante)
                         for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
                             knoten = Knoten()
                             knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)

@@ -29,9 +29,7 @@ class Kante:
     ende: Ende
 
 
-@dataclass
-class Polygon:
-    kante: Kante
+
  #Haltung: A57c, Number of edges: Polygon(kante=Kante(start=Start(punkt=Punkt(x=2564687.012, y=5461936.858, z=210.77), tag='RAP'), ende=Ende(punkt=Punkt(x=2564692.117, y=5461934.148, z=210.757), tag='RAP')))
     
 @dataclass
@@ -56,7 +54,7 @@ class Haltung:
     anschluss_bez: Optional[str]= None
     entfernung: Optional[float]= None
     #Geometriedaten:
-    polygons = []
+    polygon = []
     zulauf: Optional[str]= None
     ablauf: Optional[str]= None
     zulauf_sh: Optional[float]= None
@@ -68,8 +66,7 @@ class Haltung:
     profilbreite: Optional[int]= None
     profilhoehe: Optional[int]= None
     aussendurchmesser: Optional[int]= None
-    def add_polygon(self, polygon: Polygon):
-        self.polygons.append(polygon)
+    
 
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
@@ -188,6 +185,7 @@ def parse_haltung(root):
                             haltung.aussendurchmesser = int(aussendurchmesser_element[0].firstChild.nodeValue)
                         for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
+                                haltung.polygon = []
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                     if kanten_element:
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -208,9 +206,8 @@ def parse_haltung(root):
 
                                         kante = Kante(start=start, ende=ende)
                                         haltung.add_kante(kante)
-
-                            polygon = Polygon(kante=kante)
-                            haltung.add_polygon(polygon)
+                                        haltung.polygon.append(kante)
+                            
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')

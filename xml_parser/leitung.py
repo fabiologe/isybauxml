@@ -28,9 +28,7 @@ class Kante:
     ende: Ende
 
 
-@dataclass
-class Polygon:
-    kante: Kante
+
 @dataclass
 class Leitung:
     def __init__(self):
@@ -54,7 +52,7 @@ class Leitung:
         self.anschluss_bez: Optional[str]= None
         self.entfernung: Optional[float]= None
         #Geometriedaten:
-        self.polygons = []
+        self.polygon = []
         self.zulauf: Optional[str]= None
         self.ablauf: Optional[str]= None
         self.zulauf_sh: Optional[float]= None
@@ -66,11 +64,11 @@ class Leitung:
         self.profilbreite: Optional[int]= None
         self.profilhoehe: Optional[int]= None
         self.aussendurchmesser: Optional[int]= None
-    def add_polygon(self, polygon: Polygon):
-        self.polygons.append(polygon)
+   
 
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
+        return
     def __str__(self):
         return f"Objektbezeichnung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nZulauf: {self.zulauf}\nAblauf: {self.ablauf}\nProfil: {self.profilart}\nKante: {self.kanten}"
 def parse_leitung(root):
@@ -171,6 +169,7 @@ def parse_leitung(root):
                             leitung.aussendurchmesser = int(aussendurchmesser_element[0].firstChild.nodeValue)
                         for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
+                                leitung.polygon = []
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                     if kanten_element:
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -191,9 +190,8 @@ def parse_leitung(root):
 
                                         kante = Kante(start=start, ende=ende)
                                         leitung.add_kante(kante)
-
-                                polygon = Polygon(kante=kante)
-                                leitung.add_polygon(polygon)
+                                        leitung.polygon.append(kante)
+                                
                         leitung_list.append(leitung)
     print(f"Number of Leitung objects: {len(leitung_list)}")
     print('\n')

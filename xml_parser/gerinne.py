@@ -30,9 +30,6 @@ class Kante:
 
 
 @dataclass
-class Polygon:
-    kante: Kante
-@dataclass
 class Gerinne:
     def __init__(self):
         self.objektbezeichnung = ""
@@ -54,7 +51,7 @@ class Gerinne:
         self.anschluss_bez: Optional[str]= None
         self.entfernung: Optional[float]= None
         #Geometriedaten:
-        self.Polygons = []
+        self.polygon = []
         self.zulauf: Optional[str]= None
         self.ablauf: Optional[str]= None
         self.zulauf_sh: Optional[float]= None
@@ -62,16 +59,16 @@ class Gerinne:
         self.strang: Optional[str]= None
         self.laenge: Optional[float]= None
         self.material: Optional[str]= None
-    def add_polygon(self, polygon: Polygon):
-        self.Polygons.append(polygon)
+    
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
+        return
     def __str__(self):
         return f"Gerinne: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nZulauf: {self.zulauf}\nAblauf: {self.ablauf}\nProfil: {self.profilart}\nKante: {self.kanten}"
 
 def parse_geinne(root):
     gerinne= Gerinne()
-    for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage')
+    for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')
         if objektart_element:
             objektart = int(objektart_element[0].firstChild.nodeValue)
@@ -163,6 +160,7 @@ def parse_geinne(root):
                             gerinne.aussendurchmesser = int(aussendurchmesser_element[0].firstChild.nodeValue)
                         for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
+                                gerinne.polygon = []
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
                                     if kanten_element:
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
@@ -183,9 +181,8 @@ def parse_geinne(root):
 
                                         kante = Kante(start=start, ende=ende)
                                         gerinne.add_kante(kante)
-
-                                polygon = Polygon(kante=kante)
-                                gerinne.add_polygon(polygon)
+                                        gerinne.polygon.append(kante)
+                                
                         gerinne_list.append(gerinne)
     print(f"Number of Gerinne objects: {len(gerinne_list)}")
     return gerinne_list
