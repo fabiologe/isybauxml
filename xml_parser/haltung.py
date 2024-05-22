@@ -173,7 +173,7 @@ def parse_haltung(root):
                             haltung.material = material_element[0].firstChild.nodeValue
                         profilart_element = abwasser_objekt.getElementsByTagName('Profilart')
                         if profilart_element:
-                            haltung.profilart = str(profilart_element[0].firstChild.nodeValue)
+                            haltung.profilart = int(profilart_element[0].firstChild.nodeValue)
                         profilbreite_element = abwasser_objekt.getElementsByTagName('Profilbreite')
                         if profilbreite_element:
                             haltung.profilbreite = int(profilbreite_element[0].firstChild.nodeValue)

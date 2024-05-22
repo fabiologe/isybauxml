@@ -958,6 +958,87 @@ F_120022_Dach         4.5        0.2        6.5        7          0
 [XSECTIONS]
 ;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels
 ;;-------------- ------------ ---------------- ---------- ---------- ---------- ----------
+119001         CIRCULAR       0.25      0         0         0         1   
+119002         CIRCULAR       0.25      0         0         0         1   
+119003         CIRCULAR       0.25      0         0         0         1   
+119004         CIRCULAR       0.25      0         0         0         1   
+119004B01      CIRCULAR       0.3       0         0         0         1   
+119004SF01     CIRCULAR       0.15      0         0         0         1   
+119005         CIRCULAR       0.5       0         0         0         1   
+119007         CIRCULAR       0.5       0         0         0         1   
+119008         CIRCULAR       0.5       0         0         0         1   
+119009         CIRCULAR       0.5       0         0         0         1   
+119010         CIRCULAR       0.7       0         0         0         1   
+119011         CIRCULAR       0.7       0         0         0         1   
+119012A        CIRCULAR       0.4       0         0         0         1   
+119012B        CIRCULAR       0.4       0         0         0         1   
+119012B01      CIRCULAR       0.4       0         0         0         1   
+119012B02      CIRCULAR       0.4       0         0         0         1   
+119012B03      CIRCULAR       0.4       0         0         0         1   
+119012C        CIRCULAR       0.4       0         0         0         1   
+119012SF01     CIRCULAR       0.4       0         0         0         1   
+119012SF02     CIRCULAR       0.4       0         0         0         1   
+119012SF03     CIRCULAR       0.4       0         0         0         1   
+119013         CIRCULAR       0.7       0         0         0         1   
+119014         CIRCULAR       0.7       0         0         0         1   
+119015         CIRCULAR       0.7       0         0         0         1   
+119015A        CIRCULAR       0.15      0         0         0         1   
+119016AUSF     CIRCULAR       0.5       0         0         0         1   
+119017         CIRCULAR       0.2       0         0         0         1   
+119018         CIRCULAR       0.2       0         0         0         1   
+119019         CIRCULAR       0.2       0         0         0         1   
+119020         CIRCULAR       0.2       0         0         0         1   
+119021         CIRCULAR       0.3       0         0         0         1   
+119022         CIRCULAR       0.4       0         0         0         1   
+119023         CIRCULAR       0.4       0         0         0         1   
+119024         CIRCULAR       0.3       0         0         0         1   
+119025         CIRCULAR       0.4       0         0         0         1   
+119026         CIRCULAR       0.4       0         0         0         1   
+119027         CIRCULAR       0.4       0         0         0         1   
+119028         CIRCULAR       0.4       0         0         0         1   
+119029         CIRCULAR       0.4       0         0         0         1   
+119029A        CIRCULAR       0.4       0         0         0         1   
+119030         CIRCULAR       0.2       0         0         0         1   
+119031         CIRCULAR       0.2       0         0         0         1   
+119032         CIRCULAR       0.2       0         0         0         1   
+119033         CIRCULAR       0.3       0         0         0         1   
+119034         CIRCULAR       0.3       0         0         0         1   
+119035         CIRCULAR       0.5       0         0         0         1   
+119036         CIRCULAR       0.3       0         0         0         1   
+119037         CIRCULAR       0.3       0         0         0         1   
+119038         CIRCULAR       0.5       0         0         0         1   
+119039         CIRCULAR       0.2       0         0         0         1   
+119040         CIRCULAR       0.2       0         0         0         1   
+119042         CIRCULAR       0.3       0         0         0         1   
+119043         CIRCULAR       0.3       0         0         0         1   
+119044         CIRCULAR       0.4       0         0         0         1   
+119045         CIRCULAR       0.3       0         0         0         1   
+119046         CIRCULAR       0.3       0         0         0         1   
+119047         CIRCULAR       0.3       0         0         0         1   
+119056         CIRCULAR       0.25      0         0         0         1   
+119057         CIRCULAR       0.25      0         0         0         1   
+119058         CIRCULAR       0.25      0         0         0         1   
+120001         CIRCULAR       0.2       0         0         0         1   
+120002         CIRCULAR       0.2       0         0         0         1   
+120003         CIRCULAR       0.2       0         0         0         1   
+120004         CIRCULAR       0.2       0         0         0         1   
+120005         CIRCULAR       0.2       0         0         0         1   
+120006         CIRCULAR       0.2       0         0         0         1   
+120007         CIRCULAR       0.3       0         0         0         1   
+120008         CIRCULAR       0.3       0         0         0         1   
+120010         CIRCULAR       0.22      0         0         0         1   
+120011         CIRCULAR       0.25      0         0         0         1   
+120012         CIRCULAR       0.15      0         0         0         1   
+120013         CIRCULAR       0.2       0         0         0         1   
+120014         CIRCULAR       0.3       0         0         0         1   
+120015         CIRCULAR       0.15      0         0         0         1   
+120016         CIRCULAR       0.2       0         0         0         1   
+120017         CIRCULAR       0.2       0         0         0         1   
+120018         CIRCULAR       0.15      0         0         0         1   
+120019         CIRCULAR       0.15      0         0         0         1   
+120020         CIRCULAR       0.15      0         0         0         1   
+120021         CIRCULAR       0.2       0         0         0         1   
+120022         CIRCULAR       0.15      0         0         0         1   
 
 [OUTFALLS]
 ;;               Invert     Outfall    Stage/Table      Tide
@@ -1273,4 +1354,4 @@ RainGage        32570413.11409876   5828071.929876541
 [BACKDROP]
 ;;Filename          X1                 Y1                 X2                 Y2
 ;;----------------- ----------------- ----------------- ----------------- -----------------
-hg_20240522180358.png 32570491.017      5828270.765       32570481.367      5827767.89       
+hg_20240522184020.png 32570491.017      5828270.765       32570481.367      5827767.89       
