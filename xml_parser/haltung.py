@@ -211,6 +211,8 @@ def parse_haltung(root):
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')
+    for haltung in  haltung_list:
+        print(haltung.profilart)
     #Haltung.fix_orientation(self)
     #print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
     return haltung_list

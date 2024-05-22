@@ -19,6 +19,7 @@ from xml_parser.bauwerk import Becken
 from xml_parser.bauwerk import Behandlungsanlage
 from xml_parser.bauwerk import Klaeranlage
 from xml_parser.haltung import parse_haltung
+from xml_parser.haltung import Haltung
 from xml_parser.leitung import parse_leitung
 from xml_parser.bauwerk import parse_bauwerk_dump
 from xml_parser.bauwerk import parse_becken
@@ -99,5 +100,6 @@ __all__ = [
     "Behandlungsanlage",
     "Klaeranlage",
     "parse_bauwerk_dump",
-    "Bauwerk_dump"
+    "Bauwerk_dump",
+    "Haltung"
 ]

@@ -247,7 +247,7 @@ def check_crs(schacht_list):
     # Determine the CRS based on the coordinate values
     if -180 <= x <= 180 and -90 <= y <= 90:
         epsg = '4326'  # WGS 84 (GPS)
-    elif 30000000 <= x <= 60000000 and 5000000 <= y <= 100000000:
+    elif 30000000 <= x <= 60000000 and 5000000 <= y <= 10000000:
         epsg = '25832'  # UTM zone 32N
     elif 2500000 <= x <= 3000000 and 5300000 <= y <= 5600000:
         epsg = '31466'  # GK2
@@ -255,3 +255,4 @@ def check_crs(schacht_list):
         epsg = None  # EPSG code unknown
     #print(f"Determined EPSG code: {epsg}") 
     return epsg
+

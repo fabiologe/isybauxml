@@ -16,7 +16,7 @@ import os
 
 
 def main():
-    file_path = ("input/Stammdaten_ISY.xml")
+    file_path = ("input/Model.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -59,7 +59,7 @@ def main():
         print(os.getcwd())
         to_xsls_haltung(col_haltung, col_schacht , col_leitung)'''
         metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
-        create_inp(metadata, flaechen_list, schacht_list, bauwerke_list)
+        create_inp(metadata, flaechen_list, schacht_list,haltung_list, bauwerke_list)
         default_sim()
         default_plot(schacht_list)
         sys.exit()

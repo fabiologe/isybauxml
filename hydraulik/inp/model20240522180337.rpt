@@ -1,0 +1,12 @@
+
+  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.2 (Build 5.2.4)
+  PYSWMM TOOLKIT API - VERSION v1.0 (2024-04-17)
+  ------------------------------------------------------------
+
+  
+  ERROR 209: undefined object 119016AUS2 at line 901 of [CONDUIT] section:
+  119016AUSF                  119016AUSF                  119016AUS2                  19.98     0.01    37.6        37.58       0           0           
+
+  
+  ERROR 209: undefined object 120008AUS1 at line 943 of [CONDUIT] section:
+  120008                      120008                      120008AUS1                  22.5      0.01    36.92       36.7        0           0           

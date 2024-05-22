@@ -164,7 +164,7 @@ class subcatchments:
         return subcatchment_list
             
     def to_subcatchment_string(flaechen_list: List, subcatchment_list: List['subcatchments']) -> str:
-        subcatchments.from_flache(flaechen_list)
+        
         header = [
             "[SUBCATCHMENTS]",
             ";;                                                         Total        Pcnt.             Pcnt.    Curb     Snow ",
@@ -573,13 +573,13 @@ class conduit: #abflusswirksame Verbindungen
         conduits_list = []
         for haltung in haltung_list:
             conduits_sgl = conduit(
-                name = haltung.objektbezeichung,
+                name = haltung.objektbezeichnung,
                 node1= haltung.zulauf,
                 node2= haltung.ablauf, 
                 length= haltung.laenge,
                 n= 0.01, # concrete 
                 z1 = haltung.zulauf_sh,
-                z2 = haltung.anlauf_sh,
+                z2 = haltung.ablauf_sh,
                 Q0 = 0,
                 Qmax = 0            
             )
@@ -588,14 +588,14 @@ class conduit: #abflusswirksame Verbindungen
     def to_conduits_str(conduits_list  : List) -> str:
         header = [
         "[CONDUITS]",
-        ";;               Inlet            Outlet                      Manning    Inlet      Outlet     Init.      Max.",      
-        ";;Name           Node             Node             Length     N          Offset     Offset     Flow       Flow",
-        ";;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------"
+        ";;                          Inlet                     Outlet                               Manning    Inlet      Outlet     Init.      Max.",      
+        ";;Name                      Node                      Node                      Length     N          Offset     Offset     Flow       Flow",
+        ";;------------------------- ------------------------- ------------------------- ---------- ---------- ---------- ---------- ---------- ----------"
         ]
         conduits_strings = []
         for conduit in conduits_list:
-            data = f"{conduit.name:<15}{conduit.node1:<15}{conduit.node2:<15}{conduit.length:<10}{conduit.n:<8}"\
-                   f"{conduit.z1:<10}{conduit.z2:<10}{conduit.Q0:<8}{conduit.Qmax:<8}"
+            data = f"{conduit.name:<28}{conduit.node1:<28}{conduit.node2:<28}{conduit.length:<10}{conduit.n:<8}"\
+                   f"{conduit.z1:<12}{conduit.z2:<12}{conduit.Q0:<12}{conduit.Qmax:<12}"
             conduits_strings.append(data)
         return  "\n".join(header + conduits_strings)
 
@@ -890,56 +890,223 @@ class xsection:
     link: str  
     shape: str
     geom1: float
-    geom2: Optional[float] = 0
+    geom2: Optional[float] = 0 
     geom3: Optional[float] = 0
     geom4: Optional[float] = 0
     barrels: int = 1 
     culvert: Optional[int] = None
     curve: Optional[str] = None
     tsec: Optional[str] = None
-    def from_haltung(haltung_list : List)-> List['xsection']:
-        xsection_list = []
+    def from_haltung(haltung_list: List[Haltung])-> List['xsection']:
+        xsection_list: List[xsection] = []
+        
         for haltung in haltung_list:
-            if haltung.profilart == 0:
+            if haltung.profilart == int(0):
                 shape = 'CIRCULAR'
                 if haltung.profilhoehe is not None:
                     geom1 = float(haltung.profilhoehe / 1000)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
                 else:
-                    geom1 = float(haltung.profilbreite / 1000)
+                    print(f'NO DN for Haltung: {haltung.objektbezeichnung} setting to 250mm')
+                    geom1 = float(0.25)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
 
             elif haltung.profilart == 1:
                 shape = 'EGG'
+                if haltung.profilhoehe is not None:
+                    geom1 = float(haltung.profilhoehe / 1000)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+                else:
+                    print(f'NO DN for Haltung: {haltung.objektbezeichnung} setting to 500mm')
+                    geom1 = float(0.5)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+            
             elif haltung.profilart == 2:
                 shape = 'CATENARY'
+                if haltung.profilhoehe is not None:
+                    geom1 = float(haltung.profilhoehe / 1000)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+                else:
+                    print(f'NO DN for Haltung: {haltung.objektbezeichnung} setting to 500mm')
+                    geom1 = float(0.5)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = 0,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+            
             elif haltung.profilart == 3:
                 shape = 'RECT_CLOSED'
+                if haltung.profilhoehe is not None:
+                    geom1 = float(haltung.profilhoehe / 1000)
+                    if haltung.profilbreite is not None:
+                        geom2 = float(haltung.profilbreite / 1000)
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = 0,
+                                                geom4 = 0
+                                                    )
+                        xsection_list.append(xsection_sgl)
+                    else: 
+                        print(f'NO profilbreite for Haltung: {haltung.objektbezeichnung} setting to 1000mm')
+                        geom2 = float(1.0)
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = 0,
+                                                geom4 = 0
+                                                    )
+                        xsection_list.append(xsection_sgl)
+                else:
+                    print(f'NO Geometry for Haltung: {haltung.objektbezeichnung} setting to 1/2')
+                    geom1 = float(0.5)
+                    geom2 = float(1.0)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = geom2,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+                
+            
             elif haltung.profilart == 5:
                 shape = 'RECT_OPEN'
                 if haltung.profilhoehe is not None:
-                    geom1  = float(haltung.profilhoehe/1000)
-                else: 
-                    geom1 = 1
-                if haltung.profilbreite is not None:
-                    geom2 = float(haltung.profilbreite/1000)
+                    geom1 = float(haltung.profilhoehe / 1000)
+                    if haltung.profilbreite is not None:
+                        geom2 = float(haltung.profilbreite / 1000)
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = 0,
+                                                geom4 = 0
+                                                    )
+                        xsection_list.append(xsection_sgl)
+                    else: 
+                        print(f'NO profilbreite for Haltung: {haltung.objektbezeichnung} setting to 1000mm')
+                        geom2 = float(1.0)
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = 0,
+                                                geom4 = 0
+                                                    )
+                        xsection_list.append(xsection_sgl)
                 else:
-                    geom2 = 1 
+                    print(f'NO Geometry for Haltung: {haltung.objektbezeichnung} setting to 1/2')
+                    geom1 = float(0.5)
+                    geom2 = float(1.0)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = geom2,
+                                            geom3 = 0,
+                                            geom4 = 0
+                                                )
+                    xsection_list.append(xsection_sgl)
+            
             elif haltung.profilart == 8:
                 shape = 'TRAPEZOIDAL'
                 if haltung.profilhoehe is not None:
-                    geom1 = float(haltung.profilhoehe/1000)
-                if haltung.profilbreite is not None:
-                    geom2 = float(haltung.proiflbreite/1000)
-                geom3 = 1
-                geom4 = 1
-            xsection_sgl = xsection(
-                link = haltung.objektbezeichung,
-                shape = shape,
-                geom1= geom1,
-                geom2 = geom2,
-                geom3 = geom3,
-                geom4 = geom4
-                                )
-            xsection_list.append(xsection_sgl)
+                    geom1 = float(haltung.profilhoehe / 1000)
+                    if haltung.profilbreite is not None:
+                        geom2 = float(haltung.profilbreite / 1000)
+                        geom3 = 0.5
+                        geom4 = 0.5 
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = geom3,
+                                                geom4 = geom4
+                                                    )
+                        xsection_list.append(xsection_sgl)
+                    else: 
+                        print(f'NO profilbreite for Haltung: {haltung.objektbezeichnung} setting to 1000mm')
+                        geom2 = float(1.0)
+                        xsection_sgl = xsection(
+                                                link = haltung.objektbezeichnung,
+                                                shape = shape,
+                                                geom1= geom1,
+                                                geom2 = geom2,
+                                                geom3 = geom4,
+                                                geom4 = geom4
+                                                    )
+                        xsection_list.append(xsection_sgl)
+                else:
+                    print(f'NO Geometry for Haltung: {haltung.objektbezeichnung} setting to 1/2')
+                    geom1 = float(0.5)
+                    geom2 = float(1.0)
+                    xsection_sgl = xsection(
+                                            link = haltung.objektbezeichnung,
+                                            shape = shape,
+                                            geom1= geom1,
+                                            geom2 = geom2,
+                                            geom3 = geom3,
+                                            geom4 = geom4
+                                                )
+                    xsection_list.append(xsection_sgl)
+            
+            
+        print(xsection_list)
         return xsection_list
     def to_xsection_string(xsection_list : List)-> str:
         header = [
@@ -1234,15 +1401,15 @@ class vertices:
         vertices_list = []
         for haltung in haltung_list:
             link = haltung.objektbezeichnung
-            if haltung.polygons:
-                for polygon in haltung.polygons:
-                    Xcoord_S = polygon.kante.start.punkt.x
+            if haltung.polygon:
+                for kante in haltung.polygon:
+                    Xcoord_S = kante.start.punkt.x
                     #print(Xcoord_S)
-                    Ycoord_S = polygon.kante.start.punkt.y
+                    Ycoord_S = kante.start.punkt.y
                     #print(Ycoord_S)
-                    Xcoord_E = polygon.kante.ende.punkt.x
+                    Xcoord_E = kante.ende.punkt.x
                     #print(Xcoord_E)
-                    Ycoord_E = polygon.kante.ende.punkt.y
+                    Ycoord_E = kante.ende.punkt.y
                     #print(Ycoord_E)
                     vertices_start = vertices(
                         link=link,
@@ -1254,8 +1421,8 @@ class vertices:
                         Xcoord=Xcoord_E,
                         Ycoord=Ycoord_E
                     )
-                vertices_list.append(vertices_start)
-                vertices_list.append(vertices_ende)
+                    vertices_list.append(vertices_start)
+                    vertices_list.append(vertices_ende)
         
         #print(vertices_list)
         return vertices_list
@@ -1396,7 +1563,7 @@ class backdrop:
         return '\n'.join(header + [data])
 
 
-def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
+def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerke_list):
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
     x = 6.99641136598768
     y = 49.2853524841828
@@ -1405,6 +1572,8 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
     junction_list = junction.from_schacht(schacht_list)
+    conduit_list = conduit.from_haltung(haltung_list)
+    xsection_list = xsection.from_haltung(haltung_list)
     pump_list = pump.get_pump(bauwerke_list)
     drossel_list = pump.get_drossel(bauwerke_list)
     
@@ -1443,6 +1612,12 @@ def create_inp(metadata, flaechen_list, schacht_list, bauwerke_list):
         f.write("\n")
         f.write("\n")
         f.write(junction.to_junction_string(junction_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(conduit.to_conduits_str(conduit_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(xsection.to_xsection_string(xsection_list))
         f.write("\n")
         f.write("\n")
         f.write(outfall.to_outfall_string(outfall_list))
