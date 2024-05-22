@@ -28,10 +28,7 @@ class Kante:
     ende: Ende
 
 
-@dataclass
-class Polygon:
-    kante: Kante
-    points= []
+
 
 @dataclass
 class Flaeche:
@@ -48,7 +45,7 @@ class Flaeche:
     abflussbeiwert: Optional[float] = 0
     kommentar: Optional[str] = None
     gebietskennung: Optional[str] = None
-    polygon = []
+    polygon= []
     kanten = [] 
     schwerpunkt: Optional[Punkt] = None
     schwerpunktlaufzeit: Optional[float] = None
@@ -59,8 +56,8 @@ class Flaeche:
     nodes= []
     hydro_vertices= []
     width: Optional[float] = None
-    def add_polygon(self, polygon: Polygon):
-        self.polygon.append(polygon)
+    def add_polygon(self, kante: Kante):
+        self.polygons.append(kante)
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
     def calc_width(self, polygon):
@@ -76,7 +73,7 @@ def parse_flaeche(root):
             flaeche.flaechennummer = int(flaechennummer_element[0].firstChild.nodeValue)
         flaechenbezeichnung_element = flaeche_objekt.getElementsByTagName('Flaechenbezeichnung')
         if flaechenbezeichnung_element:
-            flaeche.objektbezeichnung = str(flaechenbezeichnung_element[0].firstChild.nodeValue)
+            flaeche.objektbezeichnung = f'F_{flaechenbezeichnung_element[0].firstChild.nodeValue}'
         flaechenart_element = flaeche_objekt.getElementsByTagName('Flaechenart')
         if flaechenart_element: 
             flaeche.flaechenart = int(flaechenart_element[0].firstChild.nodeValue)
@@ -112,8 +109,11 @@ def parse_flaeche(root):
             flaeche.gebietskennung = str(gebietskennung_element[0].firstChild.nodeValue)       
         for polygon_element in flaeche_objekt.getElementsByTagName('Polygon'):  
                             if polygon_element:
+                                flaeche.polygon = []
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
+
                                     if kanten_element:
+
                                         start_element = kanten_element.getElementsByTagName('Start')[0]
                                         x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
@@ -132,10 +132,7 @@ def parse_flaeche(root):
 
                                         kante = Kante(start=start, ende=ende)
                                         flaeche.add_kante(kante)
-                                        polygon= Polygon(kante=kante)
-                                        point_tuple = (punkt_s,punkt_e)
-                                polygon.points.append(point_tuple)
-                                flaeche.add_polygon(polygon)
+                                        flaeche.polygon.append(kante)        
         for hydro_objekt in flaeche_objekt.getElementsByTagName('HydraulikObjekt'):
             if hydro_objekt:
                 hydro_vertices = hydro_objekt.getElementsByTagName('Objektbezeichnung')
@@ -154,13 +151,6 @@ def parse_flaeche(root):
         flaechen_list.append(flaeche)
     print(f"Number of Flaechen objects: {len(flaechen_list)}")
     print('\n')
-    #print(f"Number of unique Flaechen: {len(set(f.objektbezeichnung for f in flaechen_list))}")
+    
+             
     return flaechen_list
-
-@dataclass
-class hoehenlinien:
-    punkte: Optional[List[Punkt]] = None
-    polygon: Optional[List[Polygon]] = None
-
-    def create_conturs(flaechen_list, netz_punkt):
-         pass

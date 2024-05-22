@@ -42,18 +42,9 @@ def default_plot(schacht_list:List):
         print(f"Determined CRS code: {crs_check}")
         
         crs = f'epsg:{crs_check}' 
-        simulation_info = swmmio.Model(latest_file, crs=crs)
+        crs_test = 'epsg:3728'
+        simulation_info = swmmio.Model(latest_file, crs=crs_test)
         
-        # Validate the nodes' coordinates before creating the map
-        node_df = simulation_info.nodes.dataframe
-        if 'X' not in node_df.columns or 'Y' not in node_df.columns:
-            raise ValueError("Node dataframe does not contain 'X' or 'Y' coordinates.")
-        
-        valid_nodes = node_df.dropna(subset=['X', 'Y'])
-        if valid_nodes.empty:
-            raise ValueError("No valid node coordinates found for creating the map.")
-        
-        # Create map
         swmmio.create_map(simulation_info, filename=file_name)
         print(f"Map created successfully: {file_name}")
         

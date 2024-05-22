@@ -150,7 +150,7 @@ class subcatchments:
         subcatchment_list = []
         for flaeche in flaechen_list:
             subcatchment_sgl = subcatchments(
-                name= {flaeche.objektbezeichnung},
+                name= flaeche.objektbezeichnung,
                 raingage="RainGage",
                 outletID=str(flaeche.hydro_vertices[0]) or "NO_HYDRO",
                 imperv=float(flaeche.abflussbeiwert) if flaeche.abflussbeiwert is not None else 1,
@@ -220,8 +220,8 @@ class subareas:
 @dataclass
 class infiltration_H: #For Horton/ Modified Horton
     subname: str
-    maxrate: Optional[float] = 100 # maximum infiltration rate on Horton curve (in/hr or mm/hr)
-    minrate: Optional[float] = 5 # minimum infiltration rate on Horton curve (in/hr or mm/hr)
+    maxrate: Optional[float] = 4.5 # maximum infiltration rate on Horton curve (in/hr or mm/hr)
+    minrate: Optional[float] = 0.2 # minimum infiltration rate on Horton curve (in/hr or mm/hr)
     decay: Optional[float] = 6.5  # decay rate constant of Horton curve (1/hr).
     drytime: Optional[float] = 7 # time it takes for fully saturated soil to dry  (days).
     maxinf: Optional[float] =  0 #maximum infiltration volume possible  (mm)
@@ -231,8 +231,8 @@ class infiltration_H: #For Horton/ Modified Horton
         for subcatchment in subcatchment_list:
             infiltration_sgl = infiltration_H(
                 subname = str(subcatchment.name),
-                maxrate = 10,
-                minrate= 5,
+                maxrate = 4.5,
+                minrate= 0.2,
                 decay= 6.5,
                 drytime= 7,
                 maxinf= 0)
@@ -242,12 +242,12 @@ class infiltration_H: #For Horton/ Modified Horton
         infiltration_H.from_subcatchment(subcatchment_list)
         header = [
             "[INFILTRATION]",
-            ";;Subcatchment   MaxRate    MinRate    Decay      DryTime    MaxInfil",
-            ";;-------------- ---------- ---------- ---------- ---------- ----------"
+            ";;Subcatchment         MaxRate    MinRate    Decay      DryTime    MaxInfil",
+            ";;------------------- ---------- ---------- ---------- ---------- ----------"
         ]
         infiltration_strings = []
         for infiltration in infiltration_list:
-            data = f"{infiltration.subname:<16} {infiltration.maxrate:<10} {infiltration.minrate:<10} {infiltration.decay:<10} {infiltration.drytime:<10} {infiltration.maxinf:<10}"
+            data = f"{infiltration.subname:<21} {infiltration.maxrate:<10} {infiltration.minrate:<10} {infiltration.decay:<10} {infiltration.drytime:<10} {infiltration.maxinf:<10}"
             infiltration_strings.append(data)
         return '\n'.join(header + infiltration_strings)
 
@@ -1287,38 +1287,38 @@ class polygons:
         for flaeche in flaechen_list:
             subcat = flaeche.objektbezeichnung
             if flaeche.polygon:
-                for polygon in flaeche.polygon:
-                    Xcoord_S = polygon.kante.start.punkt.x
-                    #print(Xcoord_S)
-                    Ycoord_S = polygon.kante.start.punkt.y
-                    #print(Ycoord_S)
-                    Xcoord_E = polygon.kante.ende.punkt.x
-                    #print(Xcoord_E)
-                    Ycoord_E = polygon.kante.ende.punkt.y
-                    #print(Ycoord_E)
-                    polygon_start = polygons(
-                        subcat = subcat,
-                        Xcoord = Xcoord_S,
-                        Ycoord = Ycoord_S,
-                    )
-                    polygon_end = polygons(
-                        subcat = subcat,
-                        Xcoord = Xcoord_E,
-                        Ycoord = Ycoord_E
-                    )
-                polygons_list.append(polygon_start)
-                polygons_list.append(polygon_end)
+                for kanten in flaeche.polygon:
+                        Xcoord_S = kanten.start.punkt.x
+                        #print(Xcoord_S)
+                        Ycoord_S = kanten.start.punkt.y
+                        #print(Ycoord_S)
+                        Xcoord_E = kanten.ende.punkt.x
+                        #print(Xcoord_E)
+                        Ycoord_E = kanten.ende.punkt.y
+                        #print(Ycoord_E)
+                        polygon_start = polygons(
+                            subcat = subcat,
+                            Xcoord = Xcoord_S,
+                            Ycoord = Ycoord_S,
+                        )
+                        polygon_end = polygons(
+                            subcat = subcat,
+                            Xcoord = Xcoord_E,
+                            Ycoord = Ycoord_E
+                        )
+                        polygons_list.append(polygon_start)
+                        polygons_list.append(polygon_end)
         #print(polygons_list)
         return polygons_list
     def to_polygons_string(polygons_list: List)-> str:
         header = [
             "[Polygons]", 
-            ";;Subcatchment   X-Coord            Y-Coord",           
-            ";;-------------- ------------------ ------------------"
+            ";;Subcatchment                    X-Coord            Y-Coord",           
+            ";;------------------------------ ------------------ ------------------"
             ]
         polygons_strings = []
         for polygons in polygons_list:
-            data = f"{polygons.subcat:<16}{polygons.Xcoord:<20}{polygons.Ycoord:<20}"
+            data = f"{polygons.subcat:<32}{polygons.Xcoord:<20}{polygons.Ycoord:<20}"
             polygons_strings.append(data)
         return '\n'.join(header +    polygons_strings)
 
