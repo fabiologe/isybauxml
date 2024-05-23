@@ -14,7 +14,7 @@ class Punkt:
 @dataclass
 class Start:
     punkt: Punkt
-    tag: str
+    tag: Optional[str]
 
 
 @dataclass
@@ -70,6 +70,7 @@ class Haltung:
 
     def add_kante(self, kante: Kante):
         self.kanten.append(kante)
+        return
     def __str__(self):
         return f"Haltung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nZulauf: {self.zulauf}\nAblauf: {self.ablauf}\nProfil: {self.profilart}\nKante: {self.kanten}"
    
@@ -192,17 +193,17 @@ def parse_haltung(root):
                                         x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt = Punkt(x=x, y=y, z=z)
-                                        tag = start_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        start = Start(punkt=punkt, tag=tag)
+                                        punkt_s = Punkt(x=x, y=y, z=z)
+                                        tag_s = start_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
+                                        start = Start(punkt=punkt_s, tag=tag_s)
 
                                         ende_element = kanten_element.getElementsByTagName('Ende')[0]
                                         x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
                                         y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                        punkt = Punkt(x=x, y=y, z=z)
-                                        tag = ende_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
-                                        ende = Ende(punkt=punkt, tag=tag)
+                                        punkt_e = Punkt(x=x, y=y, z=z)
+                                        tag_e = ende_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
+                                        ende = Ende(punkt=punkt_e, tag=tag_e)
 
                                         kante = Kante(start=start, ende=ende)
                                         haltung.add_kante(kante)
@@ -211,8 +212,12 @@ def parse_haltung(root):
                         haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')
-    for haltung in  haltung_list:
-        print(haltung.profilart)
+     
+    for haltung in haltung_list:
+            link = haltung.objektbezeichnung
+            print(link)
+            print(haltung.polygon)
+            
     #Haltung.fix_orientation(self)
     #print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")
     return haltung_list

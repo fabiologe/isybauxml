@@ -1397,20 +1397,20 @@ class vertices:
     link: str
     Xcoord: float
     Ycoord: float
-    @classmethod
-    def from_haltung(cls, haltung_list: List) -> List['vertices']:
+   
+    def from_haltung(haltung_list: List) -> List['vertices']:
         vertices_list = []
         for haltung in haltung_list:
             link = haltung.objektbezeichnung
             if haltung.polygon:
-                for kante in haltung.polygon:
-                    Xcoord_S = kante.start.punkt.x
+                for kanten in haltung.polygon:
+                    Xcoord_S = kanten.start.punkt.x
                     #print(Xcoord_S)
-                    Ycoord_S = kante.start.punkt.y
+                    Ycoord_S = kanten.start.punkt.y
                     #print(Ycoord_S)
-                    Xcoord_E = kante.ende.punkt.x
+                    Xcoord_E = kanten.ende.punkt.x
                     #print(Xcoord_E)
-                    Ycoord_E = kante.ende.punkt.y
+                    Ycoord_E = kanten.ende.punkt.y
                     #print(Ycoord_E)
                     vertices_start = vertices(
                         link=link,
@@ -1425,7 +1425,7 @@ class vertices:
                     vertices_list.append(vertices_start)
                     vertices_list.append(vertices_ende)
         
-        #print(vertices_list)
+        print(f'dont work yet :/{vertices_list}')
         return vertices_list
     
     def to_vertices_string(vertices_list: List)-> str: 
@@ -1467,7 +1467,7 @@ class polygons:
                         polygon_start = polygons(
                             subcat = subcat,
                             Xcoord = Xcoord_S,
-                            Ycoord = Ycoord_S,
+                            Ycoord = Ycoord_S
                         )
                         polygon_end = polygons(
                             subcat = subcat,
