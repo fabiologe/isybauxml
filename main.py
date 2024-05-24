@@ -17,7 +17,7 @@ import os
 
 
 def main():
-    file_path = ("input/Stammdaten_ISY.xml")
+    file_path = ("input/Globus_UTM.xml")
     if file_path:
    
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
@@ -25,6 +25,7 @@ def main():
         root = dom.documentElement
         update_punkthoehe(dom)
         update_haltunghoehe(dom)
+        DN_bug(dom)
         delete_incomplete_points(dom)
         analysis_results = analyze_xml(root)
         print(analysis_results)

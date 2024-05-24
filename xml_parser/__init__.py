@@ -4,6 +4,7 @@ from xml_parser.xml_fixer import delete_incomplete_points
 from xml_parser.xml_fixer import kill_duplicates
 from xml_parser.xml_fixer import analyze_xml
 from xml_parser.xml_fixer import transform_crs
+from xml_parser.xml_fixer import DN_bug
 from xml_parser.schacht import parse_schacht
 from xml_parser.bauwerk import Bauwerk_dump
 from xml_parser.bauwerk import Auslaufbauwerk
@@ -53,6 +54,7 @@ from xml_parser.schacht import SchachtManager
 
 
 __all__ = [
+    "DN_bug",
     "SchachtManager",
     "analyze_xml",
     "kill_duplicates",

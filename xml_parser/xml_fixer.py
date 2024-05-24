@@ -1,5 +1,7 @@
 
 from orientation.validate_CRS import find_CRSfromXML
+from pyproj import Proj, transform
+
 def update_punkthoehe(dom):
     all_punkt_elements = dom.getElementsByTagName('Punkt')
     for punkt in all_punkt_elements:
@@ -15,7 +17,12 @@ def dwa_to_isy(dom):
             status.firstChild.nodeValue = 0
         elif status.firstChild.nodeValue == "P":
             status.firstChild.nodeValue = 1 
-        
+def DN_bug(dom):
+    all_profilart = dom.getElementsByTagName('Profilart')
+    for profilart in all_profilart:
+        if profilart.firstChild.nodeValue == 'DN':
+            profilart.firstChild.nodeValue == 0
+                 
 def update_haltunghoehe(dom):
     all_start = dom.getElementsByTagName('Start')
     for punkt in all_start:
@@ -127,11 +134,28 @@ def transform_crs(dom):
     all_points = []
     all_punkt_elements = dom.getElementsByTagName('Punkt')
     for punkt in all_punkt_elements:
-        rechtswert = punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue
-        hochwert = punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue
+        rechtswert = float(punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+        hochwert = float(punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
         all_points.append((rechtswert, hochwert))
-    print(all_points)
-    print(len(all_points))
+    
+    # Print or process the original points before transformation
+    print("Original Points:", all_points)
+    print("Number of Points:", len(all_points))
+    total_x = 0
+    total_y = 0
+    count = 0
+
+    total_rechtswert = sum(point[0] for point in all_points)
+    total_hochwert = sum(point[1] for point in all_points)
+    count = len(all_points)
+    
+    if count == 0:
+        return None
+    
+    x = total_rechtswert / count
+    y = total_hochwert / count
+
+    
     given_crs = find_CRSfromXML(x,y)
     print('GK3= 31467 , GK2 = 31466 , UTM32N = 25832')
     print(f'From given CRS: {given_crs} to....?')
@@ -139,6 +163,9 @@ def transform_crs(dom):
     source_proj = Proj(init=f'EPSG:{given_crs}')
     target_proj = Proj(init=f'EPSG:{trans_crs}')
     transformed_points = [transform(source_proj, target_proj, x, y) for x, y in all_points]
+    
+    # Print the transformed points
+    print("Transformed Points:", transformed_points)
     
     # Update the XML with transformed coordinates
     i = 0
