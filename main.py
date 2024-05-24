@@ -30,6 +30,7 @@ def main():
         print(analysis_results)
         parse_all(root) 
         print(len(schacht_list))
+        transform_crs(dom)
 
         #schacht_manager = SchachtManager(schacht_list)
 

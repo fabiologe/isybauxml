@@ -1,4 +1,5 @@
 
+from orientation.validate_CRS import find_CRSfromXML
 def update_punkthoehe(dom):
     all_punkt_elements = dom.getElementsByTagName('Punkt')
     for punkt in all_punkt_elements:
@@ -121,3 +122,31 @@ def analyze_xml(root):
 
     return analysis_results
 
+
+def transform_crs(dom):
+    all_points = []
+    all_punkt_elements = dom.getElementsByTagName('Punkt')
+    for punkt in all_punkt_elements:
+        rechtswert = punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue
+        hochwert = punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue
+        all_points.append((rechtswert, hochwert))
+    print(all_points)
+    print(len(all_points))
+    given_crs = find_CRSfromXML(x,y)
+    print('GK3= 31467 , GK2 = 31466 , UTM32N = 25832')
+    print(f'From given CRS: {given_crs} to....?')
+    trans_crs = int(input(f'Enter transform CRS as EPSG:'))
+    source_proj = Proj(init=f'EPSG:{given_crs}')
+    target_proj = Proj(init=f'EPSG:{trans_crs}')
+    transformed_points = [transform(source_proj, target_proj, x, y) for x, y in all_points]
+    
+    # Update the XML with transformed coordinates
+    i = 0
+    for punkt in all_punkt_elements:
+        punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue = str(transformed_points[i][0])
+        punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue = str(transformed_points[i][1])
+        i += 1
+    
+    # Write the updated XML back to the file
+    with open('your_updated_xml_file.xml', 'w') as f:
+        f.write(dom.toxml())
