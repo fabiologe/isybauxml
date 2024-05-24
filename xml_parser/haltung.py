@@ -174,17 +174,17 @@ def parse_haltung(root):
                             haltung.material = material_element[0].firstChild.nodeValue
                         profilart_element = abwasser_objekt.getElementsByTagName('Profilart')
                         if profilart_element:
-                            haltung.profilart = int(profilart_element[0].firstChild.nodeValue)
+                            haltung.profilart = int(profilart_element[0].firstChild.nodeValue.strip())
                         profilbreite_element = abwasser_objekt.getElementsByTagName('Profilbreite')
                         if profilbreite_element:
-                            haltung.profilbreite = int(profilbreite_element[0].firstChild.nodeValue)
+                            haltung.profilbreite = int(profilbreite_element[0].firstChild.nodeValue.strip())
                         profilhoehe_element = abwasser_objekt.getElementsByTagName('Profilhoehe')
                         if profilhoehe_element:
                             haltung.profilhoehe = int(profilhoehe_element[0].firstChild.nodeValue)
                         aussendurchmesser_element = abwasser_objekt.getElementsByTagName('Aussendurchmesser')
                         if aussendurchmesser_element:
                             haltung.aussendurchmesser = int(aussendurchmesser_element[0].firstChild.nodeValue)
-                        for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                        for polygon_element in abwasser_objekt.getElementsByTagName('Polygon') :  
                             if polygon_element:
                                 haltung.polygon = []
                                 for kanten_element in polygon_element.getElementsByTagName('Kante'):
@@ -194,6 +194,7 @@ def parse_haltung(root):
                                         y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
                                         z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
                                         punkt_s = Punkt(x=x, y=y, z=z)
+                                        print(punkt_s)
                                         tag_s = start_element.getElementsByTagName('PunktattributAbwasser')[0].firstChild.nodeValue
                                         start = Start(punkt=punkt_s, tag=tag_s)
 
@@ -208,15 +209,13 @@ def parse_haltung(root):
                                         kante = Kante(start=start, ende=ende)
                                         haltung.add_kante(kante)
                                         haltung.polygon.append(kante)
-                            
-                        haltung_list.append(haltung)
+                    
+                    haltung_list.append(haltung)
     print(f"Number of Haltung objects: {len(haltung_list)}")
     print('\n')
      
-    for haltung in haltung_list:
-            link = haltung.objektbezeichnung
-            print(link)
-            print(haltung.polygon)
+    
+            
             
     #Haltung.fix_orientation(self)
     #print(f"Number of unique Haltungen: {len(set(h.objektbezeichnung for h in haltung_list))}")

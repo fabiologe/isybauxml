@@ -10285,7 +10285,7 @@
      <Material>KST</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>800</Profilbreite>
       <Profilhoehe>800</Profilhoehe>
       </Profil>
@@ -10448,7 +10448,7 @@
      <Material>KST</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>800</Profilbreite>
       <Profilhoehe>800</Profilhoehe>
       </Profil>
@@ -10502,7 +10502,7 @@
      <Material>KST</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>800</Profilbreite>
       <Profilhoehe>800</Profilhoehe>
       </Profil>
@@ -10556,7 +10556,7 @@
      <Material>KST</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>800</Profilbreite>
       <Profilhoehe>800</Profilhoehe>
       </Profil>
@@ -15160,7 +15160,7 @@
      <Material>PVC</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>200</Profilbreite>
       <Profilhoehe>200</Profilhoehe>
       </Profil>
@@ -15273,7 +15273,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15330,7 +15330,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15387,7 +15387,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15444,7 +15444,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15501,7 +15501,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15558,7 +15558,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15615,7 +15615,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -15672,7 +15672,7 @@
      <Material>SB</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
