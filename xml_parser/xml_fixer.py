@@ -131,20 +131,29 @@ def analyze_xml(root):
 
 
 def transform_crs(dom):
+   
     all_points = []
-    all_punkt_elements = dom.getElementsByTagName('Punkt')
-    for punkt in all_punkt_elements:
-        rechtswert = float(punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-        hochwert = float(punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-        all_points.append((rechtswert, hochwert))
+    elements_to_update = []
+
+    # Get all elements in the document
+    all_elements = dom.getElementsByTagName('*')
+
+    for element in all_elements:
+        # Check if the element has both 'Rechtswert' and 'Hochwert' children
+        rechtswert_elements = element.getElementsByTagName('Rechtswert')
+        hochwert_elements = element.getElementsByTagName('Hochwert')
+
+        if rechtswert_elements and hochwert_elements:
+            rechtswert = float(rechtswert_elements[0].firstChild.nodeValue)
+            hochwert = float(hochwert_elements[0].firstChild.nodeValue)
+
+            all_points.append((rechtswert, hochwert))
+            elements_to_update.append(element)
     
     # Print or process the original points before transformation
     print("Original Points:", all_points)
     print("Number of Points:", len(all_points))
-    total_x = 0
-    total_y = 0
-    count = 0
-
+    
     total_rechtswert = sum(point[0] for point in all_points)
     total_hochwert = sum(point[1] for point in all_points)
     count = len(all_points)
@@ -155,24 +164,23 @@ def transform_crs(dom):
     x = total_rechtswert / count
     y = total_hochwert / count
 
-    
-    given_crs = find_CRSfromXML(x,y)
+    given_crs = find_CRSfromXML(x, y)
     print('GK3= 31467 , GK2 = 31466 , UTM32N = 25832')
     print(f'From given CRS: {given_crs} to....?')
-    trans_crs = int(input(f'Enter transform CRS as EPSG:'))
+    trans_crs = int(input('Enter transform CRS as EPSG: '))
+    
     source_proj = Proj(init=f'EPSG:{given_crs}')
     target_proj = Proj(init=f'EPSG:{trans_crs}')
+    
     transformed_points = [transform(source_proj, target_proj, x, y) for x, y in all_points]
     
     # Print the transformed points
     print("Transformed Points:", transformed_points)
     
     # Update the XML with transformed coordinates
-    i = 0
-    for punkt in all_punkt_elements:
-        punkt.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue = str(transformed_points[i][0])
-        punkt.getElementsByTagName('Hochwert')[0].firstChild.nodeValue = str(transformed_points[i][1])
-        i += 1
+    for i, element in enumerate(elements_to_update):
+        element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue = str(transformed_points[i][0])
+        element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue = str(transformed_points[i][1])
     
     # Write the updated XML back to the file
     with open('your_updated_xml_file.xml', 'w') as f:

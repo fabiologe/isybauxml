@@ -2,6 +2,7 @@
 from typing import Optional, Union
 from dataclasses import dataclass
 from typing  import List
+from enum import Enum
 import string
 import random
 bauwerke_list = []
@@ -9,8 +10,25 @@ def generate_unique_id(length=7) -> str:
     characters = string.ascii_letters + string.digits
     unique_id = ''.join(random.choices(characters, k=length))
     return unique_id
+class bauwerktypENUM(Enum):
+    BAUWERKDUMP = 0
+    PUMPWERK = 1
+    BECKEN = 2
+    BEHANDLUNGSANLAGE = 3
+    KLAERANLAGE = 4
+    AUSLAUFBAUWERK = 5
+    PUMPE = 6
+    WEHR_UEBERLAUF = 7
+    DROSSEL = 8
+    SCHIEBER = 9
+    RECHEN = 10
+    SIEB = 11
+    VERSICKERUNGSANLAGE = 12
+    REGENWASSERNUTZUNGSANLAGE = 13
+    EINLAUFBAUWERK = 14
 
 '''NOT FINISHED YET'''
+
 @dataclass
 class Punkt:
     x: float
@@ -64,6 +82,7 @@ class Bauwerk_dump:
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int]= 0
     kanten = []
     polygon = []
     def add_knoten(self, knoten: 'Knoten'):
@@ -86,87 +105,96 @@ def parse_bauwerk_dump(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element not in range(1, 15):
-                            print("bauwerkstyp_element is not between 1 and 14")
-                            bauwerk_dump= Bauwerk_dump()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                bauwerk_dump.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                bauwerk_dump.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                bauwerk_dump.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                bauwerk_dump.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                bauwerk_dump.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                bauwerk_dump.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                bauwerk_dump.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                bauwerk_dump.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                bauwerk_dump.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                bauwerk_dump.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                bauwerk_dump.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                bauwerk_dump.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                bauwerk_dump.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                            if polygon_element:
-                                                bauwerk_dump.polygon = []
-                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                    if kanten_element:
-                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                        punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp not in range(0,15):
+                                print(bauwerkstyp)
+                                print(type(bauwerkstyp))
+                                print("bauwerkstyp_element is not between 1 and 14")
+                                bauwerk_dump= Bauwerk_dump()
+                                bauwerk_dump.bauwerktyp == 0
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    bauwerk_dump.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    bauwerk_dump.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    bauwerk_dump.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    bauwerk_dump.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    bauwerk_dump.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    bauwerk_dump.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    bauwerk_dump.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    bauwerk_dump.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    bauwerk_dump.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    bauwerk_dump.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    bauwerk_dump.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    bauwerk_dump.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    bauwerk_dump.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                                if polygon_element:
+                                                    bauwerk_dump.polygon = []
+                                                    for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                        if kanten_element:
+                                                            start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                            x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                            y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                            z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                            punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                        start = Start(punkt=punkt_s)
+                                                            start = Start(punkt=punkt_s)
 
-                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                        punkt_e = Punkt(x=x, y=y, z=z)
+                                                            ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                            x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                            y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                            z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                            punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                        ende = Ende(punkt=punkt_e)
+                                                            ende = Ende(punkt=punkt_e)
 
-                                                        kante = Kante(start=start, ende=ende)
-                                                        bauwerk_dump.add_kante(kante)
-                                                        bauwerk_dump.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                    knoten = Knoten()
-                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                    if punkt_elements:
-                                        for punkt_element in punkt_elements:
-                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                            knoten.add_punkt(punkt)
-                                        bauwerk_dump.add_knoten(knoten)
-                            bauwerke_list.append(bauwerk_dump)
-                            print(f"{bauwerk_dump.objektbezeichnung} saved in Bauwerk_dump")
+                                                            kante = Kante(start=start, ende=ende)
+                                                            bauwerk_dump.add_kante(kante)
+                                                            bauwerk_dump.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                        knoten = Knoten()
+                                        knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                        punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                        if punkt_elements:
+                                            for punkt_element in punkt_elements:
+                                                punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                                y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                                z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                                punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                                knoten.add_punkt(punkt)
+                                            bauwerk_dump.add_knoten(knoten)
+                                bauwerke_list.append(bauwerk_dump)
+                                print(f"{bauwerk_dump.objektbezeichnung} saved in Bauwerk_dump")
+                            else:
+        
+                                print("bauwerkstyp is between 1 and 14")
+                                
     return bauwerke_list
 @dataclass
 class Pumpwerk:   #1
@@ -179,6 +207,7 @@ class Pumpwerk:   #1
         lagegenauigkeitsklasse: Optional[str]= None
         hoehengenauigkeitsklasse: Optional[int]= None
         knoten: Optional[List['Knoten']] = None
+        bauwerktyp: Optional[int] = 1
         kanten = []
         polygon = []
         #Objektspezifische Attribute:
@@ -211,105 +240,108 @@ def parse_pumpwerk(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 1:
-                            pumpwerk = Pumpwerk()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                pumpwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                pumpwerk.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                pumpwerk.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                pumpwerk.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                pumpwerk.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                pumpwerk.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                pumpwerk.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                pumpwerk.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                pumpwerk.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                pumpwerk.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                pumpwerk.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                pumpwerk.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                pumpwerk.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            # Class specific attributes:
-                            grundflaeche_element = abwasser_objekt.getElementsByTagName('Grundflaeche')
-                            if grundflaeche_element:
-                                pumpwerk.grundflaeche = float(grundflaeche_element[0].firstChild.nodeValue)
-                            max_laenge_element = abwasser_objekt.getElementsByTagName('MaxLaenge')
-                            if max_laenge_element:
-                                pumpwerk.max_laenge = float(max_laenge_element[0].firstChild.nodeValue)
-                            max_breite_element = abwasser_objekt.getElementsByTagName('MaxBreite')
-                            if max_breite_element:
-                                pumpwerk.max_breite = float(max_breite_element[0].firstChild.nodeValue)
-                            max_hoehe_element = abwasser_objekt.getElementsByTagName('MaxHoehe')
-                            if max_hoehe_element:
-                                pumpwerk.max_hoehe = float(max_hoehe_element[0].firstChild.nodeValue)
-                            raum_hochbau_element = abwasser_objekt.getElementsByTagName('RaumHochbau')
-                            if raum_hochbau_element:
-                                pumpwerk.raum_hochbau = float(raum_hochbau_element[0].firstChild.nodeValue)
-                            raum_tiefbau_element = abwasser_objekt.getElementsByTagName('RaumTiefbau')
-                            if raum_tiefbau_element:
-                                pumpwerk.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        pumpwerk.polygon = []
-                                        if polygon_element:
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp_element == 1:
+                                pumpwerk = Pumpwerk()
+                                pumpwerk.bauwerktyp == 1
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    pumpwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    pumpwerk.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    pumpwerk.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    pumpwerk.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    pumpwerk.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    pumpwerk.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    pumpwerk.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    pumpwerk.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    pumpwerk.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    pumpwerk.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    pumpwerk.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    pumpwerk.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    pumpwerk.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                # Class specific attributes:
+                                grundflaeche_element = abwasser_objekt.getElementsByTagName('Grundflaeche')
+                                if grundflaeche_element:
+                                    pumpwerk.grundflaeche = float(grundflaeche_element[0].firstChild.nodeValue)
+                                max_laenge_element = abwasser_objekt.getElementsByTagName('MaxLaenge')
+                                if max_laenge_element:
+                                    pumpwerk.max_laenge = float(max_laenge_element[0].firstChild.nodeValue)
+                                max_breite_element = abwasser_objekt.getElementsByTagName('MaxBreite')
+                                if max_breite_element:
+                                    pumpwerk.max_breite = float(max_breite_element[0].firstChild.nodeValue)
+                                max_hoehe_element = abwasser_objekt.getElementsByTagName('MaxHoehe')
+                                if max_hoehe_element:
+                                    pumpwerk.max_hoehe = float(max_hoehe_element[0].firstChild.nodeValue)
+                                raum_hochbau_element = abwasser_objekt.getElementsByTagName('RaumHochbau')
+                                if raum_hochbau_element:
+                                    pumpwerk.raum_hochbau = float(raum_hochbau_element[0].firstChild.nodeValue)
+                                raum_tiefbau_element = abwasser_objekt.getElementsByTagName('RaumTiefbau')
+                                if raum_tiefbau_element:
+                                    pumpwerk.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            pumpwerk.polygon = []
+                                            if polygon_element:
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    pumpwerk.add_kante(kante)
-                                                    pumpwerk.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    pumpwerk.add_knoten(knoten)
-                            bauwerke_list.append(pumpwerk)
-                            print(f"Found objects Bauwerktyp 1 (Pumpwerk)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        pumpwerk.add_kante(kante)
+                                                        pumpwerk.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        pumpwerk.add_knoten(knoten)
+                                bauwerke_list.append(pumpwerk)
+                                print(f"Found objects Bauwerktyp 1 (Pumpwerk)")
     return bauwerke_list                        
 
 
@@ -324,6 +356,7 @@ class Becken:   #2
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 2
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -371,147 +404,150 @@ def parse_becken(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 2:
-                            becken = Becken()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                becken.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                becken.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                becken.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                becken.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                becken.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                becken.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                becken.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                becken.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                becken.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                becken.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                becken.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                becken.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                becken.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            # Class specific attributes:
-                            beckenfunktion_element = abwasser_objekt.getElementsByTagName('BeckenFunktion')
-                            if beckenfunktion_element:
-                                becken.beckenfunktion = beckenfunktion_element[0].firstChild.nodeValue
-                            beckenart_element = abwasser_objekt.getElementsByTagName('Beckenart')
-                            if beckenart_element:
-                                becken.beckenart = int(beckenart_element[0].firstChild.nodeValue)
-                            beckenbauart_element = abwasser_objekt.getElementsByTagName('BeckenBauart')
-                            if beckenbauart_element:
-                                becken.beckenbauart = int(beckenbauart_element[0].firstChild.nodeValue)
-                            beckenform_element = abwasser_objekt.getElementsByTagName('Beckenform')
-                            if beckenform_element:
-                                becken.beckenform = int(beckenform_element[0].firstChild.nodeValue)
-                            beckenausfuehrung_element = abwasser_objekt.getElementsByTagName('BeckenAusfuehrung')
-                            if beckenausfuehrung_element:
-                                becken.beckenausfuehrung = int(beckenausfuehrung_element[0].firstChild.nodeValue)
-                            beckenablauf_element = abwasser_objekt.getElementsByTagName('Ablaufart')
-                            if beckenablauf_element:
-                                becken.beckenablauf = int(beckenablauf_element[0].firstChild.nodeValue)
-                            grundflaeche_element = abwasser_objekt.getElementsByTagName('Grundflaeche')
-                            if grundflaeche_element:
-                                becken.grundflaeche = float(grundflaeche_element[0].firstChild.nodeValue)
-                            max_laenge_element = abwasser_objekt.getElementsByTagName('MaxLaenge')
-                            if max_laenge_element:
-                                becken.max_laenge = float(max_laenge_element[0].firstChild.nodeValue)
-                            max_breite_element = abwasser_objekt.getElementsByTagName('MaxBreite')
-                            if max_breite_element:
-                                becken.max_breite = float(max_breite_element[0].firstChild.nodeValue)
-                            max_hoehe_element = abwasser_objekt.getElementsByTagName('MaxHoehe')
-                            if max_hoehe_element:
-                                becken.max_hoehe = float(max_hoehe_element[0].firstChild.nodeValue)
-                            boechungsneigung_element = abwasser_objekt.getElementsByTagName('Boeschungsneigung')
-                            if boechungsneigung_element:
-                                becken.boechungsneigung = float(boechungsneigung_element[0].firstChild.nodeValue)
-                            nutzvolumen_element = abwasser_objekt.getElementsByTagName('NutzVolumen')
-                            if nutzvolumen_element:
-                                becken.nutzvolumen = float(nutzvolumen_element[0].firstChild.nodeValue)
-                            raum_hochbau_element = abwasser_objekt.getElementsByTagName('RaumHochbau')
-                            if raum_hochbau_element:
-                                becken.raum_hochbau = float(raum_hochbau_element[0].firstChild.nodeValue)
-                            raum_tiefbau_element = abwasser_objekt.getElementsByTagName('RaumTiefbau')
-                            if raum_tiefbau_element:
-                                becken.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
-                            anzahl_zulauf_element = abwasser_objekt.getElementsByTagName('AnzahlZulaeufe')
-                            if anzahl_zulauf_element:
-                                becken.anzahl_zulauf = int(anzahl_zulauf_element[0].firstChild.nodeValue)
-                            anzahl_ablauf_element = abwasser_objekt.getElementsByTagName('AnzahlAblaeufe')
-                            if anzahl_ablauf_element:
-                                becken.anzahl_ablauf = int(anzahl_ablauf_element[0].firstChild.nodeValue)
-                            anzahl_kammern_element = abwasser_objekt.getElementsByTagName('AnzahlKammern')
-                            if anzahl_kammern_element:
-                                becken.anzahl_kammern = int(anzahl_kammern_element[0].firstChild.nodeValue)
-                            filterschicht_element = abwasser_objekt.getElementsByTagName('Filterschicht')
-                            if filterschicht_element:
-                                becken.filterschicht = float(filterschicht_element[0].firstChild.nodeValue)
-                            filtermaterial_element = abwasser_objekt.getElementsByTagName('Filtermaterial')
-                            if filtermaterial_element:
-                                becken.filtermaterial = int(filtermaterial_element[0].firstChild.nodeValue)
-                            bepflanzung_element = abwasser_objekt.getElementsByTagName('Bepflanzung')
-                            if bepflanzung_element:
-                                becken.bepflanzung = int(bepflanzung_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        if polygon_element:
-                                            becken.polygon = []
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)                        
+                            if bauwerkstyp_element == 2:
+                                becken = Becken()
+                                becken.bauwerktyp = 2 
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    becken.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    becken.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    becken.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    becken.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    becken.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    becken.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    becken.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    becken.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    becken.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    becken.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    becken.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    becken.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    becken.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                # Class specific attributes:
+                                beckenfunktion_element = abwasser_objekt.getElementsByTagName('BeckenFunktion')
+                                if beckenfunktion_element:
+                                    becken.beckenfunktion = beckenfunktion_element[0].firstChild.nodeValue
+                                beckenart_element = abwasser_objekt.getElementsByTagName('Beckenart')
+                                if beckenart_element:
+                                    becken.beckenart = int(beckenart_element[0].firstChild.nodeValue)
+                                beckenbauart_element = abwasser_objekt.getElementsByTagName('BeckenBauart')
+                                if beckenbauart_element:
+                                    becken.beckenbauart = int(beckenbauart_element[0].firstChild.nodeValue)
+                                beckenform_element = abwasser_objekt.getElementsByTagName('Beckenform')
+                                if beckenform_element:
+                                    becken.beckenform = int(beckenform_element[0].firstChild.nodeValue)
+                                beckenausfuehrung_element = abwasser_objekt.getElementsByTagName('BeckenAusfuehrung')
+                                if beckenausfuehrung_element:
+                                    becken.beckenausfuehrung = int(beckenausfuehrung_element[0].firstChild.nodeValue)
+                                beckenablauf_element = abwasser_objekt.getElementsByTagName('Ablaufart')
+                                if beckenablauf_element:
+                                    becken.beckenablauf = int(beckenablauf_element[0].firstChild.nodeValue)
+                                grundflaeche_element = abwasser_objekt.getElementsByTagName('Grundflaeche')
+                                if grundflaeche_element:
+                                    becken.grundflaeche = float(grundflaeche_element[0].firstChild.nodeValue)
+                                max_laenge_element = abwasser_objekt.getElementsByTagName('MaxLaenge')
+                                if max_laenge_element:
+                                    becken.max_laenge = float(max_laenge_element[0].firstChild.nodeValue)
+                                max_breite_element = abwasser_objekt.getElementsByTagName('MaxBreite')
+                                if max_breite_element:
+                                    becken.max_breite = float(max_breite_element[0].firstChild.nodeValue)
+                                max_hoehe_element = abwasser_objekt.getElementsByTagName('MaxHoehe')
+                                if max_hoehe_element:
+                                    becken.max_hoehe = float(max_hoehe_element[0].firstChild.nodeValue)
+                                boechungsneigung_element = abwasser_objekt.getElementsByTagName('Boeschungsneigung')
+                                if boechungsneigung_element:
+                                    becken.boechungsneigung = float(boechungsneigung_element[0].firstChild.nodeValue)
+                                nutzvolumen_element = abwasser_objekt.getElementsByTagName('NutzVolumen')
+                                if nutzvolumen_element:
+                                    becken.nutzvolumen = float(nutzvolumen_element[0].firstChild.nodeValue)
+                                raum_hochbau_element = abwasser_objekt.getElementsByTagName('RaumHochbau')
+                                if raum_hochbau_element:
+                                    becken.raum_hochbau = float(raum_hochbau_element[0].firstChild.nodeValue)
+                                raum_tiefbau_element = abwasser_objekt.getElementsByTagName('RaumTiefbau')
+                                if raum_tiefbau_element:
+                                    becken.raum_tiefbau = float(raum_tiefbau_element[0].firstChild.nodeValue)
+                                anzahl_zulauf_element = abwasser_objekt.getElementsByTagName('AnzahlZulaeufe')
+                                if anzahl_zulauf_element:
+                                    becken.anzahl_zulauf = int(anzahl_zulauf_element[0].firstChild.nodeValue)
+                                anzahl_ablauf_element = abwasser_objekt.getElementsByTagName('AnzahlAblaeufe')
+                                if anzahl_ablauf_element:
+                                    becken.anzahl_ablauf = int(anzahl_ablauf_element[0].firstChild.nodeValue)
+                                anzahl_kammern_element = abwasser_objekt.getElementsByTagName('AnzahlKammern')
+                                if anzahl_kammern_element:
+                                    becken.anzahl_kammern = int(anzahl_kammern_element[0].firstChild.nodeValue)
+                                filterschicht_element = abwasser_objekt.getElementsByTagName('Filterschicht')
+                                if filterschicht_element:
+                                    becken.filterschicht = float(filterschicht_element[0].firstChild.nodeValue)
+                                filtermaterial_element = abwasser_objekt.getElementsByTagName('Filtermaterial')
+                                if filtermaterial_element:
+                                    becken.filtermaterial = int(filtermaterial_element[0].firstChild.nodeValue)
+                                bepflanzung_element = abwasser_objekt.getElementsByTagName('Bepflanzung')
+                                if bepflanzung_element:
+                                    becken.bepflanzung = int(bepflanzung_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                becken.polygon = []
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    becken.add_kante(kante)
-                                                    becken.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    becken.add_knoten(knoten)
-                            bauwerke_list.append(becken)
-                            print(f"Found objects Bauwerktyp 2 (Becken)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        becken.add_kante(kante)
+                                                        becken.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        becken.add_knoten(knoten)
+                                bauwerke_list.append(becken)
+                                print(f"Found objects Bauwerktyp 2 (Becken)")
     return bauwerke_list
 
 @dataclass
@@ -525,6 +561,7 @@ class Behandlungsanlage:   #3
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 3
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -561,114 +598,117 @@ def parse_behandlungsanlage(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 3:
-                            behandlungsanlage = Behandlungsanlage()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                behandlungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                behandlungsanlage.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                behandlungsanlage.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                behandlungsanlage.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                behandlungsanlage.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                behandlungsanlage.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                behandlungsanlage.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                behandlungsanlage.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                behandlungsanlage.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                behandlungsanlage.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                behandlungsanlage.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                behandlungsanlage.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                behandlungsanlage.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            # Class specific attributes:
-                            behandlungsart_element = abwasser_objekt.getElementsByTagName('Behandlungsart')
-                            if behandlungsart_element:
-                                behandlungsanlage.behandlungsart = behandlungsart_element[0].firstChild.nodeValue
-                            bypass_element = abwasser_objekt.getElementsByTagName('Bypass')
-                            if bypass_element:
-                                behandlungsanlage.bypass = int(bypass_element[0].firstChild.nodeValue)
-                            aufstellungsart_element = abwasser_objekt.getElementsByTagName('Aufstellungsart')
-                            if aufstellungsart_element:
-                                behandlungsanlage.aufstellungsart = int(aufstellungsart_element[0].firstChild.nodeValue)
-                            breite_element = abwasser_objekt.getElementsByTagName('Breite')
-                            if breite_element:
-                                behandlungsanlage.breite = int(breite_element[0].firstChild.nodeValue)
-                            laenge_element = abwasser_objekt.getElementsByTagName('Laenge')
-                            if laenge_element:
-                                behandlungsanlage.laenge = int(laenge_element[0].firstChild.nodeValue)
-                            hoehe_element = abwasser_objekt.getElementsByTagName('Hoehe')
-                            if hoehe_element:
-                                behandlungsanlage.hoehe = int(hoehe_element[0].firstChild.nodeValue)
-                            hoehezulauf_element = abwasser_objekt.getElementsByTagName('HoeheZulauf')
-                            if hoehezulauf_element:
-                                behandlungsanlage.hoehe_zulauf = float(hoehezulauf_element[0].firstChild.nodeValue)
-                            hoeheablauf_element = abwasser_objekt.getElementsByTagName('HoeheAblauf')
-                            if hoeheablauf_element:
-                                behandlungsanlage.hoehe_ablauf = float(hoeheablauf_element[0].firstChild.nodeValue)
-                            materialanlage_element = abwasser_objekt.getElementsByTagName('MaterialAnlage')
-                            if materialanlage_element:
-                                behandlungsanlage.material_anlage = float([0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        if polygon_element:
-                                            behandlungsanlage.polygon = []
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp_element == 3:
+                                behandlungsanlage = Behandlungsanlage()
+                                behandlungsanlage.bauwerktyp = 3
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    behandlungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    behandlungsanlage.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    behandlungsanlage.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    behandlungsanlage.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    behandlungsanlage.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    behandlungsanlage.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    behandlungsanlage.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    behandlungsanlage.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    behandlungsanlage.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    behandlungsanlage.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    behandlungsanlage.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    behandlungsanlage.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    behandlungsanlage.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                # Class specific attributes:
+                                behandlungsart_element = abwasser_objekt.getElementsByTagName('Behandlungsart')
+                                if behandlungsart_element:
+                                    behandlungsanlage.behandlungsart = behandlungsart_element[0].firstChild.nodeValue
+                                bypass_element = abwasser_objekt.getElementsByTagName('Bypass')
+                                if bypass_element:
+                                    behandlungsanlage.bypass = int(bypass_element[0].firstChild.nodeValue)
+                                aufstellungsart_element = abwasser_objekt.getElementsByTagName('Aufstellungsart')
+                                if aufstellungsart_element:
+                                    behandlungsanlage.aufstellungsart = int(aufstellungsart_element[0].firstChild.nodeValue)
+                                breite_element = abwasser_objekt.getElementsByTagName('Breite')
+                                if breite_element:
+                                    behandlungsanlage.breite = int(breite_element[0].firstChild.nodeValue)
+                                laenge_element = abwasser_objekt.getElementsByTagName('Laenge')
+                                if laenge_element:
+                                    behandlungsanlage.laenge = int(laenge_element[0].firstChild.nodeValue)
+                                hoehe_element = abwasser_objekt.getElementsByTagName('Hoehe')
+                                if hoehe_element:
+                                    behandlungsanlage.hoehe = int(hoehe_element[0].firstChild.nodeValue)
+                                hoehezulauf_element = abwasser_objekt.getElementsByTagName('HoeheZulauf')
+                                if hoehezulauf_element:
+                                    behandlungsanlage.hoehe_zulauf = float(hoehezulauf_element[0].firstChild.nodeValue)
+                                hoeheablauf_element = abwasser_objekt.getElementsByTagName('HoeheAblauf')
+                                if hoeheablauf_element:
+                                    behandlungsanlage.hoehe_ablauf = float(hoeheablauf_element[0].firstChild.nodeValue)
+                                materialanlage_element = abwasser_objekt.getElementsByTagName('MaterialAnlage')
+                                if materialanlage_element:
+                                    behandlungsanlage.material_anlage = float([0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                behandlungsanlage.polygon = []
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    behandlungsanlage.add_kante(kante)
-                                                    behandlungsanlage.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    behandlungsanlage.add_knoten(knoten)
-                            bauwerke_list.append(behandlungsanlage)
-                            print("Found objects Bauwerktyp 3 (Behandlungsanlage)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        behandlungsanlage.add_kante(kante)
+                                                        behandlungsanlage.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        behandlungsanlage.add_knoten(knoten)
+                                bauwerke_list.append(behandlungsanlage)
+                                print("Found objects Bauwerktyp 3 (Behandlungsanlage)")
     return bauwerke_list
 
 @dataclass
@@ -682,6 +722,7 @@ class Klaeranlage:   #4
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 4 
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -711,93 +752,96 @@ def parse_klaeranlage(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 4:
-                            klaeranlage = Klaeranlage()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                klaeranlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                klaeranlage.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                klaeranlage.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                klaeranlage.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                klaeranlage.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                klaeranlage.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                klaeranlage.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                klaeranlage.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                klaeranlage.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                klaeranlage.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                klaeranlage.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                klaeranlage.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                klaeranlage.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            # Class specific attributes:
-                            klaeranlagefunktion_element = abwasser_objekt.getElementsByTagName('KlaeranlageFunktion')
-                            if klaeranlagefunktion_element:
-                                klaeranlage.klaeranlagefunktion = klaeranlagefunktion_element[0].firstChild.nodeValue
-                            einwohnerwert_element = abwasser_objekt.getElementsByTagName('Einwohnerwerte')
-                            if einwohnerwert_element:
-                                klaeranlage.einwohnerwerte = int(einwohnerwert_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        if polygon_element:
-                                            klaeranlage.polygon = []
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp_element == 4:
+                                klaeranlage = Klaeranlage()
+                                klaeranlage.bauwerktyp = 4
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    klaeranlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    klaeranlage.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    klaeranlage.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    klaeranlage.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    klaeranlage.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    klaeranlage.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    klaeranlage.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    klaeranlage.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    klaeranlage.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    klaeranlage.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    klaeranlage.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    klaeranlage.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    klaeranlage.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                # Class specific attributes:
+                                klaeranlagefunktion_element = abwasser_objekt.getElementsByTagName('KlaeranlageFunktion')
+                                if klaeranlagefunktion_element:
+                                    klaeranlage.klaeranlagefunktion = klaeranlagefunktion_element[0].firstChild.nodeValue
+                                einwohnerwert_element = abwasser_objekt.getElementsByTagName('Einwohnerwerte')
+                                if einwohnerwert_element:
+                                    klaeranlage.einwohnerwerte = int(einwohnerwert_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                klaeranlage.polygon = []
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    klaeranlage.add_kante(kante)
-                                                    klaeranlage.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    klaeranlage.add_knoten(knoten)
-                            bauwerke_list.append(klaeranlage)
-                            print("Found objects Bauwerktyp 4 (Klaeranlage)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        klaeranlage.add_kante(kante)
+                                                        klaeranlage.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        klaeranlage.add_knoten(knoten)
+                                bauwerke_list.append(klaeranlage)
+                                print("Found objects Bauwerktyp 4 (Klaeranlage)")
     return bauwerke_list
 
 @dataclass
@@ -811,6 +855,7 @@ class Auslaufbauwerk:   #5
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 5
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -848,115 +893,118 @@ def parse_auslaufbauwerk(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 5:
-                            auslaufbauwerk = Auslaufbauwerk()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                auslaufbauwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                auslaufbauwerk.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                auslaufbauwerk.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                auslaufbauwerk.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                auslaufbauwerk.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                auslaufbauwerk.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                auslaufbauwerk.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                auslaufbauwerk.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                auslaufbauwerk.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                auslaufbauwerk.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                auslaufbauwerk.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                auslaufbauwerk.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                auslaufbauwerk.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            art_auslaufbauwerk_element = abwasser_objekt.getElementsByTagName('ArtAuslaufbauwerk')
-                            if art_auslaufbauwerk_element:
-                                auslaufbauwerk.art_auslaufbauwerk = int(art_auslaufbauwerk_element[0].firstChild.nodeValue)
-                            einleitungsart_element = abwasser_objekt.getElementsByTagName('Einleitungsart')
-                            if einleitungsart_element:
-                                auslaufbauwerk.einleitungsart = int(einleitungsart_element[0].firstChild.nodeValue)
-                            schutzgitter_element = abwasser_objekt.getElementsByTagName('Schutzgitter')
-                            if schutzgitter_element:
-                                auslaufbauwerk.schutzgitter = int(schutzgitter_element[0].firstChild.nodeValue)
-                            sohlsicherung_element = abwasser_objekt.getElementsByTagName('Sohlsicherung')
-                            if sohlsicherung_element:
-                                auslaufbauwerk.sohlsicherung = int(sohlsicherung_element[0].firstChild.nodeValue)
-                            boeschungssicherung_element = abwasser_objekt.getElementsByTagName('Boeschungssicherung')
-                            if boeschungssicherung_element:
-                                auslaufbauwerk.boeschungssicherung = int(boeschungssicherung_element[0].firstChild.nodeValue)
-                            material_element = abwasser_objekt.getElementsByTagName('Material')
-                            if material_element:
-                                auslaufbauwerk.material = material_element[0].firstChild.nodeValue
-                            neigung_element = abwasser_objekt.getElementsByTagName('Neigung')
-                            if neigung_element:
-                                auslaufbauwerk.neigung = float(neigung_element[0].firstChild.nodeValue)
-                            laenge_element = abwasser_objekt.getElementsByTagName('Laenge')
-                            if laenge_element:
-                                auslaufbauwerk.laenge = float(laenge_element[0].firstChild.nodeValue)
-                            breite_element = abwasser_objekt.getElementsByTagName('Breite')
-                            if breite_element:
-                                auslaufbauwerk.breite = float(breite_element[0].firstChild.nodeValue)
-                            hoehe_element = abwasser_objekt.getElementsByTagName('Hoehe')
-                            if hoehe_element:
-                                auslaufbauwerk.hoehe = float(hoehe_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        if polygon_element:
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp_element == 5:
+                                auslaufbauwerk = Auslaufbauwerk()
+                                auslaufbauwerk.bauwerktyp = 5
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    auslaufbauwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    auslaufbauwerk.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    auslaufbauwerk.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    auslaufbauwerk.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    auslaufbauwerk.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    auslaufbauwerk.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    auslaufbauwerk.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    auslaufbauwerk.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    auslaufbauwerk.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    auslaufbauwerk.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    auslaufbauwerk.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    auslaufbauwerk.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    auslaufbauwerk.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                art_auslaufbauwerk_element = abwasser_objekt.getElementsByTagName('ArtAuslaufbauwerk')
+                                if art_auslaufbauwerk_element:
+                                    auslaufbauwerk.art_auslaufbauwerk = int(art_auslaufbauwerk_element[0].firstChild.nodeValue)
+                                einleitungsart_element = abwasser_objekt.getElementsByTagName('Einleitungsart')
+                                if einleitungsart_element:
+                                    auslaufbauwerk.einleitungsart = int(einleitungsart_element[0].firstChild.nodeValue)
+                                schutzgitter_element = abwasser_objekt.getElementsByTagName('Schutzgitter')
+                                if schutzgitter_element:
+                                    auslaufbauwerk.schutzgitter = int(schutzgitter_element[0].firstChild.nodeValue)
+                                sohlsicherung_element = abwasser_objekt.getElementsByTagName('Sohlsicherung')
+                                if sohlsicherung_element:
+                                    auslaufbauwerk.sohlsicherung = int(sohlsicherung_element[0].firstChild.nodeValue)
+                                boeschungssicherung_element = abwasser_objekt.getElementsByTagName('Boeschungssicherung')
+                                if boeschungssicherung_element:
+                                    auslaufbauwerk.boeschungssicherung = int(boeschungssicherung_element[0].firstChild.nodeValue)
+                                material_element = abwasser_objekt.getElementsByTagName('Material')
+                                if material_element:
+                                    auslaufbauwerk.material = material_element[0].firstChild.nodeValue
+                                neigung_element = abwasser_objekt.getElementsByTagName('Neigung')
+                                if neigung_element:
+                                    auslaufbauwerk.neigung = float(neigung_element[0].firstChild.nodeValue)
+                                laenge_element = abwasser_objekt.getElementsByTagName('Laenge')
+                                if laenge_element:
+                                    auslaufbauwerk.laenge = float(laenge_element[0].firstChild.nodeValue)
+                                breite_element = abwasser_objekt.getElementsByTagName('Breite')
+                                if breite_element:
+                                    auslaufbauwerk.breite = float(breite_element[0].firstChild.nodeValue)
+                                hoehe_element = abwasser_objekt.getElementsByTagName('Hoehe')
+                                if hoehe_element:
+                                    auslaufbauwerk.hoehe = float(hoehe_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    auslaufbauwerk.add_kante(kante)
-                                                    auslaufbauwerk.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    auslaufbauwerk.add_knoten(knoten)
-                            bauwerke_list.append(auslaufbauwerk)
-                            print("Found objects Bauwerktyp 5 (Auslaufbauwerk)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        auslaufbauwerk.add_kante(kante)
+                                                        auslaufbauwerk.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        auslaufbauwerk.add_knoten(knoten)
+                                bauwerke_list.append(auslaufbauwerk)
+                                print("Found objects Bauwerktyp 5 (Auslaufbauwerk)")
     return bauwerke_list
 
 @dataclass
@@ -970,6 +1018,7 @@ class Pumpe:   #6
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 6 
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1001,101 +1050,104 @@ def parse_pumpe(root):
                 if knoten_typ_element:
                     knoten_typ = int(knoten_typ_element[0].firstChild.nodeValue)
                     if knoten_typ == 2:
-                        bauwerkstyp_element= abwasser_objekt.getElementsByTagName('Bauwerkstyp')
-                        if bauwerkstyp_element == 6:
-                            pumpe = Pumpe()
-                            objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
-                            if objektbezeichnung_element:
-                                pumpe.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
-                            entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
-                            if entwaesserungsart_element:
-                                pumpe.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
-                            status_element = abwasser_objekt.getElementsByTagName('Status')
-                            if status_element:
-                                pumpe.status= status_element[0].firstChild.nodeValue
-                            baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
-                            if baujahr_element:
-                                pumpe.baujahr = float(baujahr_element[0].firstChild.nodeValue)
-                            geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
-                            if geo_objektart_element:
-                                pumpe.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
-                            geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
-                            if geo_objekttyp_element:
-                                pumpe.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
-                            lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
-                            if lagegenauigkeitsklasse_element:
-                                pumpe.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
-                            hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
-                            if hoehengenauigkeitsklasse_element:
-                                pumpe.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
-                            hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
-                            if hersteller_element:
-                                pumpe.hersteller_typ = hersteller_element[0].firstChild.nodeValue
-                            adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
-                            if adresse_hersteller_element:
-                                pumpe.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
-                            ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
-                            if ufis_baunummer_element:
-                                pumpe.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
-                            art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
-                            if art_einstieghilfe_element:
-                                pumpe.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
-                            uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
-                            if uebergabebauwerk_element:
-                                pumpe.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
-                            leistungsaufnahme_element = abwasser_objekt.getElementsByTagName('Leistungsaufnahme')
-                            if leistungsaufnahme_element:
-                                pumpe.leistungsaufnahme = float(leistungsaufnahme_element[0].firstChild.nodeValue)
-                            leistung_element = abwasser_objekt.getElementsByTagName('Leistung')
-                            if leistung_element:
-                                pumpe.leistung = float(leistung_element[0].firstChild.nodeValue)
-                            foerderhoehe_gesamt_element = abwasser_objekt.getElementsByTagName('FoerderhoeheGesamt')
-                            if foerderhoehe_gesamt_element:
-                                pumpe.foerderhoehe_gesamt = float(foerderhoehe_gesamt_element[0].firstChild.nodeValue)
-                            foerderhoehe_manometrisch_element = abwasser_objekt.getElementsByTagName('FoerderhoeheManometrisch')
-                            if foerderhoehe_manometrisch_element:
-                                pumpe.foerderhoehe_manometrisch = float(foerderhoehe_manometrisch_element[0].firstChild.nodeValue)
-                            pumpenart_element = abwasser_objekt.getElementsByTagName('Pumpenart')
-                            if pumpenart_element:
-                                pumpe.pumpenart = int(pumpenart_element[0].firstChild.nodeValue)
-                            for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
-                                        if polygon_element:
-                                            pumpe.polygon = []
-                                            for kanten_element in polygon_element.getElementsByTagName('Kante'):
-                                                if kanten_element:
-                                                    start_element = kanten_element.getElementsByTagName('Start')[0]
-                                                    x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_s= Punkt(x=x, y=y, z=z)
+                        bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
+                        if bauwerkstyp_element:
+                            bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
+                            if bauwerkstyp_element == 6:
+                                pumpe = Pumpe()
+                                pumpe.bauwerktyp = 6
+                                objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
+                                if objektbezeichnung_element:
+                                    pumpe.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
+                                entwaesserungsart_element = abwasser_objekt.getElementsByTagName('Entwaesserungsart')
+                                if entwaesserungsart_element:
+                                    pumpe.entwaesserungsart = entwaesserungsart_element[0].firstChild.nodeValue
+                                status_element = abwasser_objekt.getElementsByTagName('Status')
+                                if status_element:
+                                    pumpe.status= status_element[0].firstChild.nodeValue
+                                baujahr_element = abwasser_objekt.getElementsByTagName('Baujahr')
+                                if baujahr_element:
+                                    pumpe.baujahr = float(baujahr_element[0].firstChild.nodeValue)
+                                geo_objektart_element = abwasser_objekt.getElementsByTagName('GeoObjektart')
+                                if geo_objektart_element:
+                                    pumpe.geo_objektart = int(geo_objektart_element[0].firstChild.nodeValue)
+                                geo_objekttyp_element = abwasser_objekt.getElementsByTagName('GeoObjekttyp')
+                                if geo_objekttyp_element:
+                                    pumpe.geo_objekttyp = str(geo_objekttyp_element[0].firstChild.nodeValue)
+                                lagegenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Lagegenauigkeitsklasse')
+                                if lagegenauigkeitsklasse_element:
+                                    pumpe.lagegenauigkeitsklasse = lagegenauigkeitsklasse_element[0].firstChild.nodeValue
+                                hoehengenauigkeitsklasse_element = abwasser_objekt.getElementsByTagName('Hoehengenauigkeitsklasse')
+                                if hoehengenauigkeitsklasse_element:
+                                    pumpe.hoehengenauigkeitsklasse = int(hoehengenauigkeitsklasse_element[0].firstChild.nodeValue)
+                                hersteller_element = abwasser_objekt.getElementsByTagName('Hersteller_Typ')
+                                if hersteller_element:
+                                    pumpe.hersteller_typ = hersteller_element[0].firstChild.nodeValue
+                                adresse_hersteller_element = abwasser_objekt.getElementsByTagName('Adresse_Hersteller')
+                                if adresse_hersteller_element:
+                                    pumpe.adresse_hersteller = adresse_hersteller_element[0].firstChild.nodeValue
+                                ufis_baunummer_element = abwasser_objekt.getElementsByTagName('UFIS_BauNr')
+                                if ufis_baunummer_element:
+                                    pumpe.ufis_baunummer = int(ufis_baunummer_element[0].firstChild.nodeValue)
+                                art_einstieghilfe_element = abwasser_objekt.getElementsByTagName('Art_Einstieghilfe')
+                                if art_einstieghilfe_element:
+                                    pumpe.art_einstieghilfe = art_einstieghilfe_element[0].firstChild.nodeValue
+                                uebergabebauwerk_element = abwasser_objekt.getElementsByTagName('Uebergabebauwerk')
+                                if uebergabebauwerk_element:
+                                    pumpe.uebergabebauwerk = bool(uebergabebauwerk_element[0].firstChild.nodeValue)
+                                leistungsaufnahme_element = abwasser_objekt.getElementsByTagName('Leistungsaufnahme')
+                                if leistungsaufnahme_element:
+                                    pumpe.leistungsaufnahme = float(leistungsaufnahme_element[0].firstChild.nodeValue)
+                                leistung_element = abwasser_objekt.getElementsByTagName('Leistung')
+                                if leistung_element:
+                                    pumpe.leistung = float(leistung_element[0].firstChild.nodeValue)
+                                foerderhoehe_gesamt_element = abwasser_objekt.getElementsByTagName('FoerderhoeheGesamt')
+                                if foerderhoehe_gesamt_element:
+                                    pumpe.foerderhoehe_gesamt = float(foerderhoehe_gesamt_element[0].firstChild.nodeValue)
+                                foerderhoehe_manometrisch_element = abwasser_objekt.getElementsByTagName('FoerderhoeheManometrisch')
+                                if foerderhoehe_manometrisch_element:
+                                    pumpe.foerderhoehe_manometrisch = float(foerderhoehe_manometrisch_element[0].firstChild.nodeValue)
+                                pumpenart_element = abwasser_objekt.getElementsByTagName('Pumpenart')
+                                if pumpenart_element:
+                                    pumpe.pumpenart = int(pumpenart_element[0].firstChild.nodeValue)
+                                for polygon_element in abwasser_objekt.getElementsByTagName('Polygon'):  
+                                            if polygon_element:
+                                                pumpe.polygon = []
+                                                for kanten_element in polygon_element.getElementsByTagName('Kante'):
+                                                    if kanten_element:
+                                                        start_element = kanten_element.getElementsByTagName('Start')[0]
+                                                        x = float(start_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(start_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(start_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_s= Punkt(x=x, y=y, z=z)
 
-                                                    start = Start(punkt=punkt_s)
+                                                        start = Start(punkt=punkt_s)
 
-                                                    ende_element = kanten_element.getElementsByTagName('Ende')[0]
-                                                    x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
-                                                    y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
-                                                    z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
-                                                    punkt_e = Punkt(x=x, y=y, z=z)
+                                                        ende_element = kanten_element.getElementsByTagName('Ende')[0]
+                                                        x = float(ende_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue)
+                                                        y = float(ende_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue)
+                                                        z = float(ende_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue)
+                                                        punkt_e = Punkt(x=x, y=y, z=z)
 
-                                                    ende = Ende(punkt=punkt_e)
+                                                        ende = Ende(punkt=punkt_e)
 
-                                                    kante = Kante(start=start, ende=ende)
-                                                    pumpe.add_kante(kante)
-                                                    pumpe.polygon.append(kante)
-                            for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
-                                knoten = Knoten()
-                                knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
-                                punkt_elements = knoten_element.getElementsByTagName('Punkt')
-                                if punkt_elements:
-                                    for punkt_element in punkt_elements:
-                                        punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
-                                                        y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
-                                                        z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
-                                        punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
-                                        knoten.add_punkt(punkt)
-                                    pumpe.add_knoten(knoten)
-                            bauwerke_list.append(pumpe)
-                            print("Found objects Bauwerktyp 6 (Pumpwerk)")
+                                                        kante = Kante(start=start, ende=ende)
+                                                        pumpe.add_kante(kante)
+                                                        pumpe.polygon.append(kante)
+                                for knoten_element in abwasser_objekt.getElementsByTagName('Knoten'):
+                                    knoten = Knoten()
+                                    knoten.obj = str(objektbezeichnung_element[0].firstChild.nodeValue)
+                                    punkt_elements = knoten_element.getElementsByTagName('Punkt')
+                                    if punkt_elements:
+                                        for punkt_element in punkt_elements:
+                                            punkt = Punkt( x = float(punkt_element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue),
+                                                            y = float(punkt_element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue),
+                                                            z = float(punkt_element.getElementsByTagName('Punkthoehe')[0].firstChild.nodeValue))
+                                            punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
+                                            knoten.add_punkt(punkt)
+                                        pumpe.add_knoten(knoten)
+                                bauwerke_list.append(pumpe)
+                                print("Found objects Bauwerktyp 6 (Pumpwerk)")
     return bauwerke_list
 
 @dataclass
@@ -1109,6 +1161,7 @@ class Wehr:   #7
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 7
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1148,6 +1201,7 @@ def parse_wehr(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 7:
                                 wehr = Wehr()
+                                wehr.bauwerktyp = 7
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     wehr.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1262,6 +1316,7 @@ class Drossel:   #8
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 8
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1296,6 +1351,7 @@ def parse_drossel(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 8:
                                 drossel = Drossel()
+                                drossel.bauwerktyp = 8
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     drossel.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1393,6 +1449,7 @@ class Schieber:   #9
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 9
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1431,6 +1488,7 @@ def parse_schieber(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 9:
                                 schieber = Schieber()
+                                schieber.bauwerktyp = 9
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     schieber.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1539,6 +1597,7 @@ class Rechen:   #10
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 10
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1580,6 +1639,7 @@ def parse_rechen(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 10:
                                 rechen = Rechen()
+                                rechen.bauwerktyp = 10
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     rechen.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1694,6 +1754,7 @@ class Sieb:   #11
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 11
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1732,6 +1793,7 @@ def parse_sieb(root):
                                 bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                                 if bauwerkstyp == 11:
                                     sieb = Sieb()
+                                    sieb.bauwerktyp = 11
                                     objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                     if objektbezeichnung_element:
                                         sieb.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1841,6 +1903,7 @@ class Versickerungsanlage:   #12
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 12 
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -1879,6 +1942,7 @@ def parse_versickerungsanlage(root):
                                 bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                                 if bauwerkstyp == 12:
                                     versickerungsanlage = Versickerungsanlage()
+                                    versickerungsanlage.bauwerktyp = 12
                                     objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                     if objektbezeichnung_element:
                                         versickerungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -1987,6 +2051,7 @@ class Regenwassernutzungsanlage:   #13
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 13 
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -2034,6 +2099,7 @@ def parse_regenwassernutzungsanlage(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 13:
                                 regenwassernutzungsanlage = Regenwassernutzungsanlage()
+                                regenwassernutzungsanlage.bauwerktyp = 
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     regenwassernutzungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
@@ -2170,6 +2236,7 @@ class Einlaufbauwerk:   #14
     lagegenauigkeitsklasse: Optional[str]= None
     hoehengenauigkeitsklasse: Optional[int]= None
     knoten: Optional[List['Knoten']] = None
+    bauwerktyp: Optional[int] = 14
     kanten = []
     polygon = []
         #Objektspezifische Attribute:
@@ -2204,6 +2271,7 @@ def parse_einlaufbauwerk(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 14:
                                 einlaufbauwerk = Einlaufbauwerk()
+                                einlaufbauwerk.bauwerktyp = 14
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     einlaufbauwerk.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue

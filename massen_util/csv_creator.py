@@ -1,4 +1,13 @@
 import csv
+from xml_parser import *
+
+def to_csv_bauwerke(bauwerke_list):
+    for bauwerk in bauwerke_list:
+        name = bauwerk.objektbezeichnung
+        dh = bauwerk.knoten[0].punkte[0].z
+        sh = bauwerk.knoten[0].punkte[1].z
+        typ = bauwerk.classname
+        typ_str = bauwerktypENUM(typ)
 
 def to_csv_schacht(mass_schacht):
     mass_schacht_index = list(mass_schacht[0].keys())

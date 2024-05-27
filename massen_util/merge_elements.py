@@ -2,6 +2,7 @@ from xml_parser import *
 from typing import Union, List
 from collections import defaultdict
 
+
 def find_status(schacht_list, haltung_list):
     for Haltung in haltung_list:
         try:
@@ -9,7 +10,7 @@ def find_status(schacht_list, haltung_list):
                 print("Found planning objects")
         except ValueError:
             print("Could not find planning objects") 
-                
+  
 def mass_schacht(schacht_list, haltung_list):
     mass_schacht = []
     for schacht in schacht_list:

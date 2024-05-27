@@ -1163,7 +1163,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1220,7 +1220,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1273,7 +1273,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1326,7 +1326,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1379,7 +1379,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1528,7 +1528,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>300</Profilbreite>
       <Profilhoehe>300</Profilhoehe>
       </Profil>
@@ -1581,7 +1581,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>250</Profilbreite>
       <Profilhoehe>250</Profilhoehe>
       </Profil>
@@ -1634,7 +1634,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>250</Profilbreite>
       <Profilhoehe>250</Profilhoehe>
       </Profil>
@@ -1687,7 +1687,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>250</Profilbreite>
       <Profilhoehe>250</Profilhoehe>
       </Profil>
@@ -1958,7 +1958,7 @@
      <Material>KST</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>400</Profilbreite>
       <Profilhoehe>400</Profilhoehe>
       </Profil>
@@ -2175,7 +2175,7 @@
      <Material>PVCU</Material>
      <Profil>
       <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>DN</Profilart>
+      <Profilart>0</Profilart>
       <Profilbreite>250</Profilbreite>
       <Profilhoehe>250</Profilhoehe>
       </Profil>
