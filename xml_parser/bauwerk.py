@@ -2099,7 +2099,7 @@ def parse_regenwassernutzungsanlage(root):
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
                             if bauwerkstyp == 13:
                                 regenwassernutzungsanlage = Regenwassernutzungsanlage()
-                                regenwassernutzungsanlage.bauwerktyp = 
+                                regenwassernutzungsanlage.bauwerktyp = 13
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
                                 if objektbezeichnung_element:
                                     regenwassernutzungsanlage.objektbezeichnung = objektbezeichnung_element[0].firstChild.nodeValue
