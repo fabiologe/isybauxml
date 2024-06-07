@@ -3,12 +3,6 @@ from typing import Optional, List, Tuple, Dict
 import numpy as np
 from collections import defaultdict
 from collections import defaultdict
-import glfw 
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import gluLookAt
-from pyrr import Vector3, vector, vector3, matrix44
-from math import sin, cos, radians
 
 
 
@@ -27,19 +21,19 @@ class Vertex:
         return (self.x_value, self.y_value, self.z_value) == (other.x_value, other.y_value, other.z_value)
 
 
-'''For getting an more precise mesh we split the Triangle in smaller ones
+'''For getting an more precise mesh we split the Polygon in smaller ones
 @dataclass
-class calc_Triangle:
+class calc_Polygon:
     vertices: List[Vertex]
     typ: Optional[str] = 'Grass'
     perme: Optional[float]= 0
     focus: Vertex
-    part: Triangle
+    part: Polygon
     kst: Optional[float]= 100.0 #concrete smooth
     rain_volume: Optional[float]= 0.0'''
 
 @dataclass
-class Triangle:
+class Polygon:
     vertices: List[Vertex]
     typ: Optional[str] = 'Grass'
     perme: Optional[float]= 0
@@ -47,6 +41,7 @@ class Triangle:
     kst: Optional[float]= 100.0 #concrete smooth
     slop: Optional[float]= 0 # Gefälle I in Promilley 
     rain_volume: Optional[float]= 0.0
+    color: Optional[List] = [1, 0, 0, 1]
     def contains_point(self, point: Tuple[float, float]) -> bool:
         def sign(p1, p2, p3):
             return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
@@ -70,22 +65,22 @@ class Triangle:
         return hash(tuple(sorted((v.x_value, v.y_value) for v in self.vertices)))
 
     def __eq__(self, other):
-        if not isinstance(other, Triangle):
+        if not isinstance(other, Polygon):
             return False
         return sorted((v.x_value, v.y_value) for v in self.vertices) == sorted((v.x_value, v.y_value) for v in other.vertices)
 
 class RunoffSimulation:
-    def __init__(self, Triangles: List[Triangle], start_point: Tuple[float, float]):
-        self.Triangles = Triangles
+    def __init__(self, Polygons: List[Polygon], start_point: Tuple[float, float]):
+        self.Polygons = Polygons
         self.current_position = np.array(start_point)
-        self.Triangle_neighbors = self.compute_neighbors()
+        self.Polygon_neighbors = self.compute_neighbors()
         self.path = []
 
     def compute_neighbors(self) -> Dict[int, List[int]]:
         edges = defaultdict(list)
         neighbors = defaultdict(list)
         
-        for i, tri in enumerate(self.Triangles):
+        for i, tri in enumerate(self.Polygons):
             for j in range(3):
                 edge = (tri.vertices[j], tri.vertices[(j + 1) % 3])
                 edge = tuple(sorted(edge, key=lambda v: (v.x_value, v.y_value)))
@@ -98,32 +93,32 @@ class RunoffSimulation:
         
         return neighbors
 
-    def find_Triangle(self, position: Tuple[float, float]) -> int:
-        for i, Triangle in enumerate(self.Triangles):
-            if Triangle.contains_point(position):
+    def find_Polygon(self, position: Tuple[float, float]) -> int:
+        for i, Polygon in enumerate(self.Polygons):
+            if Polygon.contains_point(position):
                 return i
         return -1
 
     def calculate_path_to_lowest_point(self):
-        current_Triangle_index = self.find_Triangle(tuple(self.current_position))
-        if current_Triangle_index == -1:
+        current_Polygon_index = self.find_Polygon(tuple(self.current_position))
+        if current_Polygon_index == -1:
             print("Starting point is outside the mesh.")
             return []
 
         while True:
-            current_Triangle = self.Triangles[current_Triangle_index]
-            self.path.append(current_Triangle)
-            lowest_Vertex = current_Triangle.get_lowest_Vertex()
-            if all(v.z_value >= lowest_Vertex.z_value for v in current_Triangle.vertices):
+            current_Polygon = self.Polygons[current_Polygon_index]
+            self.path.append(current_Polygon)
+            lowest_Vertex = current_Polygon.get_lowest_Vertex()
+            if all(v.z_value >= lowest_Vertex.z_value for v in current_Polygon.vertices):
                 print("Reached the lowest point.")
                 break
             
             lowest_neighbor_index = -1
             lowest_elevation = lowest_Vertex.z_value
 
-            for neighbor_index in self.Triangle_neighbors[current_Triangle_index]:
-                neighbor_Triangle = self.Triangles[neighbor_index]
-                neighbor_lowest_Vertex = neighbor_Triangle.get_lowest_Vertex()
+            for neighbor_index in self.Polygon_neighbors[current_Polygon_index]:
+                neighbor_Polygon = self.Polygons[neighbor_index]
+                neighbor_lowest_Vertex = neighbor_Polygon.get_lowest_Vertex()
                 if neighbor_lowest_Vertex.z_value < lowest_elevation:
                     lowest_elevation = neighbor_lowest_Vertex.z_value
                     lowest_neighbor_index = neighbor_index
@@ -132,7 +127,7 @@ class RunoffSimulation:
                 print("No lower neighbors, water stops here.")
                 break
             
-            current_Triangle_index = lowest_neighbor_index
+            current_Polygon_index = lowest_neighbor_index
 
         return self.path
     
