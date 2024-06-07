@@ -1,6 +1,7 @@
 import numpy as np
 from glumpy import app, gl, glm, gloo
 from glumpy.transforms import Trackball, Position
+from surface_runoff.boundary import Polygon
 
     
 def create_buffers(vertices, faces, colors, normals, texcoords):
@@ -56,24 +57,13 @@ window = app.Window(width=1024, height=1024,
 def on_draw(dt):
     window.clear()
 
-    # Draw green surface
-    program['u_color'] = 0, 1, 0, 1
-    program.bind(green_vertex_buffer)
-    program.draw(gl.GL_TRIANGLES, green_filled_buffer)
-    program.draw(gl.GL_LINES, green_outline_buffer)
-
     # Draw blue surface
     program['u_color'] = 0, 0, 1, 1
     program.bind(blue_vertex_buffer)
     program.draw(gl.GL_TRIANGLES, blue_filled_buffer)
     program.draw(gl.GL_LINES, blue_outline_buffer)
 
-# Example 2D surface data for green surface
-green_vertices = np.array([[ 1, 1, 0], [-1, 1, 0], [-1, -1, 0], [ 1, -1, 0]], dtype=np.float32)
-green_faces = np.array([[0, 1, 2], [0, 2, 3]], dtype=np.uint32)
-green_colors = np.array([[0, 1, 0, 1]] * len(green_vertices), dtype=np.float32)
-green_normals = np.array([[0, 0, 1]] * len(green_vertices), dtype=np.float32)
-green_texcoords = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float32)
+
 
 # Example 2D surface data for blue surface
 blue_vertices = np.array([[ 7, 0.5, 8], [-3, 0.5, 5], [-0.5, -0.5, 1], [ 0.5, -0.5, 0]], dtype=np.float32)
@@ -82,8 +72,7 @@ blue_colors = np.array([[0, 0, 1, 1]] * len(blue_vertices), dtype=np.float32)
 blue_normals = np.array([[0, 0, 1]] * len(blue_vertices), dtype=np.float32)
 blue_texcoords = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float32)
 
-# Create buffers for the green surface
-green_vertex_buffer, green_filled_buffer, green_outline_buffer = create_buffers(green_vertices, green_faces, green_colors, green_normals, green_texcoords)
+
 
 # Create buffers for the blue surface
 blue_vertex_buffer, blue_filled_buffer, blue_outline_buffer = create_buffers(blue_vertices, blue_faces, blue_colors, blue_normals, blue_texcoords)

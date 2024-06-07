@@ -1,10 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List, Tuple, Dict
 import numpy as np
 from collections import defaultdict
 from collections import defaultdict
-
-
+from stl import mesh
 
 
 @dataclass
@@ -20,18 +19,6 @@ class Vertex:
             return False
         return (self.x_value, self.y_value, self.z_value) == (other.x_value, other.y_value, other.z_value)
 
-
-'''For getting an more precise mesh we split the Polygon in smaller ones
-@dataclass
-class calc_Polygon:
-    vertices: List[Vertex]
-    typ: Optional[str] = 'Grass'
-    perme: Optional[float]= 0
-    focus: Vertex
-    part: Polygon
-    kst: Optional[float]= 100.0 #concrete smooth
-    rain_volume: Optional[float]= 0.0'''
-
 @dataclass
 class Polygon:
     vertices: List[Vertex]
@@ -41,7 +28,7 @@ class Polygon:
     kst: Optional[float]= 100.0 #concrete smooth
     slop: Optional[float]= 0 # Gefälle I in Promilley 
     rain_volume: Optional[float]= 0.0
-    color: Optional[List] = [1, 0, 0, 1]
+    color: Optional[List] = field(default_factory=lambda: [1, 0, 0, 1])
     def contains_point(self, point: Tuple[float, float]) -> bool:
         def sign(p1, p2, p3):
             return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
@@ -68,6 +55,47 @@ class Polygon:
         if not isinstance(other, Polygon):
             return False
         return sorted((v.x_value, v.y_value) for v in self.vertices) == sorted((v.x_value, v.y_value) for v in other.vertices)
+    def to_buffer(self):
+        vertices = np.array([[v.x_value, v.y_value, v.z_value] for v in self.vertices], dtype=np.float32)
+        faces = np.array([[i, i + 1, i + 2] for i in range(0, len(self.vertices) - 2, 3)], dtype=np.uint32)
+        colors = np.array([self.color] * len(self.vertices), dtype=np.float32)
+        normals = np.array([[0, 0, 1]] * len(self.vertices), dtype=np.float32)
+        texcoords = np.array([[0, 0], [1, 0], [0,1]], dtype=np.float32)
+
+        return vertices, faces, colors, normals, texcoords
+
+
+
+class ModelHandler:
+    def __init__(self):
+        self.polygons = []
+
+    def load_stl(self, file_path: str):
+        stl_mesh = mesh.Mesh.from_file(file_path)
+        self.polygons = []
+
+        for facet in stl_mesh.vectors:
+            vertices = [Vertex(x, y, z) for x, y, z in facet]
+            polygon = Polygon(vertices=vertices)
+            self.polygons.append(polygon)
+
+    def load_obj(self, file_path: str):
+        self.polygons = []
+        vertices = []
+
+        with open(file_path, 'r') as f:
+            for line in f:
+                if line.startswith('v '):
+                    parts = line.strip().split()
+                    vertices.append(Vertex(float(parts[1]), float(parts[2]), float(parts[3])))
+                elif line.startswith('f '):
+                    parts = line.strip().split()
+                    face_vertices = [vertices[int(index.split('/')[0]) - 1] for index in parts[1:]]
+                    polygon = Polygon(vertices=face_vertices)
+                    self.polygons.append(polygon)
+    def get_polygons(self) -> List[Polygon]:
+        return self.polygons
+
 
 class RunoffSimulation:
     def __init__(self, Polygons: List[Polygon], start_point: Tuple[float, float]):

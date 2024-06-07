@@ -1,35 +1,31 @@
 import numpy as np
-from glumpy import app, gloo, gl
+from glumpy import app, gl, glm, gloo
+from glumpy.transforms import Trackball, Position
+from surface_runoff.boundary import Polygon
 
-# Vertex shader
-vertex = """
-attribute vec2 position;
-void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-}
-"""
+    
+def create_buffers(vertices, faces, colors, normals, texcoords):
+    """ Generate buffers for vertices, faces, colors, normals, and texcoords """
 
-# Fragment shader
-fragment = """
-void main() {
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-}
-"""
+    vtype = [('position', np.float32, 3),
+             ('texcoord', np.float32, 2),
+             ('normal',   np.float32, 3),
+             ('color',    np.float32, 4)]
+    itype = np.uint32
 
-# Create a window
-window = app.Window(width=800, height=600, color=(0, 0, 0, 1))
+    # Create vertex buffer
+    vertex_data = np.zeros(len(vertices), vtype)
+    vertex_data['position'] = vertices
+    vertex_data['normal'] = normals
+    vertex_data['color'] = colors
+    vertex_data['texcoord'] = texcoords
 
-# Define the vertices of the triangle
-vertices = np.array([[0, 0], [1, 0], [0.5, 1]], dtype=np.float32)
+    # Create index buffers for filled and outlined shapes
+    filled = np.resize(faces, len(faces) * 3)
+    outline = np.resize(faces, len(faces) * 3)
 
-# Create VertexBuffer object
-triangle = gloo.Program(vertex, fragment)
-triangle['position'] = vertices
+    vertex_buffer = vertex_data.view(gloo.VertexBuffer)
+    filled_buffer = filled.view(gloo.IndexBuffer)
+    outline_buffer = outline.view(gloo.IndexBuffer)
 
-@window.event
-def on_draw(dt):
-    window.clear()
-    triangle.draw(gl.GL_TRIANGLES)
-
-# Run the application
-app.run()
+    return vertex_buffer, filled_buffer, outline_buffer
