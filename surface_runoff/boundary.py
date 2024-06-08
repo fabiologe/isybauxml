@@ -56,11 +56,12 @@ class Polygon:
             return False
         return sorted((v.x_value, v.y_value) for v in self.vertices) == sorted((v.x_value, v.y_value) for v in other.vertices)
     def to_buffer(self):
+        """ Convert the polygon data into numpy arrays for OpenGL buffers """
         vertices = np.array([[v.x_value, v.y_value, v.z_value] for v in self.vertices], dtype=np.float32)
         faces = np.array([[i, i + 1, i + 2] for i in range(0, len(self.vertices) - 2, 3)], dtype=np.uint32)
         colors = np.array([self.color] * len(self.vertices), dtype=np.float32)
         normals = np.array([[0, 0, 1]] * len(self.vertices), dtype=np.float32)
-        texcoords = np.array([[0, 0], [1, 0], [0,1]], dtype=np.float32)
+        texcoords = np.array([[i % 2, (i // 2) % 2] for i in range(len(self.vertices))], dtype=np.float32)
 
         return vertices, faces, colors, normals, texcoords
 
