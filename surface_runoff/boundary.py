@@ -4,6 +4,7 @@ import numpy as np
 from collections import defaultdict
 from collections import defaultdict
 from stl import mesh
+import pyvista as pv
 
 
 @dataclass
@@ -28,7 +29,7 @@ class Polygon:
     kst: Optional[float]= 100.0 #concrete smooth
     slop: Optional[float]= 0 # Gefälle I in Promilley 
     rain_volume: Optional[float]= 0.0
-    color: Optional[List] = field(default_factory=lambda: [1, 0, 0, 1])
+    color: Optional[List] = field(default_factory=lambda: [0.5, 1, 0.5, 1])
     def contains_point(self, point: Tuple[float, float]) -> bool:
         def sign(p1, p2, p3):
             return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
@@ -159,5 +160,42 @@ class RunoffSimulation:
             current_Polygon_index = lowest_neighbor_index
 
         return self.path
-    
 
+    def mark_path(self, path_color=[1, 0, 0, 1]):
+        for polygon in self.path:
+            polygon.color = path_color
+
+    def visualize_path(self):
+        # Collect all vertices and faces from the polygons
+        vertices = []
+        faces = []
+        colors = []
+
+        vertex_dict = {}
+        vertex_count = 0
+
+        for polygon in self.Polygons:
+            face = []
+            for vertex in polygon.vertices:
+                # Use a dictionary to avoid duplicate vertices
+                if vertex not in vertex_dict:
+                    vertex_dict[vertex] = vertex_count
+                    vertices.append([vertex.x_value, vertex.y_value, vertex.z_value])
+                    vertex_count += 1
+                face.append(vertex_dict[vertex])
+            faces.append(face)
+            colors.append(polygon.color[:3])  # Use RGB, ignore Alpha
+
+        # Convert to numpy arrays
+        vertices = np.array(vertices)
+        faces = np.hstack([np.array([[len(face)] + face for face in faces])])
+        colors = np.array(colors)
+
+        # Create a PyVista PolyData object with vertices and faces
+        mesh = pv.PolyData(vertices, faces)
+        mesh.cell_data['colors'] = colors
+
+        # Plot the mesh
+        plotter = pv.Plotter()
+        plotter.add_mesh(mesh, scalars='colors', rgb=True, show_edges=True)
+        plotter.show()
