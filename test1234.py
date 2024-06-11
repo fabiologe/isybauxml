@@ -1,34 +1,63 @@
-from surface_runoff.boundary import ModelHandler, RunoffSimulation
 import numpy as np
 import pyvista as pv
-from dataclasses import dataclass
+from surface_runoff.boundary import ModelHandler
 from typing import List, Tuple
 
-@dataclass
-class Contour:
-    terrain_mesh: pv.PolyData
-    interval: float
+def generate_contours(terrain_mesh: pv.PolyData, interval: float, polygons: List) -> pv.PolyData:
+    # Calculate the scalar values for elevation
+    vertex_elevations = {}
 
-    def generate_contours(self) -> pv.PolyData:
-        return self.terrain_mesh.contour(scalars="Elevation", isosurfaces=np.arange(self.terrain_mesh.bounds[4], self.terrain_mesh.bounds[5], self.interval))
+    for poly in polygons:
+        for vertex in poly.vertices:
+            vertex_tuple = (vertex.x_value, vertex.y_value, vertex.z_value)
+            vertex_elevations[vertex_tuple] = []
 
-    def extract_contour_vertices(self) -> List[List[Tuple[float, float, float]]]:
-        contours = self.generate_contours()
-        contour_vertices = []
+    # Ensure all vertices are considered (handle duplicates)
+    all_vertices = set((vertex.x_value, vertex.y_value, vertex.z_value) for poly in polygons for vertex in poly.vertices)
+    average_elevations = {vertex: np.mean([p[2] for p in vertex_elevations if p[:2] == vertex[:2]]) for vertex in all_vertices}
 
-        for i in range(contours.n_cells):
-            cell = contours.extract_cells(i)
-            contour_vertices.append([(cell.points[j][0], cell.points[j][1], cell.points[j][2]) for j in range(cell.n_points)])
+    # Generate scalar values for the terrain mesh vertices
+    scalar_values = []
+    for vertex in terrain_mesh.points:
+        vertex_tuple = tuple(vertex)
+        if vertex_tuple in average_elevations:
+            scalar_values.append(average_elevations[vertex_tuple])
+        else:
+            # Handle the case when vertex elevation is not found
+            print(f"Vertex elevation not found: {vertex_tuple}")
+            scalar_values.append(0.0)  # Set a default elevation or handle differently based on your requirements
 
-        return contour_vertices
+    # Add scalar data to the terrain mesh
+    terrain_mesh["Elevation"] = scalar_values
 
-    def visualize_contours(self):
-        contours = self.generate_contours()
+    # Generate contours using scalar data
+    contours = terrain_mesh.contour(scalars="Elevation", isosurfaces=np.arange(terrain_mesh.bounds[4], terrain_mesh.bounds[5], interval))
+    
+    if contours.n_points == 0:
+        print("Warning: Contour generation produced zero points.")
+        return None
 
-        plotter = pv.Plotter()
-        plotter.add_mesh(self.terrain_mesh, opacity=0.5, show_edges=True)
-        plotter.add_mesh(contours, color="black", line_width=1)
-        plotter.show()
+    return contours
+
+
+
+
+
+def visualize_contours_and_polygons(terrain_mesh: pv.PolyData, contours: pv.PolyData, polygons: List):
+    # Visualize the terrain mesh, contour lines, and polygons
+    plotter = pv.Plotter()
+    plotter.add_mesh(terrain_mesh, opacity=0.5, show_edges=True)
+    plotter.add_mesh(contours, color="black", line_width=1)
+    
+    # Add polygons as wireframe to visualize them
+    for poly in polygons:
+        vertices = np.array([[v.x_value, v.y_value, v.z_value] for v in poly.vertices])
+        faces = np.hstack([np.array([[len(poly.vertices)] + [i for i in range(len(poly.vertices))]])])
+        mesh = pv.PolyData(vertices, faces)
+        plotter.add_mesh(mesh, color="gray", style="wireframe")
+    
+    plotter.show()
+
 
 # Load polygons
 handler = ModelHandler()
@@ -39,15 +68,15 @@ polygons = handler.get_polygons()
 # Create a mesh from polygons
 vertices = np.array([[v.x_value, v.y_value, v.z_value] for poly in polygons for v in poly.vertices])
 faces = np.hstack([np.array([[len(poly.vertices)] + [i for i in range(len(poly.vertices))]]) for poly in polygons])
-terrain_mesh = pv.PolyData(vertices)
+terrain_mesh = pv.PolyData(vertices, faces)
 
+# Generate contours
+contours = generate_contours(terrain_mesh, interval=10, polygons=polygons)
 
-contours = terrain_mesh.contour()
+# Visualize contours and polygons
+if contours is not None:
+    visualize_contours_and_polygons(terrain_mesh, contours, polygons)
 
-pl = pv.Plotter()
-pl.add_mesh(terrain_mesh, opacity=0.85)
-pl.add_mesh(contours, color="white", line_width=5)
-pl.show()
 '''
 handler = ModelHandler()
 

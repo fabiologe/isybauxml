@@ -19,6 +19,7 @@ class Vertex:
         if not isinstance(other, Vertex):
             return False
         return (self.x_value, self.y_value, self.z_value) == (other.x_value, other.y_value, other.z_value)
+    
 
 @dataclass
 class Polygon:
@@ -71,6 +72,7 @@ class Polygon:
 class ModelHandler:
     def __init__(self):
         self.polygons = []
+        self.pointcloud = []
 
     def load_stl(self, file_path: str):
         stl_mesh = mesh.Mesh.from_file(file_path)
@@ -80,6 +82,17 @@ class ModelHandler:
             vertices = [Vertex(x, y, z) for x, y, z in facet]
             polygon = Polygon(vertices=vertices)
             self.polygons.append(polygon)
+    def load_xyz(self,file_path: str):
+        self.pointcloud = []
+        with open(file_path, 'r') as file:
+        # Read each line in the file
+            for line in file:
+                # Split the line into x, y, and z values
+                x, y, z = map(float, line.strip().split())
+
+                # Create a new Vertex object and append it to the point cloud list
+                vertex = Vertex(x_value =x, y_value= y, z_value = z)
+                self.pointcloud.append(vertex)
 
     def load_obj(self, file_path: str):
         self.polygons = []
@@ -97,6 +110,8 @@ class ModelHandler:
                     self.polygons.append(polygon)
     def get_polygons(self) -> List[Polygon]:
         return self.polygons
+    def get_pointcloud(self) -> List['Vertex']:
+        return self.pointcloud
 
 
 class RunoffSimulation:
