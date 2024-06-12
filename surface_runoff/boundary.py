@@ -5,6 +5,8 @@ from collections import defaultdict
 from collections import defaultdict
 from stl import mesh
 import pyvista as pv
+from pyproj import Proj, transform
+import json
 
 
 @dataclass
@@ -82,17 +84,20 @@ class ModelHandler:
             vertices = [Vertex(x, y, z) for x, y, z in facet]
             polygon = Polygon(vertices=vertices)
             self.polygons.append(polygon)
-    def load_xyz(self,file_path: str):
+    def load_xyz(self, file_path: str):
         self.pointcloud = []
         with open(file_path, 'r') as file:
-        # Read each line in the file
+            # Skip the header line
+            next(file)
             for line in file:
-                # Split the line into x, y, and z values
-                x, y, z = map(float, line.strip().split())
-
-                # Create a new Vertex object and append it to the point cloud list
-                vertex = Vertex(x_value =x, y_value= y, z_value = z)
-                self.pointcloud.append(vertex)
+                try:
+                    x, y, z = map(float, line.strip().split())
+                    vertex = Vertex(x_value=x, y_value=y, z_value=z)
+                    self.pointcloud.append(vertex)
+                except ValueError:
+                    # Skip lines that cannot be converted to floats
+                    continue
+                
 
     def load_obj(self, file_path: str):
         self.polygons = []
@@ -108,6 +113,30 @@ class ModelHandler:
                     face_vertices = [vertices[int(index.split('/')[0]) - 1] for index in parts[1:]]
                     polygon = Polygon(vertices=face_vertices)
                     self.polygons.append(polygon)
+    def load_geojson(self, file_path: str):
+        self.polygons = []
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        wgs84 = Proj(init='epsg:4326')  # WGS84 coordinate system
+        utm32n = Proj(init='epsg:32632')  # UTM zone 32N
+
+        for feature in data['features']:
+            if feature['geometry']['type'] == 'Point':
+                lon, lat, z = feature['geometry']['coordinates']
+                x, y = transform(wgs84, utm32n, lon, lat)
+                vertex = Vertex(x_value=x, y_value=y, z_value=z)
+                self.pointcloud.append(vertex)
+            elif feature['geometry']['type'] == 'Polygon':
+                polygon_vertices = []
+                for coord in feature['geometry']['coordinates'][0]:  # Assuming exterior ring
+                    lon, lat, z = coord
+                    x, y = transform(wgs84, utm32n, lon, lat)
+                    vertex = Vertex(x_value=x, y_value=y, z_value=300)
+                    polygon_vertices.append(vertex)
+                # Set the color to red for polygons loaded via GeoJSON
+                polygon = Polygon(vertices=polygon_vertices, color=[1.0, 0.0, 0.0, 1.0])  # Red color
+                self.polygons.append(polygon)
     def get_polygons(self) -> List[Polygon]:
         return self.polygons
     def get_pointcloud(self) -> List['Vertex']:

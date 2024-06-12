@@ -1,0 +1,9 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.713978752493858,48.922133339140636,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.71062632650137,48.92024419137709,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.705261573195457,48.922287111522074,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.705886527895927,48.92707937332441,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.717154152691364,48.92708003417279,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.715990073978901,48.92322405535716,0]},
+"properties":{}},{"type":"Feature","id":"Vertex","geometry":{"type":"Point","coordinates":[8.713978752493858,48.922133339140636,0]},
+"properties":{}},{"type":"Feature","id":"PT_1","geometry":{"type":"Point","coordinates":[8.711207695305347,48.923662229735676,0]},
+"properties":{}}]}
