@@ -16,17 +16,32 @@ import os
 
 
 
+
 def main():
-    file_path = ("input/Stammdaten_ISY.xml")
+    file_path = "input/Stammdaten_ISY.xml"
     if file_path:
-   
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
-            dom = xml.dom.minidom.parse(file)
-        root = dom.documentElement
+            xml_content = file.read()
+        
+        # Convert the read content into utf-8
+        xml_content = xml_content.encode('ISO-8859-1').decode('utf-8')
+        
+        # Fix umlauts in the raw XML string before parsing
+        fixed_content = umlaut_mapping(xml_content)
+        
+        # Parse the fixed XML content
+        dom = xml.dom.minidom.parseString(fixed_content)
+        
+        # Replace umlauts in the parsed DOM
+        replace_umlaut(dom)
+        
+        
         update_punkthoehe(dom)
         update_haltunghoehe(dom)
-        #DN_bug(dom)
         delete_incomplete_points(dom)
+        replace_umlaut(dom)
+
+        root = dom.documentElement
         analysis_results = analyze_xml(root)
         print(analysis_results)
         parse_all(root) 

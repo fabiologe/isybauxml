@@ -4,7 +4,8 @@ from xml_parser.xml_fixer import delete_incomplete_points
 from xml_parser.xml_fixer import kill_duplicates
 from xml_parser.xml_fixer import analyze_xml
 from xml_parser.xml_fixer import transform_crs
-from xml_parser.xml_fixer import DN_bug
+from xml_parser.xml_fixer import replace_umlaut
+from xml_parser.xml_fixer import umlaut_mapping
 from xml_parser.schacht import parse_schacht
 from xml_parser.bauwerk import bauwerktypENUM
 from xml_parser.bauwerk import Bauwerk_dump
@@ -56,7 +57,8 @@ from xml_parser.schacht import SchachtManager
 
 __all__ = [
     "bauwerktypENUM",
-    "DN_bug",
+    "umlaut_mapping",
+    #"DN_bug",
     "SchachtManager",
     "analyze_xml",
     "kill_duplicates",
@@ -107,5 +109,6 @@ __all__ = [
     "parse_bauwerk_dump",
     "Bauwerk_dump",
     "Haltung",
-    "transform_crs"
+    "transform_crs",
+    "replace_umlaut"
 ]

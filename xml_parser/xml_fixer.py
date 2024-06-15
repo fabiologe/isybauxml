@@ -1,7 +1,23 @@
-
 from orientation.validate_CRS import find_CRSfromXML
 from pyproj import Proj, transform
 
+def umlaut_mapping(s):
+    if isinstance(s, str):
+        s = s.replace('Ä', 'Ae').replace('Ö', 'Oe').replace('Ü', 'Ue')
+        s = s.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
+        s = s.replace('ß', 'ss')
+        s = s.replace('�', '_')
+    return s
+
+def replace_umlaut(dom):
+    for element in dom.getElementsByTagName('*'):
+        for child in element.childNodes:
+            if child.nodeType == child.TEXT_NODE:
+                original_value = child.nodeValue
+                new_value = umlaut_mapping(child.nodeValue)
+                if original_value != new_value:
+                    print(f"Replaced '{original_value}' with '{new_value}'")
+                child.nodeValue = new_value
 def update_punkthoehe(dom):
     all_punkt_elements = dom.getElementsByTagName('Punkt')
     for punkt in all_punkt_elements:
