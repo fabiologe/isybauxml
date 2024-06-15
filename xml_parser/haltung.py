@@ -73,22 +73,22 @@ class Haltung:
         return
     def __str__(self):
         return f"Haltung: {self.objektbezeichnung}\nEntwaesserungsart: {self.entwaesserungsart}\nZulauf: {self.zulauf}\nAblauf: {self.ablauf}\nProfil: {self.profilart}\nKante: {self.kanten}"
-   
+    '''
     @staticmethod
     def fix_orientation(self):
         if self.zulauf_sh >= self.ablauf_sh:
             return self.zulauf, self.ablauf, self.zulauf_sh, self.ablauf_sh
         elif self.zulauf_sh <= self.ablauf_sh:
             # Swap the values of zulauf, ablauf, zulauf_sh, and ablauf_sh
-            temp_zulauf = self.zulauf
-            self.zulauf = self.ablauf
-            self.ablauf = temp_zulauf
+                temp_zulauf = self.zulauf
+                self.zulauf = self.ablauf
+                self.ablauf = temp_zulauf
             
-            temp_zulauf_sh = self.zulauf_sh
-            self.zulauf_sh = self.ablauf_sh
-            self.ablauf_sh = temp_zulauf_sh
+                temp_zulauf_sh = self.zulauf_sh
+                self.zulauf_sh = self.ablauf_sh
+                self.ablauf_sh = temp_zulauf_sh
             
-            return self.zulauf, self.ablauf, self.zulauf_sh, self.ablauf_sh
+                return self.zulauf, self.ablauf, self.zulauf_sh, self.ablauf_sh'''
 def parse_haltung(root):
     for abwasser_objekt in root.getElementsByTagName('AbwassertechnischeAnlage'):
         objektart_element = abwasser_objekt.getElementsByTagName('Objektart')

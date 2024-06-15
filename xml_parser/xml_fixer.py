@@ -1,5 +1,11 @@
 from orientation.validate_CRS import find_CRSfromXML
 from pyproj import Proj, transform
+import re
+
+def bauwerk_fix(xml_content):
+    pattern = r'<></>'
+    fixed_content = re.sub(pattern,'', xml_content)
+    return fixed_content
 
 def umlaut_mapping(s):
     if isinstance(s, str):
@@ -7,8 +13,13 @@ def umlaut_mapping(s):
         s = s.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
         s = s.replace('ß', 'ss')
         s = s.replace('�', '_')
+    
     return s
-
+def DN_bug(xml_content):
+    pattern = r'<Profilart>DN'
+    fixed_content = re.sub(pattern,'<Profilart>0',xml_content)
+    return fixed_content
+    
 def replace_umlaut(dom):
     for element in dom.getElementsByTagName('*'):
         for child in element.childNodes:
@@ -33,11 +44,7 @@ def dwa_to_isy(dom):
             status.firstChild.nodeValue = 0
         elif status.firstChild.nodeValue == "P":
             status.firstChild.nodeValue = 1 
-def DN_bug(dom):
-    all_profilart = dom.getElementsByTagName('Profilart')
-    for profilart in all_profilart:
-        if profilart.firstChild.nodeValue == 'DN':
-            profilart.firstChild.nodeValue == 0
+
                  
 def update_haltunghoehe(dom):
     all_start = dom.getElementsByTagName('Start')

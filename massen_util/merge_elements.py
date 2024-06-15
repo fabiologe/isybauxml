@@ -45,10 +45,15 @@ def mass_schacht(schacht_list, haltung_list):
 def mass_haltung(schacht_list, bauwerk_list, haltung_list):
     massen_haltung = []
     node_list= schacht_list + bauwerk_list
+
     print(f"Merging {len(set(h.objektbezeichnung for h in haltung_list))} Haltungen ....")
     for haltung in haltung_list:
             zulauf_schacht = next((node for node in node_list if node.objektbezeichnung == haltung.zulauf), None)
             ablauf_schacht = next((node for node in node_list if node.objektbezeichnung == haltung.ablauf), None)
+            if not zulauf_schacht:
+                print(f"Zulauf node not found: {haltung.zulauf}")
+            if not ablauf_schacht:
+                print(f"Ablauf node not found: {haltung.ablauf}")
             if zulauf_schacht and ablauf_schacht:
                 current_haltung = {
                     'Schacht Nr. oben': zulauf_schacht.objektbezeichnung,
@@ -75,8 +80,10 @@ def mass_haltung(schacht_list, bauwerk_list, haltung_list):
 
                 massen_haltung.append(current_haltung)
             else:
-                print("Either zulauf_schacht or ablauf_schacht could not be found in schacht_list.")
+                print("Either zulauf_schacht or ablauf_schacht could not be found in schacht_list.")   
                 print(f"Not found matching Schachts for Haltung {haltung.objektbezeichnung}")
+                print(f'Zulauf-Schacht in CLASS: {haltung.ablauf}')
+                print(f'Ablauf-Schacht in CLASS: {haltung.zulauf}')
     seen = set()
     mass_haltung_unique  = []
     for item in massen_haltung:

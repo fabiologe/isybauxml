@@ -23,19 +23,30 @@ def main():
         with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
             xml_content = file.read()
         
-        # Convert the read content into utf-8
-        xml_content = xml_content.encode('ISO-8859-1').decode('utf-8')
-        
-        # Fix umlauts in the raw XML string before parsing
+        # Apply umlaut mapping (if needed)
         fixed_content = umlaut_mapping(xml_content)
+        
+        # Fix the content to remove unwanted patterns
+        fixed_content = bauwerk_fix(fixed_content)
+
+        fixed_content = DN_bug(fixed_content)
+        
+        # Ensure the fixed content is a string
+        if isinstance(fixed_content, bytes):
+            fixed_content = fixed_content.decode('ISO-8859-1')
+        
+        # Parse the fixed XML content
+        try:
+            dom = parseString(fixed_content)
+            print(dom.toprettyxml())
+        except Exception as e:
+            print(f"Error parsing XML: {e}")
         
         # Parse the fixed XML content
         dom = xml.dom.minidom.parseString(fixed_content)
         
         # Replace umlauts in the parsed DOM
         replace_umlaut(dom)
-        
-        
         update_punkthoehe(dom)
         update_haltunghoehe(dom)
         delete_incomplete_points(dom)
