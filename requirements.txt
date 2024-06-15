@@ -3,3 +3,5 @@ pandas == 2.2.0
 pyswmm == 2.0.0
 swmmio == 0.7.0
 matplotlib == 3.8.4
+pyvista == 0.43.9
+stl == 0.0.3

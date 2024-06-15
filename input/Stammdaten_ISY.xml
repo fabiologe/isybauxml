@@ -4,7 +4,7 @@
  <Admindaten></Admindaten>
  <Datenkollektive>
   <Datenstatus>1</Datenstatus>
-  <Erstellungsdatum>2023-12-19</Erstellungsdatum>
+  <Erstellungsdatum>2024-06-13</Erstellungsdatum>
   <Kennungen>
    <Kollektiv>
     <Kennung>STA01</Kennung>
@@ -19,7 +19,7 @@
       </Stammdaten>
      </Kollektiveigenschaft>
     <Regelwerk>2</Regelwerk>
-    <Bearbeitungsstand>2023-12-19</Bearbeitungsstand>
+    <Bearbeitungsstand>2024-06-13</Bearbeitungsstand>
     </Kollektiv>
    </Kennungen>
   <Stammdatenkollektiv>
@@ -9813,6 +9813,8 @@
     <Entwaesserungsart>KM</Entwaesserungsart>
     <Knoten>
      <KnotenTyp>2</KnotenTyp>
+     <Bauwerk>
+      </Bauwerk>
      <Abdeckungen>
       <Deckel>
        <Index>1</Index>
@@ -9956,6 +9958,8 @@
     <Kommentar>Schachtnummer geaendert, alte Nr. wie Bezeichnung</Kommentar>
     <Knoten>
      <KnotenTyp>2</KnotenTyp>
+     <Bauwerk>
+      </Bauwerk>
      <Abdeckungen>
       <Deckel>
        <Index>1</Index>
@@ -11485,59 +11489,6 @@
      </Geometrie>
     </AbwassertechnischeAnlage>
    <AbwassertechnischeAnlage>
-    <Objektbezeichnung>HS-039</Objektbezeichnung>
-    <Objektart>1</Objektart>
-    <Status>0</Status>
-    <Entwaesserungsart>KM</Entwaesserungsart>
-    <Kante>
-     <KantenTyp>0</KantenTyp>
-     <KnotenZulauf>HS-027</KnotenZulauf>
-     <KnotenZulaufTyp>0</KnotenZulaufTyp>
-     <KnotenAblauf>H-026</KnotenAblauf>
-     <KnotenAblaufTyp>0</KnotenAblaufTyp>
-     <SohlhoeheZulauf>204.590</SohlhoeheZulauf>
-     <SohlhoeheAblauf>204.260</SohlhoeheAblauf>
-     <Laenge>53.42</Laenge>
-     <Material>B</Material>
-     <Profil>
-      <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>0</Profilart>
-      <Profilhoehe>500</Profilhoehe>
-      </Profil>
-     <Haltung>
-      <Rohrlaenge>52.42</Rohrlaenge>
-      </Haltung>
-     </Kante>
-    <Lage></Lage>
-    <Umweltparameter></Umweltparameter>
-    <Geometrie>
-     <GeoObjektart>4</GeoObjektart>
-     <GeoObjekttyp>L</GeoObjekttyp>
-     <Geometriedaten>
-      <Polygone>
-       <Polygon>
-        <Polygonart>3</Polygonart>
-        <Kante>
-         <Start>
-          <Rechtswert>2564564.433</Rechtswert>
-          <Hochwert>5461915.596</Hochwert>
-          <Punkthoehe>204.590</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Start>
-         <Ende>
-          <Rechtswert>2564513.389</Rechtswert>
-          <Hochwert>5461903.683</Hochwert>
-          <Punkthoehe>204.260</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Ende>
-         </Kante>
-        </Polygon>
-       </Polygone>
-      </Geometriedaten>
-     <CRSLage>DE_DHDN_3GK2</CRSLage>
-     </Geometrie>
-    </AbwassertechnischeAnlage>
-   <AbwassertechnischeAnlage>
     <Objektbezeichnung>H-026</Objektbezeichnung>
     <Objektart>1</Objektart>
     <Status>0</Status>
@@ -11581,6 +11532,59 @@
           <Rechtswert>2564508.455</Rechtswert>
           <Hochwert>5461904.237</Hochwert>
           <Punkthoehe>203.740</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Ende>
+         </Kante>
+        </Polygon>
+       </Polygone>
+      </Geometriedaten>
+     <CRSLage>DE_DHDN_3GK2</CRSLage>
+     </Geometrie>
+    </AbwassertechnischeAnlage>
+   <AbwassertechnischeAnlage>
+    <Objektbezeichnung>HS-039</Objektbezeichnung>
+    <Objektart>1</Objektart>
+    <Status>0</Status>
+    <Entwaesserungsart>KM</Entwaesserungsart>
+    <Kante>
+     <KantenTyp>0</KantenTyp>
+     <KnotenZulauf>HS-027</KnotenZulauf>
+     <KnotenZulaufTyp>0</KnotenZulaufTyp>
+     <KnotenAblauf>H-026</KnotenAblauf>
+     <KnotenAblaufTyp>0</KnotenAblaufTyp>
+     <SohlhoeheZulauf>204.590</SohlhoeheZulauf>
+     <SohlhoeheAblauf>204.260</SohlhoeheAblauf>
+     <Laenge>53.42</Laenge>
+     <Material>B</Material>
+     <Profil>
+      <SonderprofilVorhanden>0</SonderprofilVorhanden>
+      <Profilart>0</Profilart>
+      <Profilhoehe>500</Profilhoehe>
+      </Profil>
+     <Haltung>
+      <Rohrlaenge>52.42</Rohrlaenge>
+      </Haltung>
+     </Kante>
+    <Lage></Lage>
+    <Umweltparameter></Umweltparameter>
+    <Geometrie>
+     <GeoObjektart>4</GeoObjektart>
+     <GeoObjekttyp>L</GeoObjekttyp>
+     <Geometriedaten>
+      <Polygone>
+       <Polygon>
+        <Polygonart>3</Polygonart>
+        <Kante>
+         <Start>
+          <Rechtswert>2564564.433</Rechtswert>
+          <Hochwert>5461915.596</Hochwert>
+          <Punkthoehe>204.590</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Start>
+         <Ende>
+          <Rechtswert>2564513.389</Rechtswert>
+          <Hochwert>5461903.683</Hochwert>
+          <Punkthoehe>204.260</Punkthoehe>
           <PunktattributAbwasser>RAP</PunktattributAbwasser>
           </Ende>
          </Kante>
@@ -12280,59 +12284,6 @@
      </Geometrie>
     </AbwassertechnischeAnlage>
    <AbwassertechnischeAnlage>
-    <Objektbezeichnung>M3550</Objektbezeichnung>
-    <Objektart>1</Objektart>
-    <Status>0</Status>
-    <Entwaesserungsart>KM</Entwaesserungsart>
-    <Kante>
-     <KantenTyp>0</KantenTyp>
-     <KnotenZulauf>M3550</KnotenZulauf>
-     <KnotenZulaufTyp>0</KnotenZulaufTyp>
-     <KnotenAblauf>M3554</KnotenAblauf>
-     <KnotenAblaufTyp>0</KnotenAblaufTyp>
-     <SohlhoeheZulauf>211.390</SohlhoeheZulauf>
-     <SohlhoeheAblauf>211.180</SohlhoeheAblauf>
-     <Laenge>5.39</Laenge>
-     <Material>PVCU</Material>
-     <Profil>
-      <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>0</Profilart>
-      <Profilhoehe>630</Profilhoehe>
-      </Profil>
-     <Haltung>
-      <Rohrlaenge>4.39</Rohrlaenge>
-      </Haltung>
-     </Kante>
-    <Lage></Lage>
-    <Umweltparameter></Umweltparameter>
-    <Geometrie>
-     <GeoObjektart>4</GeoObjektart>
-     <GeoObjekttyp>L</GeoObjekttyp>
-     <Geometriedaten>
-      <Polygone>
-       <Polygon>
-        <Polygonart>3</Polygonart>
-        <Kante>
-         <Start>
-          <Rechtswert>2564714.725</Rechtswert>
-          <Hochwert>5461922.617</Hochwert>
-          <Punkthoehe>211.390</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Start>
-         <Ende>
-          <Rechtswert>2564711.575</Rechtswert>
-          <Hochwert>5461919.568</Hochwert>
-          <Punkthoehe>211.180</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Ende>
-         </Kante>
-        </Polygon>
-       </Polygone>
-      </Geometriedaten>
-     <CRSLage>DE_DHDN_3GK2</CRSLage>
-     </Geometrie>
-    </AbwassertechnischeAnlage>
-   <AbwassertechnischeAnlage>
     <Objektbezeichnung>M3554</Objektbezeichnung>
     <Objektart>1</Objektart>
     <Status>0</Status>
@@ -12376,6 +12327,59 @@
           <Rechtswert>2564672.029</Rechtswert>
           <Hochwert>5461929.823</Hochwert>
           <Punkthoehe>207.480</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Ende>
+         </Kante>
+        </Polygon>
+       </Polygone>
+      </Geometriedaten>
+     <CRSLage>DE_DHDN_3GK2</CRSLage>
+     </Geometrie>
+    </AbwassertechnischeAnlage>
+   <AbwassertechnischeAnlage>
+    <Objektbezeichnung>M3550</Objektbezeichnung>
+    <Objektart>1</Objektart>
+    <Status>0</Status>
+    <Entwaesserungsart>KM</Entwaesserungsart>
+    <Kante>
+     <KantenTyp>0</KantenTyp>
+     <KnotenZulauf>M3550</KnotenZulauf>
+     <KnotenZulaufTyp>0</KnotenZulaufTyp>
+     <KnotenAblauf>M3554</KnotenAblauf>
+     <KnotenAblaufTyp>0</KnotenAblaufTyp>
+     <SohlhoeheZulauf>211.390</SohlhoeheZulauf>
+     <SohlhoeheAblauf>211.180</SohlhoeheAblauf>
+     <Laenge>5.39</Laenge>
+     <Material>PVCU</Material>
+     <Profil>
+      <SonderprofilVorhanden>0</SonderprofilVorhanden>
+      <Profilart>0</Profilart>
+      <Profilhoehe>630</Profilhoehe>
+      </Profil>
+     <Haltung>
+      <Rohrlaenge>4.39</Rohrlaenge>
+      </Haltung>
+     </Kante>
+    <Lage></Lage>
+    <Umweltparameter></Umweltparameter>
+    <Geometrie>
+     <GeoObjektart>4</GeoObjektart>
+     <GeoObjekttyp>L</GeoObjekttyp>
+     <Geometriedaten>
+      <Polygone>
+       <Polygon>
+        <Polygonart>3</Polygonart>
+        <Kante>
+         <Start>
+          <Rechtswert>2564714.725</Rechtswert>
+          <Hochwert>5461922.617</Hochwert>
+          <Punkthoehe>211.390</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Start>
+         <Ende>
+          <Rechtswert>2564711.575</Rechtswert>
+          <Hochwert>5461919.568</Hochwert>
+          <Punkthoehe>211.180</Punkthoehe>
           <PunktattributAbwasser>RAP</PunktattributAbwasser>
           </Ende>
          </Kante>
@@ -16199,59 +16203,6 @@
      </Geometrie>
     </AbwassertechnischeAnlage>
    <AbwassertechnischeAnlage>
-    <Objektbezeichnung>748</Objektbezeichnung>
-    <Objektart>1</Objektart>
-    <Status>0</Status>
-    <Entwaesserungsart>KM</Entwaesserungsart>
-    <Kante>
-     <KantenTyp>0</KantenTyp>
-     <KnotenZulauf>748</KnotenZulauf>
-     <KnotenZulaufTyp>0</KnotenZulaufTyp>
-     <KnotenAblauf>747</KnotenAblauf>
-     <KnotenAblaufTyp>0</KnotenAblaufTyp>
-     <SohlhoeheZulauf>206.970</SohlhoeheZulauf>
-     <SohlhoeheAblauf>206.590</SohlhoeheAblauf>
-     <Laenge>2.36</Laenge>
-     <Material>B</Material>
-     <Profil>
-      <SonderprofilVorhanden>0</SonderprofilVorhanden>
-      <Profilart>0</Profilart>
-      <Profilhoehe>300</Profilhoehe>
-      </Profil>
-     <Haltung>
-      <Rohrlaenge>1.36</Rohrlaenge>
-      </Haltung>
-     </Kante>
-    <Lage></Lage>
-    <Umweltparameter></Umweltparameter>
-    <Geometrie>
-     <GeoObjektart>4</GeoObjektart>
-     <GeoObjekttyp>L</GeoObjekttyp>
-     <Geometriedaten>
-      <Polygone>
-       <Polygon>
-        <Polygonart>3</Polygonart>
-        <Kante>
-         <Start>
-          <Rechtswert>2564467.220</Rechtswert>
-          <Hochwert>5461795.040</Hochwert>
-          <Punkthoehe>206.970</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Start>
-         <Ende>
-          <Rechtswert>2564467.965</Rechtswert>
-          <Hochwert>5461793.971</Hochwert>
-          <Punkthoehe>206.590</Punkthoehe>
-          <PunktattributAbwasser>RAP</PunktattributAbwasser>
-          </Ende>
-         </Kante>
-        </Polygon>
-       </Polygone>
-      </Geometriedaten>
-     <CRSLage>DE_DHDN_3GK2</CRSLage>
-     </Geometrie>
-    </AbwassertechnischeAnlage>
-   <AbwassertechnischeAnlage>
     <Objektbezeichnung>749</Objektbezeichnung>
     <Objektart>1</Objektart>
     <Status>0</Status>
@@ -16295,6 +16246,59 @@
           <Rechtswert>2564425.090</Rechtswert>
           <Hochwert>5461748.337</Hochwert>
           <Punkthoehe>205.761</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Ende>
+         </Kante>
+        </Polygon>
+       </Polygone>
+      </Geometriedaten>
+     <CRSLage>DE_DHDN_3GK2</CRSLage>
+     </Geometrie>
+    </AbwassertechnischeAnlage>
+   <AbwassertechnischeAnlage>
+    <Objektbezeichnung>748</Objektbezeichnung>
+    <Objektart>1</Objektart>
+    <Status>0</Status>
+    <Entwaesserungsart>KM</Entwaesserungsart>
+    <Kante>
+     <KantenTyp>0</KantenTyp>
+     <KnotenZulauf>748</KnotenZulauf>
+     <KnotenZulaufTyp>0</KnotenZulaufTyp>
+     <KnotenAblauf>747</KnotenAblauf>
+     <KnotenAblaufTyp>0</KnotenAblaufTyp>
+     <SohlhoeheZulauf>206.970</SohlhoeheZulauf>
+     <SohlhoeheAblauf>206.590</SohlhoeheAblauf>
+     <Laenge>2.36</Laenge>
+     <Material>B</Material>
+     <Profil>
+      <SonderprofilVorhanden>0</SonderprofilVorhanden>
+      <Profilart>0</Profilart>
+      <Profilhoehe>300</Profilhoehe>
+      </Profil>
+     <Haltung>
+      <Rohrlaenge>1.36</Rohrlaenge>
+      </Haltung>
+     </Kante>
+    <Lage></Lage>
+    <Umweltparameter></Umweltparameter>
+    <Geometrie>
+     <GeoObjektart>4</GeoObjektart>
+     <GeoObjekttyp>L</GeoObjekttyp>
+     <Geometriedaten>
+      <Polygone>
+       <Polygon>
+        <Polygonart>3</Polygonart>
+        <Kante>
+         <Start>
+          <Rechtswert>2564467.220</Rechtswert>
+          <Hochwert>5461795.040</Hochwert>
+          <Punkthoehe>206.970</Punkthoehe>
+          <PunktattributAbwasser>RAP</PunktattributAbwasser>
+          </Start>
+         <Ende>
+          <Rechtswert>2564467.965</Rechtswert>
+          <Hochwert>5461793.971</Hochwert>
+          <Punkthoehe>206.590</Punkthoehe>
           <PunktattributAbwasser>RAP</PunktattributAbwasser>
           </Ende>
          </Kante>
