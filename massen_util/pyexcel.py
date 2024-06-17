@@ -34,11 +34,11 @@ col_haltung = {
         "start_cell": "W7",
         "data_type": "str"
     },
-    "Schacht Nr. oben": {
+    "Knoten Nr. oben": {
         "start_cell": "A7",
         "data_type": "str"
     },
-    "Schacht Nr. unten": {
+    "Knoten Nr. unten": {
         "start_cell": "B7",
         "data_type": "str"
     },
@@ -84,8 +84,8 @@ def to_xsls_haltung(col_haltung, col_schacht, col_leitung):
     # Haltung-CSV to xsls
     column_lists = {
     "Status": df_h["Status"].tolist(),
-    "Schacht Nr. oben": df_h["Schacht Nr. oben"].tolist(),
-    "Schacht Nr. unten": df_h["Schacht Nr. unten"].tolist(),
+    "Knoten Nr. oben": df_h["Knoten Nr. oben"].tolist(),
+    "Knoten Nr. unten": df_h["Knoten Nr. unten"].tolist(),
     "Deckelhoehe oben": df_h["Deckelhoehe oben"].tolist(),
     "Deckelhoehe unten": df_h["Deckelhoehe unten"].tolist(),
     "Sohlhoehe oben": df_h["Sohlhoehe oben"].tolist(),

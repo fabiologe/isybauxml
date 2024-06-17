@@ -8,7 +8,7 @@ def to_csv_bauwerke(bauwerke_list):
         sh = bauwerk.knoten[0].punkte[1].z
         typ = bauwerk.classname
         typ_str = bauwerktypENUM(typ)
-
+        
 def to_csv_schacht(mass_schacht):
     mass_schacht_index = list(mass_schacht[0].keys())
     additional_columns = [key for key in mass_schacht_index if key.startswith('DN XY')]
@@ -27,7 +27,7 @@ def to_csv_schacht(mass_schacht):
     return print('CSV for Schaechte could be saved')
 
 def to_csv_haltung(massen_haltung_unique):
-    massen_index_haltung = ['Status','Schacht Nr. oben', 'Schacht Nr. unten', 'Deckelhoehe oben', 'Deckelhoehe unten','Sohlhoehe oben', 'Sohlhoehe unten', 'Laenge', 'DN']
+    massen_index_haltung = ['Status','Knoten Nr. oben', 'Knoten Nr. unten', 'Deckelhoehe oben', 'Deckelhoehe unten','Sohlhoehe oben', 'Sohlhoehe unten', 'Laenge', 'DN']
 
     with open('massen_haltungen.csv', 'w', newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=massen_index_haltung)
