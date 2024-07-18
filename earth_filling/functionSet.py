@@ -1,8 +1,8 @@
 import logging
 import pandas as pd
 from input import Handler
-from earth_filling.vol_2polygon import VolumeCalculator
-from earth_filling.area_polygon import AreaCalculator
+from vol_2polygon import VolumeCalculator
+from area_polygon import AreaCalculator
 
 
 logging.basicConfig(level=logging.ERROR, filename='errors.log', 

@@ -1,0 +1,2 @@
+2024-07-18 15:31:05,830 ERROR 'tuple' object has no attribute 'split'
+2024-07-18 15:31:07,255 ERROR Invalid file path or buffer object type: <class 'tuple'>
