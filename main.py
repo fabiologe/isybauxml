@@ -79,18 +79,19 @@ def main():
             print(schacht.knoten[0].punkte[1].z)'''
         for data_list in all_lists:
             data_list = kill_duplicates(data_list, 'objektbezeichnung')  
-        mass_haltung_res = mass_haltung(schacht_list,bauwerke_list, haltung_list)
+        
+        '''mass_haltung_res = mass_haltung(schacht_list,bauwerke_list, haltung_list)
         to_csv_haltung(mass_haltung_res)
         mass_schacht_res = mass_schacht(schacht_list, haltung_list)
         to_csv_schacht(mass_schacht_res)
         massen_leitung_res = mass_leitung(leitung_list)
         to_csv_leitung(massen_leitung_res)
         print(os.getcwd())
-        to_xsls_haltung(col_haltung, col_schacht , col_leitung)
-        '''metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
+        to_xsls_haltung(col_haltung, col_schacht , col_leitung)'''
+        metadata = SimulationMetadata("Kohn's Wasserwirtschaft", "Fabio Q.")
         create_inp(metadata, flaechen_list, schacht_list,haltung_list, bauwerke_list)
         default_sim()
-        default_plot(schacht_list)'''
+        default_plot(schacht_list)  #Schacht_list needs to be imported so it calculates the CRS based on the coords 
         sys.exit()
 
 

@@ -240,8 +240,12 @@ def num_potential_out(schacht_list:List, haltung_list: List):
     
     return sgl_schacht
         
+class CRSNotFoundError(Exception):
+    def __init__(self, message="No matching CRS found. Please specify the EPSG code."):
+        self.message = message
+        super().__init__(self.message)
+
 def check_crs(schacht_list):
-    
     x, y = site_middle(schacht_list)
 
     # Determine the CRS based on the coordinate values
@@ -253,6 +257,10 @@ def check_crs(schacht_list):
         epsg = '31466'  # GK2
     else:
         epsg = None  # EPSG code unknown
-    #print(f"Determined EPSG code: {epsg}") 
+
+    if epsg is None:
+        raise CRSNotFoundError()
+
     return epsg
+
 

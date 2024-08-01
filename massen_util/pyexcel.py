@@ -68,9 +68,9 @@ col_haltung = {
     }
 }
 def to_xsls_haltung(col_haltung, col_schacht, col_leitung):
-    csv_h = os.path.abspath('massen_haltungen.csv')
-    csv_s = os.path.abspath('massen_schacht.csv')
-    csv_l = os.path.abspath('massen_leitung.csv')
+    csv_h = os.path.abspath('output_xlsx_csv/massen_haltungen.csv')
+    csv_s = os.path.abspath('output_xlsx_csv/massen_schacht.csv')
+    csv_l = os.path.abspath('output_xlsx_csv/massen_leitung.csv')
     src = os.path.abspath('massen_util/src/massen.xlsx')
     print(src)
     wb = xl.load_workbook(src)
@@ -129,6 +129,6 @@ def to_xsls_haltung(col_haltung, col_schacht, col_leitung):
             # Write to the cell based on row and column offset
             ws_haltung.cell(row=row_idx + start_row, column=start_col).value = cell_value
 
-    wb.save('massen_gesamt.xlsx')
+    wb.save('output_xlsx_csv/massen_gesamt.xlsx')
     return print("Data successfully written to your XLS file!")
 

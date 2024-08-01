@@ -4,12 +4,6 @@ import sys
 import codecs
 import os
 
-
-
-
-
-
-
 def main():
     file_path = ("input/Stammdaten_ISY.xml")
     if file_path:
