@@ -18,7 +18,7 @@ def process_xml_to_xsls(schacht_list, bauwerke_list, haltung_list):
         massen_leitung_res = mass_leitung(leitung_list)
         to_csv_leitung(massen_leitung_res)
         
-        output_directory = "output_xlsx_csv"
+        output_directory = "storage/output_xlsx_csv"
         haltung_file = os.path.join(output_directory, 'haltung.csv')
         schacht_file = os.path.join(output_directory, 'schacht.csv')
         leitung_file = os.path.join(output_directory, 'leitung.csv')

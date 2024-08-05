@@ -8,8 +8,8 @@ import json
 import codecs
 
 app = Flask(__name__)
-UPLOAD_DIRECTORY = "input_xml"
-OUTPUT_DIRECTORY = "output_xml"
+UPLOAD_DIRECTORY = "storage/input_xml"
+OUTPUT_DIRECTORY = "storage/output_xml"
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
@@ -84,7 +84,7 @@ def get_mass_route():
 @app.route('/download/<filename>', methods=['GET'])
 def download_xsls(filename):
     try:
-        output_dir = "output_xlsx_csv"
+        output_dir = "storage/output_xlsx_csv"
         return send_file(os.path.join(output_dir, filename), as_attachment=True)
     except FileNotFoundError:
         return jsonify({"error": "File not found"}), 404
