@@ -1,6 +1,7 @@
 from orientation.validate_CRS import find_CRSfromXML
 from pyproj import Proj, transform
 import re
+import os
 
 def bauwerk_fix(xml_content):
     pattern = r'<></>'
@@ -153,8 +154,7 @@ def analyze_xml(root):
     return analysis_results
 
 
-def transform_crs(dom):
-   
+def transform_crs(dom, given_crs, trans_crs, output_dir, filename):
     all_points = []
     elements_to_update = []
 
@@ -184,14 +184,6 @@ def transform_crs(dom):
     if count == 0:
         return None
     
-    x = total_rechtswert / count
-    y = total_hochwert / count
-
-    given_crs = find_CRSfromXML(x, y)
-    print('GK3= 31467 , GK2 = 31466 , UTM32N = 25832')
-    print(f'From given CRS: {given_crs} to....?')
-    trans_crs = int(input('Enter transform CRS as EPSG: '))
-    
     source_proj = Proj(init=f'EPSG:{given_crs}')
     target_proj = Proj(init=f'EPSG:{trans_crs}')
     
@@ -205,6 +197,9 @@ def transform_crs(dom):
         element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue = str(transformed_points[i][0])
         element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue = str(transformed_points[i][1])
     
-    # Write the updated XML back to the file
-    with open('your_updated_xml_file.xml', 'w') as f:
+    # Save transformed XML to a file
+    output_filename = os.path.join(output_dir, f"transformed_{filename}")
+    with open(output_filename, 'w', encoding='ISO-8859-1') as f:
         f.write(dom.toxml())
+    
+    return output_filename

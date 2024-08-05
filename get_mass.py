@@ -10,40 +10,7 @@ import os
 
 
 
-def process_xml_to_xsls(file_path: str):
-    if file_path:
-        with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
-            xml_content = file.read()
-        
-        fixed_content = umlaut_mapping(xml_content)
-        fixed_content = bauwerk_fix(fixed_content)
-        fixed_content = DN_bug(fixed_content)
-   
-        if isinstance(fixed_content, bytes):
-            fixed_content = fixed_content.decode('ISO-8859-1')
-        
-        try:
-            dom = xml.dom.minidom.parseString(fixed_content)
-            print(dom.toprettyxml())
-        except Exception as e:
-            print(f"Error parsing XML: {e}")
-            return
-        
-        replace_umlaut(dom)
-        update_punkthoehe(dom)
-        update_haltunghoehe(dom)
-        delete_incomplete_points(dom)
-        replace_umlaut(dom)
-
-        root = dom.documentElement
-        analysis_results = analyze_xml(root)
-        print(analysis_results)
-        parse_all(root) 
-        print(len(schacht_list))
-    
-        for data_list in all_lists:
-            data_list = kill_duplicates(data_list, 'objektbezeichnung')  
-        
+def process_xml_to_xsls(schacht_list, bauwerke_list, haltung_list):
         mass_haltung_res = mass_haltung(schacht_list, bauwerke_list, haltung_list)
         to_csv_haltung(mass_haltung_res)
         mass_schacht_res = mass_schacht(schacht_list, haltung_list)

@@ -54,10 +54,11 @@ from xml_parser.anschlusspunkt import anschlusspunkt_list
 from xml_parser.parse_all import parse_all
 from xml_parser.parse_all import all_lists
 from xml_parser.schacht import SchachtManager
-
+from xml_parser.main_loader import XMLDataLoader
 
 
 __all__ = [
+    "XMLDataLoader",
     "bauwerktypENUM",
     "bauwerk_fix",
     "umlaut_mapping",
