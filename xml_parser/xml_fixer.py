@@ -154,15 +154,17 @@ def analyze_xml(root):
     return analysis_results
 
 
-def transform_crs(dom, given_crs, trans_crs, output_dir, filename):
+
+
+
+def transform_crs(dom, given_crs, trans_crs):
+   
     all_points = []
     elements_to_update = []
-
-    # Get all elements in the document
     all_elements = dom.getElementsByTagName('*')
 
     for element in all_elements:
-        # Check if the element has both 'Rechtswert' and 'Hochwert' children
+
         rechtswert_elements = element.getElementsByTagName('Rechtswert')
         hochwert_elements = element.getElementsByTagName('Hochwert')
 
@@ -173,33 +175,20 @@ def transform_crs(dom, given_crs, trans_crs, output_dir, filename):
             all_points.append((rechtswert, hochwert))
             elements_to_update.append(element)
     
-    # Print or process the original points before transformation
-    print("Original Points:", all_points)
-    print("Number of Points:", len(all_points))
-    
-    total_rechtswert = sum(point[0] for point in all_points)
-    total_hochwert = sum(point[1] for point in all_points)
-    count = len(all_points)
-    
-    if count == 0:
-        return None
+   
     
     source_proj = Proj(init=f'EPSG:{given_crs}')
     target_proj = Proj(init=f'EPSG:{trans_crs}')
     
     transformed_points = [transform(source_proj, target_proj, x, y) for x, y in all_points]
     
-    # Print the transformed points
+
     print("Transformed Points:", transformed_points)
     
-    # Update the XML with transformed coordinates
+
     for i, element in enumerate(elements_to_update):
         element.getElementsByTagName('Rechtswert')[0].firstChild.nodeValue = str(transformed_points[i][0])
         element.getElementsByTagName('Hochwert')[0].firstChild.nodeValue = str(transformed_points[i][1])
-    
-    # Save transformed XML to a file
-    output_filename = os.path.join(output_dir, f"transformed_{filename}")
-    with open(output_filename, 'w', encoding='ISO-8859-1') as f:
-        f.write(dom.toxml())
-    
-    return output_filename
+  
+    with open('storage/output_xml/trans_isybau.xml', 'w') as f:
+        f.write(dom.toxml()) 

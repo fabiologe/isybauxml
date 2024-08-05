@@ -6,6 +6,7 @@ from pyproj import Proj, transform
 import xml.dom.minidom
 import json
 import codecs
+import traceback
 
 app = Flask(__name__)
 UPLOAD_DIRECTORY = "storage/input_xml"
@@ -96,7 +97,9 @@ _________________
 _________________
 ___USECASE FUNC2__
 Transforming the Crs of the input Xml 
-(DOESNT WORK)
+
+curl -F "file=@storage/input_xml/scaling.xml" -F 'given_crs=31466' -F 'trans_crs=25832' -o ~/Downloads/transformed_scaling.xml http://localhost:5000/transform_crs
+
 _________________
 _________________
 
@@ -123,39 +126,49 @@ def transform_crs_route():
         trans_crs = request.form.get('trans_crs')
 
         if not given_crs or not trans_crs:
-            return jsonify({"error": "Both 'given_crs' and 'trans_crs' are required", "crs_mapping": CRS_MAPPING}), 400
+            return jsonify({"error": "Both 'given_crs' and 'trans_crs' are required", "crs_mapping": CRS_mapping}), 400
         
         if given_crs not in CRS_MAPPING or trans_crs not in CRS_MAPPING:
-            return jsonify({"error": "Invalid CRS provided", "crs_mapping": CRS_MAPPING}), 400
-        
-        with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
-            xml_content = file.read()
-        
-        fixed_content = umlaut_mapping(xml_content)
-        fixed_content = bauwerk_fix(fixed_content)
-        fixed_content = DN_bug(fixed_content)
-    
-        if isinstance(fixed_content, bytes):
-            fixed_content = fixed_content.decode('ISO-8859-1')
+            return jsonify({"error": "Invalid CRS provided", "crs_mapping": CRS_mapping}), 400
         
         try:
+            with codecs.open(file_path, 'r', encoding='ISO-8859-1') as file:
+                xml_content = file.read()
+            
+            fixed_content = umlaut_mapping(xml_content)
+            fixed_content = bauwerk_fix(fixed_content)
+            fixed_content = DN_bug(fixed_content)
+        
+            if isinstance(fixed_content, bytes):
+                fixed_content = fixed_content.decode('ISO-8859-1')
+            
             dom = xml.dom.minidom.parseString(fixed_content)
-            print(dom.toprettyxml())
+            replace_umlaut(dom)
+            update_punkthoehe(dom)
+            update_haltunghoehe(dom)
+            delete_incomplete_points(dom)
+            replace_umlaut(dom)
+            print("tringing to get transform")
+            print(given_crs)
+            print(trans_crs)
+            transform_crs(dom, given_crs, trans_crs)
+            
+            output_file_path = os.path.join(OUTPUT_DIRECTORY, filename)
+            transformed_content = dom.toxml(encoding='ISO-8859-1')
+            with open(output_file_path, 'wb') as file:
+                file.write(transformed_content)
+            
+            return send_file(output_file_path, as_attachment=True)
+        
+            
+            return jsonify({"message": "CRS transformation successful", "file_path": file_path}), 200
+        
         except Exception as e:
-            print(f"Error parsing XML: {e}")
-            return jsonify({"error": f"Error parsing XML: {e}"}), 500
-        
-        replace_umlaut(dom)
-        update_punkthoehe(dom)
-        update_haltunghoehe(dom)
-        delete_incomplete_points(dom)
-        replace_umlaut(dom)
-        
-        transformed_file_path = transform_crs(dom, given_crs, trans_crs, OUTPUT_DIRECTORY, filename)
-        
-        return send_file(transformed_file_path, as_attachment=True, attachment_filename=os.path.basename(transformed_file_path))
+            error_message = traceback.format_exc()
+            print(f"Error processing file: {e}\n{error_message}")
+            return jsonify({"error": f"Error processing file: {e}"}), 500
     
-    return jsonify({"error": "No file uploaded", "crs_mapping": CRS_MAPPING}), 400
+    return jsonify({"error": "No file provided"}), 400
 
 
 
