@@ -1,7 +1,8 @@
 from input import Handler
-from vol_2polygon import VolumeCalculator
-from area_polygon import AreaCalculator
+from earth_filling.vol_polygon import VolumeCalculator
+from earth_filling.area_polygon import AreaCalculator
 __all__ = [
     'Handler',
-    'VolumeCalculator'
+    'VolumeCalculator',
+    'AreaCalculator'
 ]

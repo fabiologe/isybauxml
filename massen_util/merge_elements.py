@@ -1,6 +1,8 @@
 from xml_parser import *
 from typing import Union, List
 from collections import defaultdict
+from earth_filling.area_polygon import AreaCalculator
+from earth_filling.vol_polygon import VolumeCalculator
 
 
 def find_status(schacht_list, haltung_list):
@@ -95,7 +97,7 @@ def mass_haltung(schacht_list, bauwerk_list, haltung_list):
                     'Knoten Nr. oben': zulauf_bauwerk.objektbezeichnung,
                     'Knoten Nr. unten': ablauf_bauwerk.objektbezeichnung,
                     'Deckelhoehe oben': float(zulauf_bauwerk.knoten[0].punkte[1].z),
-                    'Deckelhoehe unten': float(ablauf_bauwerk.knoten[0].punkte[1].z)
+                    'Deckelhoehe unten': float(ablauf_bauwerk.knoten[0].punkte[1].z) 
                 }
                 if zulauf_bauwerk.knoten[0].punkte[1].z == 0.0: 
                     current_haltung["Deckelhoehe oben"] =  float(zulauf_bauwerk.knoten[0].punkte[0].z)
@@ -155,3 +157,50 @@ def mass_leitung(leitung_list):
     print(f'End of sum_lengths, massen_leitung: {massen_leitung}')
     return massen_leitung
             
+def mass_bauwerk(bauwerk_list):
+    massen_bauwerk = []
+    print("This is MassBauwerk")
+    for bauwerk in bauwerk_list:
+    
+        Bauwerk= bauwerk.objektbezeichnung 
+       
+        Status = bauwerk.status
+        if Status == None:
+            Status = 0
+        isyCode = bauwerk.bauwerktyp
+        Bauwerkart = bauwerktypENUM(isyCode).name
+        dh = bauwerk.knoten[0].punkte[0].z
+        sh = bauwerk.knoten[0].punkte[1].z
+        Tiefe = sh- dh
+       
+        coords = []
+        for poly in bauwerk.polygon:
+            for point in poly:
+                X=point.x
+                Y=point.y
+                Z=point.z
+            coords.append((X,Y,Z))
+    
+        area = AreaCalculator.shoelace_formula([(x, y) for x, y, z in coords])
+        
+        vol = VolumeCalculator(area, height=Tiefe, slope=1.5)
+        volume_rect = vol.calculate_rect()
+       
+        volume_trap = vol.calculate_trap()
+       
+        current_bauwerk = {
+            "Status": Status,
+            "Bauwerk": Bauwerk,
+            "Bauwerkart": Bauwerkart,
+            "Tiefe": Tiefe,
+            "Breite OK": 0,
+            "Laenge OK": 0,
+            "Flaeche OK":  round(area, 2),
+            "Flaeche UK": 0,
+            "Volumen 1": round(volume_rect, 2),
+            "Volumen 2": round(volume_trap,2)}
+        massen_bauwerk.append(current_bauwerk)
+    print(massen_bauwerk)
+    return massen_bauwerk
+                
+                

@@ -47,7 +47,7 @@ from xml_parser.einzugsgebiete import parse_einzugsgebiete
 from xml_parser.schacht import schacht_list
 from xml_parser.haltung import haltung_list
 from xml_parser.leitung import leitung_list
-from xml_parser.bauwerk import bauwerke_list
+from xml_parser.bauwerk import bauwerk_list
 from xml_parser.flaechen import flaechen_list
 from xml_parser.einzugsgebiete import einzugsgebiete_list
 from xml_parser.anschlusspunkt import anschlusspunkt_list
@@ -91,7 +91,7 @@ __all__ = [
     'schacht_list',
     'haltung_list',
     'leitung_list',
-    'bauwerke_list',
+    'bauwerk_list',
     'anschlusspunkt_list',
     'flaechen_list',
     'einzugsgebiete_list',

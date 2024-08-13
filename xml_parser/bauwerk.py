@@ -1,11 +1,11 @@
 
-from typing import Optional, Union
+from typing import Optional, Union, Iterator
 from dataclasses import dataclass
 from typing  import List
 from enum import Enum
 import string
 import random
-bauwerke_list = []
+bauwerk_list = []
 def generate_unique_id(length=7) -> str:
     characters = string.ascii_letters + string.digits
     unique_id = ''.join(random.choices(characters, k=length))
@@ -36,6 +36,9 @@ class Punkt:
     z: float
     def __str__(self):
         return f"Punkt(x={self.x}, y={self.y}, z={self.z})"
+    def __hash__(self):
+        return hash((self.x, self.y, self.z))
+    
 @dataclass
 class Knoten:
     obj: Optional[str] = 'NA'
@@ -62,14 +65,18 @@ class Start:
 @dataclass
 class Ende:
     punkt: Punkt
-    tag: Optional[str] = 'S'
+    tag: Optional[str] = 'E'
 
 
 @dataclass
 class Kante:
     start: Start
     ende: Ende
-    
+    def __iter__(self) -> Iterator[Knoten]:
+        
+        # Return an iterator that yields the Punkte in start and ende
+        yield self.start.punkt
+        yield self.ende.punkt
 
 @dataclass
 class Bauwerk_dump:
@@ -189,13 +196,12 @@ def parse_bauwerk_dump(root):
                                                 punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                                 knoten.add_punkt(punkt)
                                             bauwerk_dump.add_knoten(knoten)
-                                bauwerke_list.append(bauwerk_dump)
+                                bauwerk_list.append(bauwerk_dump)
                                 print(f"{bauwerk_dump.objektbezeichnung} saved in Bauwerk_dump")
                             else:
-        
                                 print("bauwerkstyp is between 1 and 14")
-                                
-    return bauwerke_list
+                                                          
+    return bauwerk_list
 @dataclass
 class Pumpwerk:   #1
         objektbezeichnung: Optional[str] = None
@@ -243,7 +249,7 @@ def parse_pumpwerk(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
-                            if bauwerkstyp_element == 1:
+                            if bauwerkstyp == 1:
                                 pumpwerk = Pumpwerk()
                                 pumpwerk.bauwerktyp == 1
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -340,9 +346,9 @@ def parse_pumpwerk(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         pumpwerk.add_knoten(knoten)
-                                bauwerke_list.append(pumpwerk)
+                                bauwerk_list.append(pumpwerk)
                                 print(f"Found objects Bauwerktyp 1 (Pumpwerk)")
-    return bauwerke_list                        
+    return bauwerk_list                        
 
 
 @dataclass
@@ -407,7 +413,7 @@ def parse_becken(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)                        
-                            if bauwerkstyp_element == 2:
+                            if bauwerkstyp == 2:
                                 becken = Becken()
                                 becken.bauwerktyp = 2 
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -546,9 +552,9 @@ def parse_becken(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         becken.add_knoten(knoten)
-                                bauwerke_list.append(becken)
+                                bauwerk_list.append(becken)
                                 print(f"Found objects Bauwerktyp 2 (Becken)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Behandlungsanlage:   #3
@@ -601,7 +607,7 @@ def parse_behandlungsanlage(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
-                            if bauwerkstyp_element == 3:
+                            if bauwerkstyp == 3:
                                 behandlungsanlage = Behandlungsanlage()
                                 behandlungsanlage.bauwerktyp = 3
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -707,9 +713,9 @@ def parse_behandlungsanlage(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         behandlungsanlage.add_knoten(knoten)
-                                bauwerke_list.append(behandlungsanlage)
+                                bauwerk_list.append(behandlungsanlage)
                                 print("Found objects Bauwerktyp 3 (Behandlungsanlage)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Klaeranlage:   #4
@@ -755,7 +761,7 @@ def parse_klaeranlage(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
-                            if bauwerkstyp_element == 4:
+                            if bauwerkstyp == 4:
                                 klaeranlage = Klaeranlage()
                                 klaeranlage.bauwerktyp = 4
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -840,9 +846,9 @@ def parse_klaeranlage(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         klaeranlage.add_knoten(knoten)
-                                bauwerke_list.append(klaeranlage)
+                                bauwerk_list.append(klaeranlage)
                                 print("Found objects Bauwerktyp 4 (Klaeranlage)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Auslaufbauwerk:   #5
@@ -896,7 +902,7 @@ def parse_auslaufbauwerk(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
-                            if bauwerkstyp_element == 5:
+                            if bauwerkstyp == 5:
                                 auslaufbauwerk = Auslaufbauwerk()
                                 auslaufbauwerk.bauwerktyp = 5
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -1003,9 +1009,9 @@ def parse_auslaufbauwerk(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         auslaufbauwerk.add_knoten(knoten)
-                                bauwerke_list.append(auslaufbauwerk)
+                                bauwerk_list.append(auslaufbauwerk)
                                 print("Found objects Bauwerktyp 5 (Auslaufbauwerk)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Pumpe:   #6
@@ -1053,7 +1059,7 @@ def parse_pumpe(root):
                         bauwerkstyp_element = abwasser_objekt.getElementsByTagName('Bauwerkstyp')
                         if bauwerkstyp_element:
                             bauwerkstyp = int(bauwerkstyp_element[0].firstChild.nodeValue)
-                            if bauwerkstyp_element == 6:
+                            if bauwerkstyp == 6:
                                 pumpe = Pumpe()
                                 pumpe.bauwerktyp = 6
                                 objektbezeichnung_element = abwasser_objekt.getElementsByTagName('Objektbezeichnung')
@@ -1146,9 +1152,9 @@ def parse_pumpe(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         pumpe.add_knoten(knoten)
-                                bauwerke_list.append(pumpe)
+                                bauwerk_list.append(pumpe)
                                 print("Found objects Bauwerktyp 6 (Pumpwerk)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Wehr:   #7
@@ -1301,9 +1307,9 @@ def parse_wehr(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         wehr.add_knoten(knoten)
-                                bauwerke_list.append(wehr)
+                                bauwerk_list.append(wehr)
                                 print("Found objects Bauwerktyp 7 (Wehr)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Drossel:   #8
@@ -1434,9 +1440,9 @@ def parse_drossel(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         drossel.add_knoten(knoten)
-                                bauwerke_list.append(drossel)
+                                bauwerk_list.append(drossel)
                                 print("Found objects Bauwerktyp 8 (Drossel)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Schieber:   #9
@@ -1582,9 +1588,9 @@ def parse_schieber(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         schieber.add_knoten(knoten)
-                                bauwerke_list.append(schieber)
+                                bauwerk_list.append(schieber)
                                 print("Found objects Bauwerktyp 9 (Schieber)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Rechen:   #10
@@ -1739,9 +1745,9 @@ def parse_rechen(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         rechen.add_knoten(knoten)
-                                bauwerke_list.append(rechen)
+                                bauwerk_list.append(rechen)
                                 print("Found objects Bauwerktyp 10 (Rechen)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Sieb:   #11
@@ -1888,9 +1894,9 @@ def parse_sieb(root):
                                                 punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                                 knoten.add_punkt(punkt)
                                             sieb.add_knoten(knoten)
-                                    bauwerke_list.append(sieb)
+                                    bauwerk_list.append(sieb)
                                     print("Found objects Bauwerktyp 11 (Sieb)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Versickerungsanlage:   #12
@@ -2036,9 +2042,9 @@ def parse_versickerungsanlage(root):
                                                 punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                                 knoten.add_punkt(punkt)
                                             versickerungsanlage.add_knoten(knoten)
-                                    bauwerke_list.append(versickerungsanlage)
+                                    bauwerk_list.append(versickerungsanlage)
                                     print("Found objects Bauwerktyp 12 (Versickerungsanlage)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Regenwassernutzungsanlage:   #13
@@ -2221,9 +2227,9 @@ def parse_regenwassernutzungsanlage(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         regenwassernutzungsanlage.add_knoten(knoten)
-                                bauwerke_list.append(regenwassernutzungsanlage)
+                                bauwerk_list.append(regenwassernutzungsanlage)
                                 print("Found objects Bauwerktyp 13 (Regenwassernutzungsanlage)")
-    return bauwerke_list
+    return bauwerk_list
 
 @dataclass
 class Einlaufbauwerk:   #14
@@ -2353,6 +2359,6 @@ def parse_einlaufbauwerk(root):
                                             punkt.tag_element = punkt_element.getElementsByTagName('PunktattributAbwasser')
                                             knoten.add_punkt(punkt)
                                         einlaufbauwerk.add_knoten(knoten)
-                                bauwerke_list.append(einlaufbauwerk)
+                                bauwerk_list.append(einlaufbauwerk)
                                 print("Found objects Bauwerktyp 14 (Einlaufbauwerk)")
-    return bauwerke_list
+    return bauwerk_list

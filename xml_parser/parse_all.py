@@ -4,7 +4,8 @@ def parse_all(root):
     parse_schacht(root)
     parse_haltung(root)
     parse_leitung(root)
-    parse_bauwerk_dump(root)
+   
+    
     parse_behandlungsanlage(root)
     parse_becken(root)
     parse_auslaufbauwerk(root)
@@ -16,11 +17,12 @@ def parse_all(root):
     parse_versickerungsanlage(root)
     parse_regenwassernutzungsanlage(root)
     parse_einlaufbauwerk(root)
+    #parse_bauwerk_dump(root)
     
     parse_anschlusspunkt(root)
     parse_flaeche(root)
     parse_einzugsgebiete(root)
 
 all_lists = [
-    schacht_list, haltung_list, leitung_list, bauwerke_list, anschlusspunkt_list,  flaechen_list, einzugsgebiete_list
+    schacht_list, haltung_list, leitung_list, bauwerk_list, anschlusspunkt_list,  flaechen_list, einzugsgebiete_list
 ]

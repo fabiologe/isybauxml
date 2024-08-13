@@ -410,11 +410,11 @@ class outfall:  # AUSLASS
     routeto: Optional[str] = None
 
     @classmethod
-    def check_outfall(cls, schacht_list, haltung_list, bauwerke_list) -> List['outfall']:
+    def check_outfall(cls, schacht_list, haltung_list, bauwerk_list) -> List['outfall']:
         outfalls_list = []
         found_auslaufbauwerk = False
         
-        for bauwerk in bauwerke_list:
+        for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Auslaufbauwerk):
                 print("Found Auslaufbauwerk")
                 for knoten in bauwerk.knoten:
@@ -492,9 +492,9 @@ class storage:
     imd : Optional[float] = 0
     def set_area(becken_list: List)-> List['curves']:
         pass
-    def get_becken(self, bauwerke_list) -> List['Becken']:
+    def get_becken(self, bauwerk_list) -> List['Becken']:
         becken_list = []
-        for bauwerk in bauwerke_list:
+        for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Becken):
                 becken_list.append(bauwerk)
         return becken_list
@@ -1564,7 +1564,7 @@ class backdrop:
         return '\n'.join(header + [data])
 
 
-def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerke_list):
+def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerk_list):
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
     x = 6.99641136598768
     y = 49.2853524841828
@@ -1575,12 +1575,12 @@ def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerke_lis
     junction_list = junction.from_schacht(schacht_list)
     conduit_list = conduit.from_haltung(haltung_list)
     xsection_list = xsection.from_haltung(haltung_list)
-    pump_list = pump.get_pump(bauwerke_list)
-    drossel_list = pump.get_drossel(bauwerke_list)
+    pump_list = pump.get_pump(bauwerk_list)
+    drossel_list = pump.get_drossel(bauwerk_list)
     
    
     #orc etc
-    outfall_list = outfall.check_outfall(schacht_list, haltung_list, bauwerke_list)
+    outfall_list = outfall.check_outfall(schacht_list, haltung_list, bauwerk_list)
     coordinate_list = coordinates.from_schacht(schacht_list)
     vertices_list = vertices.from_haltung(haltung_list)
     polygons_list = polygons.from_flaeche(flaechen_list)

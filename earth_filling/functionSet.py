@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from input import Handler
-from vol_2polygon import VolumeCalculator
+from earth_filling.vol_polygon import VolumeCalculator
 from area_polygon import AreaCalculator
 
 

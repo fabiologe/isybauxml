@@ -72,7 +72,7 @@ _________________
 @app.route('/get_mass', methods=['POST'])
 def get_mass_route():
     try:
-        result = process_xml_to_xsls(schacht_list, bauwerke_list, haltung_list)
+        result = process_xml_to_xsls(schacht_list, bauwerk_list, haltung_list)
         
         if result:
             return jsonify({"message": "File processed successfully", "file_path": result})

@@ -1,21 +1,23 @@
 import csv
 from xml_parser import *
 
-def to_csv_bauwerke(bauwerke_list):
-    for bauwerk in bauwerke_list:
-        name = bauwerk.objektbezeichnung
-        dh = bauwerk.knoten[0].punkte[0].z
-        sh = bauwerk.knoten[0].punkte[1].z
-        typ = bauwerk.classname
-        typ_str = bauwerktypENUM(typ)
+def to_csv_bauwerk(mass_bauwerk_res):
+    mass_index_bauwerk = ["Status", "Bauwerk", "Bauwerkart", "Tiefe", "Breite OK", "Laenge OK", "Flaeche OK", "Flaeche UK", "Volumen 1", "Volumen 2"]
+    print("DEBUG:")
+    print(mass_bauwerk_res)
+    with open('storage/output_xlsx_csv/massen_bauwerk.csv', 'w', newline='') as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=mass_index_bauwerk)
+        writer.writeheader()
+        writer.writerows(mass_bauwerk_res )
+    
+    print('CSV for Bauwerk has been saved.')
+        
         
 def to_csv_schacht(mass_schacht):
-    mass_schacht_index = list(mass_schacht[0].keys())
-    additional_columns = [key for key in mass_schacht_index if key.startswith('DN XY')]
+    mass_schacht_index= ["Schacht",	"Tiefe",	"DN Zulauf",	"DN Ablauf"]
 
-    mass_schacht_index.extend(additional_columns)
 
-    with open('output_xlsx_csv/massen_schacht.csv', 'w', newline='', encoding='utf8') as csv_file:
+    with open('storage/output_xlsx_csv/massen_schacht.csv', 'w', newline='', encoding='utf8') as csv_file:
         writer = csv.writer(csv_file)
         
         # Write the header row
@@ -29,7 +31,7 @@ def to_csv_schacht(mass_schacht):
 def to_csv_haltung(massen_haltung_unique):
     massen_index_haltung = ['Status','Knoten Nr. oben', 'Knoten Nr. unten', 'Deckelhoehe oben', 'Deckelhoehe unten','Sohlhoehe oben', 'Sohlhoehe unten', 'Laenge', 'DN']
 
-    with open('output_xlsx_csv/massen_haltungen.csv', 'w', newline='') as csv_file:
+    with open('storage/output_xlsx_csv/massen_haltungen.csv', 'w', newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=massen_index_haltung)
         writer.writeheader()
         writer.writerows(massen_haltung_unique) 
@@ -38,7 +40,7 @@ def to_csv_haltung(massen_haltung_unique):
 
 def to_csv_leitung(massen_leitung):
     massen_index_leitung = ['Status','DN','Rohrlaenge']
-    with open('output_xlsx_csv/massen_leitung.csv', mode='w', newline='', encoding='utf8') as file:
+    with open('storage/output_xlsx_csv/massen_leitung.csv', mode='w', newline='', encoding='utf8') as file:
         writer = csv.DictWriter(file, fieldnames=massen_index_leitung)
         writer.writeheader()
         writer.writerows(massen_leitung)  
