@@ -9,12 +9,13 @@ def build_graph(haltung_list: List) -> Dict[str, List[str]]:
             graph[haltung.ablauf] = []
         if haltung.zulauf not in graph:
             graph[haltung.zulauf] = []
-        graph[haltung.zulauf].append(haltung.ablauf)
+        # Use a set to prevent duplicate connections
+        if haltung.ablauf not in graph[haltung.zulauf]:
+            graph[haltung.zulauf].append(haltung.ablauf)
     return graph
 
 def dfs(graph: Dict[str, List[str]], node: str, visited: Set[str], path: List[str], routes: List[List[str]]):
     if node in visited:
-        
         print(f"Cycle detected at node {node}. Path: {' -> '.join(path)}")
         return
     
@@ -39,9 +40,11 @@ def find_routes(outfalls: List, graph: Dict[str, List[str]]) -> Dict[str, List[L
         dfs(graph, outfall_name, set(), [], routes[outfall_name])
     return routes
 
-def find_sewer_routes(schacht_list: List, haltung_list: List):
-    outfalls = num_potential_out(schacht_list, haltung_list)
+def find_sewer_routes(schacht_list: List, haltung_list: List, bauwerk_list: List):
+    # Include bauwerk_list in the outfall detection process
+    outfalls = num_potential_out(schacht_list + bauwerk_list, haltung_list)
     
+    # Build the graph including both haltung_list and bauwerk_list
     graph = build_graph(haltung_list)
    
     print("Graph Representation (zulauf -> ablauf):")
@@ -54,4 +57,3 @@ def find_sewer_routes(schacht_list: List, haltung_list: List):
         print(f"Routes from outfall {outfall}:")
         for path in paths:
             print(" -> ".join(path))
-    

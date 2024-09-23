@@ -13,6 +13,7 @@ from xml_parser.bauwerk import bauwerktypENUM
 from xml_parser.bauwerk import Bauwerk_dump
 from xml_parser.bauwerk import Auslaufbauwerk
 from xml_parser.bauwerk import Pumpe
+from xml_parser.bauwerk import Pumpwerk
 from xml_parser.bauwerk import Wehr
 from xml_parser.bauwerk import Drossel
 from xml_parser.bauwerk import Schieber
@@ -99,6 +100,7 @@ __all__ = [
     'all_lists',
     "Auslaufbauwerk",
     "Pumpe",
+    "Pumpwerk",
     "Wehr",
     "Drossel",
     "Schieber",

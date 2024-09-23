@@ -5,9 +5,10 @@ from hydraulik.utils import search_potential_out, num_potential_out
 from hydraulik.dfs_routes import find_sewer_routes
 from datetime import datetime
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Set
 import random
 import string
+import math
 
 
 def generate_unique_id(length=7):
@@ -283,7 +284,7 @@ class lid_usage:
 
 '''MISSING CLASSES: AQUIFIER , GROUNDWATER , GWF , SNOWPACK ---> maybe when there is an project I gonna add them '''
 
-@dataclass
+@dataclass #= an node element like Schacht or Bauwerk
 class junction:
     name: str
     elev: float  #SH
@@ -293,7 +294,7 @@ class junction:
     apond: Optional[float] = 0  #ueberflutungsflaeche
 
     '''SOMETHING NOT RIGTH--------------------------------------------------'''
-    ''' def fict_junc(element_list: List, element) -> List['junction']:
+    def fict_junc(element_list: List, element, junction_list) -> List['junction']:
             elev = None
             y0 = None
             if element.knoten:
@@ -330,17 +331,19 @@ class junction:
                                 )
                 junction_list.append(junction_a)
                 junction_list.append(junction_b)
-            return junction'''
-    def from_schacht(schacht_list: List) -> List['junction']:
+            return junction
+    
+
+    def from_node_elem(schacht_list: List, bauwerk_list:List) -> List['junction']:
         junctions_list = []
         for schacht in schacht_list:
-            elev = None
-            ymax = None
-            y0 = None
+            elev = 0
+            ymax = 0
+            y0 = 0
             if schacht.knoten:
                 knoten = schacht.knoten[0]
-                #print(f"Schacht: {schacht.objektbezeichnung}")
-                #print(f"Number of Knoten: {len(schacht.knoten)}")
+                print(f"Schacht: {schacht.objektbezeichnung}")
+                print(f"Number of Knoten: {len(schacht.knoten)}")
                 for i, knoten in enumerate(schacht.knoten):
                     #print(f"  Knoten {i + 1}:")
                     if knoten.punkte:
@@ -368,6 +371,46 @@ class junction:
                 apond=0
             )
             junctions_list.append(junction_sgl)
+        #print(junctions_list)
+        #print("Iter Bauwerke")
+        for bauwerk in bauwerk_list:
+            if bauwerk.bauwerktyp == 1:
+                continue
+            elev = 0
+            ymax = 0
+            y0 = 0
+            if bauwerk.knoten:
+                knoten = bauwerk.knoten[0]
+                #print(f"bauwerk: {bauwerk.objektbezeichnung}")
+                #print(f"Number of Knoten: {len(bauwerk.knoten)}")
+                for i, knoten in enumerate(bauwerk.knoten):
+                    #print(f"  Knoten {i + 1}:")
+                    if knoten.punkte:
+                        punkt = knoten.punkte[0]
+                        elev = float(punkt.z)
+                        #print(f"    Elevation (elev): {elev}")
+                        if len(knoten.punkte) > 1:
+                            ymax = float(knoten.punkte[1].z)
+                            #print(f"    Y0 (second Punkt): {ymax}")
+                        else:
+                            ymax = 1000
+                            print("    Y0 (second Punkt): Not available, using default (0)")
+                        y0 = abs(ymax- elev)
+                        y0 = round(y0, 2)
+
+                    else:
+                        print("    No Punkte in this Knoten")
+
+            junction_sgl = junction(
+                name=str(bauwerk.objektbezeichnung),
+                elev=elev,
+                ymax = 0,
+                y0=0,
+                ysur=0,
+                apond=0
+            )
+            junctions_list.append(junction_sgl)
+        #print(Junction_list)
         return junctions_list
 
     def to_junction_string(junctions_list: List) -> str:
@@ -377,11 +420,13 @@ class junction:
             ";;Name           Elev.      Depth      Depth      Depth      Area ",
             ";;-------------- ---------- ---------- ---------- ---------- ----------"
         ]
+        
         junction_strings = []
-        for junction in junctions_list:
-            data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
-            junction_strings.append(data)
-        return '\n'.join(header + junction_strings)
+        for junction in junctions_list :
+            if junction is not None:
+                data = f"{junction.name:<16} {junction.elev:<10} {junction.ymax:<10} {junction.y0:<10} {junction.ysur:<10} {junction.apond:<10}"
+                junction_strings.append(data)
+        return '\n'.join(header + junction_strings) 
     
 @dataclass
 class divider: #gets skipped not cant find it inside ISYBAUXML
@@ -429,7 +474,7 @@ class outfall:  # AUSLASS
 
         if not found_auslaufbauwerk:
             print("No given Auslaufbauwerk")
-            find_sewer_routes(schacht_list, haltung_list)
+            find_sewer_routes(schacht_list, haltung_list,bauwerk_list)
             num_outfall = int(input("How many outfalls are needed:"))
             for i in range(num_outfall):
                 outfall_sgl = cls.search_set(schacht_list)
@@ -530,74 +575,89 @@ class storage:
     
     
 @dataclass
-class conduit: #abflusswirksame Verbindungen
+class conduit:  # abflusswirksame Verbindungen
     name: str
     node1: str
     node2: str
     length: float
-    n: Optional[float] = 0 #roughness paramater
+    n: Optional[float] = 0  # roughness parameter
     z1: Optional[float] = 0
     z2: Optional[float] = 0
     Q0: Optional[float] = 0
-    Qmax: Optional[float] = 0 
-    '''SOMETHING NOT RIGHT ------------------------------------------------------------------------------------'''
+    Qmax: Optional[float] = 0
+
+    @staticmethod
     def fict_cond(fict_conds: List) -> List['conduit']:
+        conduits_list = []
+        names_set: Set[str] = set()
+
         for element in fict_conds:
             zn = None
             if element.knoten:
                 knoten = element.knoten[0]
-                #print(f"Fict haltung: {element.objektbezeichnung}")
-                #print(f"Number of Knoten: {len(element.knoten)}")
                 for i, knoten in enumerate(element.knoten):
-                    #print(f"  Knoten {i + 1}:")
                     if knoten.punkte:
                         punkt = knoten.punkte[0]
                         zn = float(punkt.z)
-                        #print(f"    Elevation (elev): {zn}")
-                    else:
-                        print("    No Punkte in this Knoten")
+
             conduit_sgl = conduit(
-                name = element.objektbezeichnung,
-                node1 = element.objektbezeichnung + '_B',
-                node2 = element.objektbezeichnung + '_A',
-                length = 0.1,
-                n = 0.01,
-                z1 = zn + 0.1 ,
-                z2 = zn, 
-                Q0 = 0,
-                Qmax = 0   
+                name=element.objektbezeichnung,
+                node1=element.objektbezeichnung + '_B',
+                node2=element.objektbezeichnung + '_A',
+                length=0.1,
+                n=0.01,
+                z1=zn + 0.1 if zn is not None else 0,
+                z2=zn if zn is not None else 0,
+                Q0=0,
+                Qmax=0
             )
-            fict_conds.append(conduit_sgl)
-        return fict_conds
-    def from_haltung(haltung_list : List) -> List['conduit']:
-        conduits_list = []
-        for haltung in haltung_list:
-            conduits_sgl = conduit(
-                name = haltung.objektbezeichnung,
-                node1= haltung.zulauf,
-                node2= haltung.ablauf, 
-                length= haltung.laenge,
-                n= 0.01, # concrete 
-                z1 = haltung.zulauf_sh,
-                z2 = haltung.ablauf_sh,
-                Q0 = 0,
-                Qmax = 0            
-            )
-            conduits_list.append(conduits_sgl)
+            if conduit_sgl.name not in names_set:
+                names_set.add(conduit_sgl.name)
+                conduits_list.append(conduit_sgl)
+
         return conduits_list
-    def to_conduits_str(conduits_list  : List) -> str:
+
+    @staticmethod
+    def from_haltung(haltung_list: List) -> List['conduit']:
+        conduits_list = []
+        names_set: Set[str] = set()
+
+        for haltung in haltung_list:
+            conduit_sgl = conduit(
+                name=haltung.objektbezeichnung,
+                node1=haltung.zulauf or 'NONE FOUND',
+                node2=haltung.ablauf or 'NONE FOUND',
+                length=haltung.laenge,
+                n=0.01,  # concrete
+                z1=haltung.zulauf_sh if haltung.zulauf_sh is not None else 0,
+                z2=haltung.ablauf_sh if haltung.ablauf_sh is not None else 0,
+                Q0=0,
+                Qmax=0
+            )
+            if conduit_sgl.name not in names_set:
+                names_set.add(conduit_sgl.name)
+                conduits_list.append(conduit_sgl)
+
+        return conduits_list
+
+    @staticmethod
+    def to_conduits_str(conduits_list: List) -> str:
         header = [
-        "[CONDUITS]",
-        ";;                          Inlet                     Outlet                               Manning    Inlet      Outlet     Init.      Max.",      
-        ";;Name                      Node                      Node                      Length     N          Offset     Offset     Flow       Flow",
-        ";;------------------------- ------------------------- ------------------------- ---------- ---------- ---------- ---------- ---------- ----------"
+            "[CONDUITS]",
+            ";;                          Inlet                     Outlet                               Manning    Inlet      Outlet     Init.      Max.",
+            ";;Name                      Node                      Node                      Length     N          Offset     Offset     Flow       Flow",
+            ";;------------------------- ------------------------- ------------------------- ---------- ---------- ---------- ---------- ---------- ----------"
         ]
         conduits_strings = []
+        names_set: Set[str] = set()
+
         for conduit in conduits_list:
-            data = f"{conduit.name:<28}{conduit.node1:<28}{conduit.node2:<28}{conduit.length:<10}{conduit.n:<8}"\
-                   f"{conduit.z1:<12}{conduit.z2:<12}{conduit.Q0:<12}{conduit.Qmax:<12}"
-            conduits_strings.append(data)
-        return  "\n".join(header + conduits_strings)
+            if conduit.name not in names_set:
+                data = f"{conduit.name:<28}{conduit.node1:<28}{conduit.node2:<28}{conduit.length:<10}{conduit.n:<8}{conduit.z1:<12}{conduit.z2:<12}{conduit.Q0:<12}{conduit.Qmax:<12}"
+                conduits_strings.append(data)
+                names_set.add(conduit.name)
+
+        return "\n".join(header + conduits_strings)
 
 
 
@@ -610,6 +670,15 @@ class pump:
     status: str
     startup: Optional[float] = 0
     shutoff: Optional[float] = 0
+    Xcoord: Optional[float] = 0
+    Ycoord: Optional[float] = 0
+    Zcoord: Optional[float] = 0
+    Xcoord1: Optional[float] = 0
+    Ycoord1: Optional[float] = 0
+    Zcoord1: Optional[float] = 0
+    Xcoord2: Optional[float] = 0
+    Ycoord2: Optional[float] = 0
+    Zcoord2: Optional[float] = 0
     '''
      Drossel and Pumpe getting put together and stored as pump
      ----because most of Drossel getting as input an continuous laminar flow-----
@@ -619,36 +688,37 @@ class pump:
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Drossel):
                 drossel_list.append(bauwerk)
+                print(f"Found Drossel...",{bauwerk})
         return drossel_list
     def get_pump(bauwerk_list : List)-> List['Pumpe']:
         '''returns isybau pumpen from bauwerke '''
-        pumps_list = []
+        pumpe_list = []
         for bauwerk in bauwerk_list:
             if isinstance(bauwerk, Pumpe):
-                pumps_list.append(bauwerk)
-        return pumps_list
-    '''NOT CLEAR WHAT NEEDS TO BE DONE HERE : ''' 
-    
-    
-    '''def to_junctions(pumps_list :List,drossel_list: List, junctions_list: List):
-        for pump in pumps_list:
-            p_fict_junc = junction.fict_junc(pump)
-            junctions_list.append(p_fict_junc)
+                pumpe_list.append(bauwerk)
+                print(f"Found Pumpe...",{bauwerk})
+        return pumpe_list
+    def get_pumpwerk(bauwerk_list: List)-> List['Pumpwerk']:
+        pumpwerk_list = []
+        for bauwerk in bauwerk_list:
+            if isinstance(bauwerk, Pumpwerk):
+                pumpwerk_list.append(bauwerk)
+                print(f"Found Pumpwerk...",{bauwerk.objektbezeichnung})
+        return pumpwerk_list
+    def from_drossel(drossel_list: List, pumps_list)-> List['pump']:
         for drossel in drossel_list:
-            d_fict_junc = junction.fict_junc(drossel)
-            junctions_list.append(d_fict_junc)
-        return junctions_list
-    def to_conduit(pumps_list: List,drossel_list: List, conduits_list: List):
-        for pump in pumps_list:
-            fict_contP = conduit.fict_cond(pump)
-            conduits_list.append(fict_contP)
-        for drossel in drossel_list:
-            fict_contD = conduit.fict_cond(drossel)
-            conduits_list.append(fict_contD)
-        return conduits_list'''
-    def from_drossel(drossel_list: List)-> List['pump']:
-        pumps_list_d = []
-        for drossel in drossel_list:
+            if drossel.knoten:
+                knoten = drossel.knoten[0]
+                
+                for i, knoten in enumerate(drossel.knoten):
+                    if knoten.punkte:
+                        punkt= knoten.punkte[0]
+                        Xcoord = float(punkt.x)
+                        Ycoord = float(punkt.y)
+                        Zcoord = float(punkt.z)
+                    else: 
+                        print("No PUNKTE in this KNOTEN")
+                
             drossel_sgl = pump(
                 name= drossel.objektbezeichnung,
                 node1 = drossel.objektbezeichnung + '_B',
@@ -656,14 +726,28 @@ class pump:
                 pcurve= 'coming',  #-------------------------------------------->
                 status = 'ON',
                 startup = 0,
-                shutoff = 0
+                shutoff = 0,
+                Xcoord= Xcoord,
+                Ycoord= Ycoord,
+                Zcoord= Zcoord
+
             )
-            pumps_list_d.append(drossel_sgl)
-        return pumps_list_d
-    def from_pumpe(pumpe_list: List)-> List['pump']:
-        pumps_list = []
+            pumps_list.append(drossel_sgl)
+        return pumps_list
+   
+    def from_pumpe(pumpe_list: List, pumps_list)-> List['pump']:   
         for pumpe in pumpe_list:
-            
+            if pumpe.knoten:
+                knoten = pumpe.knoten[0]
+                
+                for i, knoten in enumerate(pumpe.knoten):
+                    if knoten.punkte:
+                        punkt= knoten.punkte[0]
+                        Xcoord = float(punkt.x)
+                        Ycoord = float(punkt.y)
+                        Zcoord = float(punkt.z)
+                    else: 
+                        print("No PUNKTE in this KNOTEN")
             pump_sgl = pump(
                 name = pumpe.objektbezeichnung,
                 node1 = pumpe.objektbezeichnung + '_B',
@@ -671,11 +755,139 @@ class pump:
                 pcurve= 'coming',  #-------------------------------------------->
                 status = 'ON',
                 startup = 0,
-                shutoff = 0
+                shutoff = 0,
+                Xcoord= Xcoord,
+                Ycoord= Ycoord,
+                Zcoord = Zcoord
             )
             pumps_list.append(pump_sgl)
+            
         return pumps_list
-    def to_pumps_string(pumps_list: List, pumps_list_d) -> str:
+    
+    def from_pumpwerk(pumpwerk_list: List, pumps_list)-> List['pump']:
+        
+        for pumpwerk in pumpwerk_list:
+            if pumpwerk.knoten:
+                knoten = pumpwerk.knoten[0]
+                
+                for i, knoten in enumerate(pumpwerk.knoten):
+                    if knoten.punkte:
+                        punkt= knoten.punkte[0]
+                        Xcoord = float(punkt.x)
+                        Ycoord = float(punkt.y)
+                        Zcoord = float(punkt.z)
+                    else: 
+                        print("No PUNKTE in this KNOTEN")
+            pumpwerk_sgl = pump(
+                name = pumpwerk.objektbezeichnung,
+                node1 = pumpwerk.objektbezeichnung + '_B',
+                node2 = pumpwerk.objektbezeichnung + '_A',
+                pcurve= 'coming',  #-------------------------------------------->
+                status = 'ON',
+                startup = 0,
+                shutoff = 0,
+                Xcoord= Xcoord,
+                Ycoord= Ycoord,
+                Zcoord= Zcoord
+            )
+            pumps_list.append(pumpwerk_sgl)
+        return pumps_list
+    
+    def write_fict_junctions(pumps_list: List, junction_list: List)-> List['junction']:
+        elev = 0
+        y0 = 0
+        for pumps in pumps_list:
+            if pumps.Zcoord is not None:
+                elev = pumps.Zcoord
+            ymax = 0
+            y0 = 0
+            junction_a = junction(
+                        name = pumps.name + '_A' if pumps.name is not None else '',
+                        elev = elev ,
+                        y0 = y0 ,
+                        ysur=0,
+                        apond=0
+                            )
+            junction_b = junction(
+                        name = pumps.name + '_B' if pumps.name is not None else '',
+                        elev = round(elev + 0.1, 2) ,
+                        y0 = round(y0 + 0.1, 2) ,
+                        ysur=0,
+                        apond=0
+                            )
+            junction_list.append(junction_a)
+            print(junction_a)
+            junction_list.append(junction_b)
+            print(junction_b)
+        return junction_list
+    
+    def write_fict_conduits(pumps_list: List, conduits_list: List)-> List['conduit']:
+        names_set: Set[str] = set()
+
+        for pumps in pumps_list:
+            if pumps.Zcoord is not None:
+                zn = pumps.Zcoord
+            ymax = 0
+            y0 = 0
+
+            conduit_sgl = conduit(
+                name=pumps.name,
+                node1=pumps.name + '_B',
+                node2=pumps.name + '_A',
+                length=1.0,
+                n=0.01,
+                z1=round(zn + 0.1, 2) if zn is not None else 0.00,  
+                z2=round(zn, 2) if zn is not None else 0.00,
+                Q0=0,
+                Qmax=0
+            )
+            if conduit_sgl.name not in names_set:
+                names_set.add(conduit_sgl.name)
+                conduits_list.append(conduit_sgl)
+
+        return conduits_list
+    
+    def write_fict_coords(pumps_list: List[Pumpe], coordinates_list: List['coordinates']) -> List['coordinates']:
+        for pump in pumps_list:
+            x0, y0 = pump.Xcoord, pump.Ycoord
+            node1 = pump.node1
+            node2 = pump.node2
+
+            # Calculate the two points that are 0.5 units away from the original point in opposite directions
+            # Let's assume the angle is 0 degrees (horizontal line)
+            angle = 0  # Angle in degrees; can be adjusted as needed
+            angle_rad = math.radians(angle)  # Convert to radians
+
+            # Calculate the first point
+            x1 = x0 - math.cos(angle_rad) * 0.5
+            y1 = y0 - math.sin(angle_rad) * 0.5
+
+            # Calculate the second point
+            x2 = x0 + math.cos(angle_rad) * 0.5
+            y2 = y0 + math.sin(angle_rad) * 0.5
+            pump.Xcoord1 = x1
+            pump.Ycoord1 = y1
+            pump.Xcoord2 = x2
+            pump.Ycoord2 = y2
+            # Create the coordinates objects
+            coord1 = coordinates(
+                node=node1,
+                Xcoord=x1,
+                Ycoord=y1
+            )
+            coord2 = coordinates(
+                node=node2,
+                Xcoord=x2,
+                Ycoord=y2
+            )
+
+           
+            coordinates_list.append(coord1)
+            coordinates_list.append(coord2)
+
+        return coordinates_list
+
+    def to_pumps_string(pumps_list: List) -> str:
         header = [
             "[PUMPS]",
             ";;               Inlet            Outlet                                 Start      Shut",
@@ -687,9 +899,7 @@ class pump:
             # Adjusting field lengths for better alignment
             data = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
             pumps_string.append(data)
-        for throtle in pumps_list_d:
-            data_d = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
-            pumps_string.append(data_d)
+    
         return '\n'.join(header + pumps_string)
 
 
@@ -1354,9 +1564,8 @@ class coordinates:
     node: str
     Xcoord: float
     Ycoord: float
-    
-    @classmethod
-    def from_schacht(cls, schacht_list: List) -> List['coordinates']:
+
+    def from_schacht(schacht_list: List) -> List['coordinates']:
         coordinates_list = []
         for schacht in schacht_list:
             if schacht.knoten:
@@ -1369,7 +1578,7 @@ class coordinates:
                         Ycoord = float(punkt.y)
                     else: 
                         print("No PUNKTE in this KNOTEN")
-                node_sgl = cls(
+                node_sgl = coordinates(
                     node=node,
                     Xcoord=Xcoord,
                     Ycoord=Ycoord
@@ -1377,6 +1586,7 @@ class coordinates:
                 coordinates_list.append(node_sgl)
         return coordinates_list
     
+            
     @staticmethod
     def to_coordinates_string(coordinates_list: List['coordinates']) -> str: 
         header = [
@@ -1568,15 +1778,38 @@ def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerk_list
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
     x = 6.99641136598768
     y = 49.2853524841828
+    pumps_list = []
+    
+    coordinate_list = []
     report_1 =report(input='NO', continuity='NO', flowstats='NO', controls='NO', subcatchments='ALL', nodes='ALL', links='ALL')
     subcatchment_list = subcatchments.from_flache(flaechen_list)
     subarea_list = subareas.from_subcatchment(subcatchment_list)
     infiltration_list = infiltration_H.from_subcatchment(subcatchment_list)
-    junction_list = junction.from_schacht(schacht_list)
+    junction_list = junction.from_node_elem(schacht_list, bauwerk_list)
+    #------------working
     conduit_list = conduit.from_haltung(haltung_list)
     xsection_list = xsection.from_haltung(haltung_list)
-    pump_list = pump.get_pump(bauwerk_list)
+    pumpe_list = pump.get_pump(bauwerk_list)
+   
     drossel_list = pump.get_drossel(bauwerk_list)
+  
+    pumpwerk_list = pump.get_pumpwerk(bauwerk_list)
+
+    pumps_list = pump.from_drossel(drossel_list, pumps_list)
+
+    pumps_list = pump.from_pumpe(pumpe_list, pumps_list)
+
+    pumps_list = pump.from_pumpwerk(pumpwerk_list, pumps_list)
+    print(f"Pumps_list:{pumps_list}")
+    if pumps_list:
+        junction_list =pump.write_fict_junctions(pumps_list, junction_list)
+    else:
+        print("No pumps in pumps_list. Skipping write_fict_junctions.")
+    print(junction_list)
+    #conduit_list =pump.write_fict_conduits(pumps_list, conduit_list)
+
+    coordinate_list= pump.write_fict_coords(pumps_list, coordinate_list)
+
     
    
     #orc etc
@@ -1619,6 +1852,9 @@ def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerk_list
         f.write("\n")
         f.write("\n")
         f.write(xsection.to_xsection_string(xsection_list))
+        f.write("\n")
+        f.write("\n")
+        f.write(pump.to_pumps_string(pumps_list))
         f.write("\n")
         f.write("\n")
         f.write(outfall.to_outfall_string(outfall_list))

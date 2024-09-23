@@ -1,116 +1,122 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.integrate import quad
+import pandas as pd
 
-class Discharge:
-    def __init__(self, volume=None, time=None, initial_flow_rate=200, decay_constant=0.1, time_params=(0.1, 120, 100)):
-        if volume is None and time is None:
-            raise ValueError("Either volume or time must be provided")
-        self.volume = volume
-        self.time = time
-        self.initial_flow_rate = initial_flow_rate
-        self.decay_constant = decay_constant
-        self.time_start, self.time_end, self.num_points = time_params
-        self.times = np.linspace(self.time_start, self.time_end, self.num_points)
-        self.flow_rates = None
+# Function to calculate the draining times and flow rates
+def torricelli_flow(V0, H, d, C_d=0.582):
+    # Konstanten
+    g = 9.81  # Erdbeschleunigung in m/s^2
 
-    def sudden(self):
-        def discharge_function(time):
-            if time < 1:
-                return self.initial_flow_rate
-            else:
-                return self.initial_flow_rate * np.exp(-self.decay_constant * (time - 1))
+    # Querschnittsfläche der Öffnung
+    A = np.pi * (d / 2)**2
 
-        self.flow_rates = np.array([discharge_function(t) for t in self.times])
-        self._adjust_flow_rates()
+    # Querschnittsfläche des Zylinders
+    A_zyl = V0 / H
 
-    def euler(self):
-        def discharge_function(time):
-            if time < 5:
-                return self.initial_flow_rate * (time / 5)
-            else:
-                return self.initial_flow_rate * np.exp(-self.decay_constant * (time - 5))
+    # Funktion zur Berechnung der Durchflussgeschwindigkeit und Zeit
+    def integrand(h):
+        # Torricelli mit Berücksichtigung von C_d
+        return (A_zyl / (C_d * A * np.sqrt(2 * g * h)))
 
-        self.flow_rates = np.array([discharge_function(t) for t in self.times])
-        self._adjust_flow_rates()
+    # Berechnung der Zeit für spezifische Entleerungsgrade (30%, 50%, 98%)
+    def time_for_volume_fraction(fraction):
+        target_height = H * (1 - fraction)
+        time_partial, _ = quad(integrand, target_height, H)
+        return time_partial
 
-    def laminar(self):
-        if self.volume is None or self.time is None:
-            raise ValueError("Volume and time must be provided for laminar flow")
+    # Berechnung der Entleerungszeiten
+    time_full, _ = quad(integrand, 0, H)
+    time_30_percent = time_for_volume_fraction(0.30)
+    time_50_percent = time_for_volume_fraction(0.50)
+    time_98_percent = time_for_volume_fraction(0.98)
+
+    # Berechnung von Durchfluss, Volumen und Zeit abhängige Höhe
+    heights = np.linspace(0, H, 100)
+    times = []
+    volumes = []
+    flow_rates = []
+
+    for h in heights:
+        # Zeitberechnung
+        time, _ = quad(integrand, h, H)
+        times.append(time)
         
-        fixed_flow_rate = self.volume / self.time
-        self.flow_rates = np.full_like(self.times, fixed_flow_rate)
-        self.times = np.linspace(0, self.time, self.num_points)
-
-    def _adjust_flow_rates(self):
-        if self.volume is not None:
-            total_volume = np.trapz(self.flow_rates, self.times)
-            adjustment_factor = self.volume / total_volume
-            self.flow_rates *= adjustment_factor
-        elif self.time is not None:
-            self.times = np.linspace(self.time_start, self.time, self.num_points)
-            total_volume = np.trapz(self.flow_rates, self.times)
-            if self.volume is not None:
-                adjustment_factor = self.volume / total_volume
-                self.flow_rates *= adjustment_factor
-
-    def plot_diagram(self, title='Flow Rate vs Time', color='red'):
-        if self.flow_rates is None:
-            raise ValueError("Flow rates are not calculated. Call a discharge method first.")
+        # Volumenberechnung
+        volume = A_zyl * h
+        volumes.append(volume)
         
-        plt.figure(figsize=(12, 6))
-        plt.plot(self.times, self.flow_rates, label=title, color=color)
-        plt.xlabel('Time (s)')
-        plt.ylabel('Flow Rate (m³/s)')
-        plt.title(title)
-        plt.legend()
-        plt.grid(True)
-        plt.show()
+        # Durchflussrate (mit Scharfkantigkeit)
+        flow_rate = C_d * A * np.sqrt(2 * g * h)
+        flow_rates.append(flow_rate)
 
-    def to_csv(self, filename):
-        if self.flow_rates is None:
-            raise ValueError("Flow rates are not calculated. Call a discharge method first.")
-        
-        data = {
-            'Time (s)': self.times,
-            'Flow Rate (m³/s)': self.flow_rates
-        }
-        df = pd.DataFrame(data)
-        df.to_csv(filename, index=False)
-        print(f"Data saved to {filename}")
+    # Zeiten invertieren, damit sie bei 0 starten
+    times_inverted = [t - times[-1] for t in times]
 
-    def check_volume_from_csv(self, filename, expected_volume):
-        df = pd.read_csv(filename)
-        total_volume = np.trapz(df.iloc[:, 1], df.iloc[:, 0])
-        print(f"Total volume of water: {total_volume:.2f} m³")
+    # Return calculated values
+    return times_inverted, flow_rates, volumes, heights
 
-        if np.isclose(total_volume, expected_volume, atol=1e-2):
-            print(f"The total volume of water is approximately {expected_volume} m³.")
-        else:
-            print(f"The total volume of water is not {expected_volume} m³.")
-            print(f"Difference: {total_volume - expected_volume:.2f} m³")
+# Function to save the CSV data
+def save_to_csv(times, flow_rates, volumes, heights, csv_filename="entleerungsdaten.csv"):
+    data = {
+        "Entleerungszeit (Sek)": times,
+        "Durchflussrate (m³/s)": flow_rates,
+        "Volumen (m³)": volumes,
+        "Höhe (m)": heights
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(csv_filename, index=False)
+    print(f"CSV-Datei '{csv_filename}' wurde erfolgreich erstellt.")
+
+# Separate plotting function with red markers and text for Q and t
+def plot_with_red_markers_and_text(times, heights, flow_rates):
+    # Plot the draining curve
+    plt.figure(figsize=(10, 6))
+    plt.plot(times, heights, label="Entleerungskurve", color="blue")
+
+    # Define the heights at which we want to mark and annotate (every 0.5m)
+    annotation_heights = np.arange(0.5, max(heights), 0.5)
+
+    # Loop over the annotation heights and mark only one value for each
+    for h_annot in annotation_heights:
+        # Find the index of the point closest to the desired annotation height
+        idx = np.abs(heights - h_annot).argmin()
+
+        # Get the corresponding time (in hours) and flow rate (rounded to 3 decimal places)
+        time_in_hours = round(times[idx] / 3600, 3)
+        flow_rate = round(flow_rates[idx], 3)
+
+        # Plot a red dot at the closest point
+        plt.plot(times[idx], heights[idx], 'ro')  # Red circle marker
+
+        # Annotate the graph with time and flow rate at each 0.5m interval
+        plt.annotate(f"t={time_in_hours:.3f} h\nQ={flow_rate:.3f} m³/s", 
+                     (times[idx], heights[idx]), 
+                     textcoords="offset points", 
+                     xytext=(-30,5), ha='center', fontsize=8)
+
+    # Adjust graph aesthetics
+    plt.gca().invert_yaxis()  # Invert y-axis to match height drop
+    plt.title("Entleerungskurve des zylinderförmigen Behälters")
+    plt.xlabel("Zeit (Sekunden)")
+    plt.ylabel("Flüssigkeitshöhe (m)")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
 # Example usage
-discharge = Discharge(volume=3825, time=60, initial_flow_rate=200, decay_constant=0.1, time_params=(0.2, 60, 200))
+# Set volume, height, and opening diameter
+V0 = 750  # Volume of the tank
+H = 4.5    # Height of the tank
+d = 0.1   # Diameter of the opening
+C_d = 0.582  # Discharge coefficient for sharp-edged openings
 
-# Sudden discharge
-discharge.sudden()
-discharge.plot_diagram(title='Flow Rate vs Time (Sudden Discharge)')
-discharge.to_csv('sudden_discharge.csv')
+# Run the flow calculations
+times, flow_rates, volumes, heights = torricelli_flow(V0, H, d, C_d=C_d)
 
-# Euler discharge
-discharge.euler()
-discharge.plot_diagram(title='Flow Rate vs Time (Euler Discharge)', color='blue')
-discharge.to_csv('euler_discharge.csv')
+# Optionally save results to CSV
+csv_filename = "entleerungsdaten_1000m3_scharfkantig_582.csv"
+save_to_csv(times, flow_rates, volumes, heights, csv_filename=csv_filename)
 
-# Laminar flow
-''''
-discharge.laminar()
-discharge.plot_diagram(title='Laminar Flow with Fixed Flow Rate', color='green')
-discharge.to_csv('laminar_flow_profile.csv')
-'''
-# Check volume from CSV
-discharge.check_volume_from_csv('sudden_discharge.csv', 3825)
-discharge.check_volume_from_csv('euler_discharge.csv', 3825)
-
-#discharge.check_volume_from_csv('laminar_flow_profile.csv', 1000)
+# Plot with red markers and text annotations for Q and t values
+plot_with_red_markers_and_text(times, heights, flow_rates)

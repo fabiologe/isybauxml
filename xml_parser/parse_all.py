@@ -7,6 +7,7 @@ def parse_all(root):
    
     
     parse_behandlungsanlage(root)
+    parse_pumpwerk(root)
     parse_becken(root)
     parse_auslaufbauwerk(root)
     parse_pumpe(root)
