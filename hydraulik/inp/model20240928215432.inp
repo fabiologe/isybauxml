@@ -1,0 +1,156 @@
+[TITLE]
+Testtry
+Fabio Q.
+2024-09-28
+
+[OPTIONS]
+flow_units           CMS
+infiltration         HORTON
+flow_routing         KINWAVE
+start_date           01/01/2007
+start_time           00:00:00
+report_start_date    01/01/2007
+report_start_time    00:00:00
+end_date             01/01/2007
+end_time             12:00:00
+sweep_start          01/01
+sweep_end            12/31
+dry_days             0
+report_step          00:01:00
+wet_step             00:01:00
+dry_step             01:00:00
+routing_step         0:01:00
+allow_ponding        NO
+inertial_damping     PARTIAL
+variable_step        0.75
+lengthening_step     0
+min_surfarea         0
+normal_flow_limited  SLOPE
+skip_steady_state    NO
+force_main_equation  H-W
+link_offsets         DEPTH
+min_slope            0
+
+[EVAPORATION]
+;;Type       Parameters
+;;---------- ----------
+CONSTANT   0.0
+
+[RAINGAGES]
+;;               Rain      Time   Snow   Data
+;;Name           Type      Intrvl Catch  Source
+;;-------------- --------- ------ ------ ----------
+RainGage        INTENSITY 0:05   1.0    TIMESERIES 5-yr 
+
+[SUBCATCHMENTS]
+;;                                                         Total        Pcnt.             Pcnt.    Curb     Snow 
+;;Name                   Raingage         Outlet           Area         Imperv   Width    Slope    Length   Pack 
+;;---------------------- ---------------- ---------------- ------------ -------- -------- -------- -------- --------
+
+[SUBAREAS]
+;;Subcatchment              N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted 
+;;------------------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+[INFILTRATION]
+;;Subcatchment         MaxRate    MinRate    Decay      DryTime    MaxInfil
+;;------------------- ---------- ---------- ---------- ---------- ----------
+
+[JUNCTIONS]
+;;               Invert     Max.       Init.      Surcharge  Ponded 
+;;Name           Elev.      Depth      Depth      Depth      Area 
+;;-------------- ---------- ---------- ---------- ---------- ----------
+K3               235.965    0          0          0          0         
+Behandlungsanlage 226.315    0          0          0          0         
+Becken1          238.246    0          0          0          0         
+Klaeranlage      229.613    0          0          0          0         
+Pumpwerk_A       235.7      0          0          0          0         
+Pumpwerk_B       235.8      0          0.1        0          0         
+
+[CONDUITS]
+;;                          Inlet                     Outlet                               Manning    Inlet      Outlet     Init.      Max.
+;;Name                      Node                      Node                      Length     N          Offset     Offset     Flow       Flow
+;;------------------------- ------------------------- ------------------------- ---------- ---------- ---------- ---------- ---------- ----------
+K3                          K3                          K4                          62.45     0.01    235.864     223.703     0           0           
+Klaeranlage                 Klaeranlage                 K4                          36.8      0.01    229.613     223.69      0           0           
+Becken1                     Becken1                     Pumpwerk                    64.0      0.01    238.246     235.7       0           0           
+Pumpwerk                    Pumpwerk_B                  Pumpwerk_A                  1.0       0.01    235.8       235.7       0           0           
+
+[XSECTIONS]
+;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels
+;;-------------- ------------ ---------------- ---------- ---------- ---------- ----------
+K3             CIRCULAR       0.3       0         0         0         1   
+Klaeranlage    CIRCULAR       0.3       0         0         0         1   
+Becken1        CIRCULAR       0.3       0         0         0         1   
+
+[PUMPS]
+;;               Inlet            Outlet                                 Start      Shut
+;;Name           Node             Node             Pcurve     Status     up         off
+;;-------------- ---------------- ---------------- ---------- ---------- ---------- ----------
+Pumpwerk        Pumpwerk_B      Pumpwerk_A      coming     ON         0          0         
+
+[OUTFALLS]
+;;               Invert     Outfall    Stage/Table      Tide
+;;Name           Elev.      Type       Time Series      Gate
+;;-------------- ---------- ---------- ---------------- ----
+K4               228.595    FREE                        NO   
+
+[TIMESERIES]
+;;Name           Date       Time       Value
+;;-------------- ---------- ---------- ----------
+3-yr                            0:00     4.16
+3-yr                            3:00     6.73
+3-yr                            6:00     2.57
+3-yr                            9:00     0.23
+3-yr                           12:00     0.01
+
+5-yr                            0:00     4.71
+5-yr                            3:00     7.61
+5-yr                            6:00     2.91
+5-yr                            9:00     0.26
+5-yr                           12:00     0.01
+
+10-yr                           0:00     5.53
+10-yr                           3:00     8.93
+10-yr                           6:00     3.42
+10-yr                           9:00     0.31
+10-yr                          12:00     0.01
+
+
+[REPORT]
+INPUT     NO           
+CONTINUITY     NO          
+FLOWSTATS     NO          
+CONTROLS     NO          
+SUBCATCHMENTS     ALL         
+NODES         ALL         
+LINKS     ALL         
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord  
+;;-------------- ------------------ ------------------
+K3               346642.165           5461995.542         
+K4               346584.998           5462017.498         
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord  
+;;-------------- ------------------ ------------------
+K3               346641.698          5461995.721         
+K3               346585.498          5462017.306         
+Klaeranlage      346616.712          5462035.18          
+Klaeranlage      346585.498          5462017.777         
+Becken1          346619.733          5461948.619         
+Becken1          346594.165          5461916.252         
+
+[Polygons]
+;;Subcatchment                    X-Coord            Y-Coord
+;;------------------------------ ------------------ ------------------
+
+[SYMBOLS]
+;;Gage           X-Coord            Y-Coord
+;;-------------- ------------------ ------------------
+RainGage        346613.5815         5462006.52          
+
+[BACKDROP]
+;;Filename          X1                 Y1                 X2                 Y2
+;;----------------- ----------------- ----------------- ----------------- -----------------
+hg_20240928215434.png 346642.165        5461995.542       346584.998        5462017.498      

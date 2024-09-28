@@ -4,15 +4,18 @@ from scipy.integrate import quad
 import pandas as pd
 
 # Function to calculate the draining times and flow rates
-def torricelli_flow(V0, H, d, C_d=0.582):
+def torricelli_flow_with_volume_reduction(V0, H, d, seepage_factor, C_d=0.582):
     # Konstanten
     g = 9.81  # Erdbeschleunigung in m/s^2
+
+    # Reduziertes Volumen aufgrund von Versickerung (V0 wird mit einem Faktor reduziert)
+    V0_reduced = V0 * (1 - seepage_factor)
 
     # Querschnittsfläche der Öffnung
     A = np.pi * (d / 2)**2
 
     # Querschnittsfläche des Zylinders
-    A_zyl = V0 / H
+    A_zyl = V0_reduced / H
 
     # Funktion zur Berechnung der Durchflussgeschwindigkeit und Zeit
     def integrand(h):
@@ -106,16 +109,18 @@ def plot_with_red_markers_and_text(times, heights, flow_rates):
 
 # Example usage
 # Set volume, height, and opening diameter
-V0 = 750  # Volume of the tank
+V0 = 500 # Volume of the tank
 H = 4.5    # Height of the tank
 d = 0.1   # Diameter of the opening
 C_d = 0.582  # Discharge coefficient for sharp-edged openings
 
-# Run the flow calculations
-times, flow_rates, volumes, heights = torricelli_flow(V0, H, d, C_d=C_d)
+seepage_factor = 0.0  # Beispiel: 10% des Volumens geht durch Versickerung verloren
+
+# Run the flow calculations with a volume reduction
+times, flow_rates, volumes, heights = torricelli_flow_with_volume_reduction(V0, H, d, seepage_factor, C_d=C_d)
 
 # Optionally save results to CSV
-csv_filename = "entleerungsdaten_1000m3_scharfkantig_582.csv"
+csv_filename = "entleerungsdaten_1000m3_scharfkantig_582_volreduktion.csv"
 save_to_csv(times, flow_rates, volumes, heights, csv_filename=csv_filename)
 
 # Plot with red markers and text annotations for Q and t values

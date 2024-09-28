@@ -896,7 +896,8 @@ class pump:
         ]
         pumps_string = []
         for pump in pumps_list:
-            # Adjusting field lengths for better alignment
+            
+
             data = f"{pump.name:<15} {pump.node1:<15} {pump.node2:<15} {pump.pcurve:<10} {pump.status:<10} {pump.startup:<10} {pump.shutoff:<10}"
             pumps_string.append(data)
     
@@ -1806,7 +1807,7 @@ def create_inp(metadata, flaechen_list, schacht_list, haltung_list, bauwerk_list
     else:
         print("No pumps in pumps_list. Skipping write_fict_junctions.")
     print(junction_list)
-    #conduit_list =pump.write_fict_conduits(pumps_list, conduit_list)
+    conduit_list =pump.write_fict_conduits(pumps_list, conduit_list)
 
     coordinate_list= pump.write_fict_coords(pumps_list, coordinate_list)
 

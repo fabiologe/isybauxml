@@ -1,11 +1,7 @@
-from surface_runoff.boundary import ModelHandler, Vertex, Polygon, RunoffSimulation
-from surface_runoff.visual import Viewer
-
-
+from simulation.scalar import Terrain
+from dgm.set_loader import STLLoader, OBJLoader
 __all__ = [
-    'ModelHandler',
-    'Vertex',
-    'Polygon',
-    'Viewer',
-    'RunoffSimulation'
+    "Terrain",
+    "STLLoader",
+    "OBJLoader"
 ]

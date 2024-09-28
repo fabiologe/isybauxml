@@ -1,0 +1,8 @@
+
+  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.2 (Build 5.2.4)
+  PYSWMM TOOLKIT API - VERSION v1.0 (2024-04-17)
+  ------------------------------------------------------------
+
+  
+  ERROR 207: duplicate ID name Pumpwerk at line 89 of [PUMP] section:
+  Pumpwerk        Pumpwerk_B      Pumpwerk_A      coming     ON         0          0         
